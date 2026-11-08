@@ -1,0 +1,334 @@
+% 先修：张量运算、Gauss--Green 与分部积分。
+\section{变分法基础：从函数的扰动到 Euler--Lagrange 方程}\label{sec:variation-foundations}
+
+课堂上所说的变分法，核心是把\textbf{整个函数或整条运动路径作为未知量}。求导时不只改变一个数，而是沿所有允许的函数方向作微小扰动。本专题按“选泛函与允许集合、算第一变分、处理边界项、识别方程、判断极值”的顺序展开。流体应用放在第~\ref{sec:variation-stokes}、\ref{sec:variation-action}~节，可在学完不可压缩方程后接着阅读。
+
+\subsection{函数、泛函与允许变分}
+
+函数 $F(x)$ 输入一个数，输出一个数；\textbf{泛函} $\mathcal J[w]$ 输入一个函数，输出一个数。例如
+\begin{equation}
+ \mathcal J[w]=\int_a^b L(x,w(x),w'(x))\dd x.
+\end{equation}
+其中 $L$ 称为被积函数或 Lagrange 密度。求极值前，必须先指定允许集合，例如
+\begin{equation}
+ \mathcal A=\{w\in H^1(a,b):w(a)=A,\ w(b)=B\}.
+\end{equation}
+这里 $H^1$ 的含义将在第~\ref{subsec:variation-spaces}~节说明。先在光滑函数中计算时，取
+\begin{equation}
+ w_\varepsilon=w+\varepsilon\eta,\qquad
+ \eta(a)=\eta(b)=0,
+\end{equation}
+其中 $\varepsilon$ 是实数参数，$\eta$ 是任意允许的扰动方向。端点值已给定，扰动就不能改变它们。若有其他约束，也必须相应限制 $\eta$，或引入乘子。
+
+\begin{definition}[第一变分与驻点]
+若方向导数存在，定义
+\begin{equation}
+ \boxed{\delta\mathcal J[w;\eta]
+ =\left.\frac{\mathrm d}{\mathrm d\varepsilon}
+ \mathcal J[w+\varepsilon\eta]\right|_{\varepsilon=0}.}
+ \label{eq:first-variation}
+\end{equation}
+若它对所有允许方向均为零，则称 $w$ 为驻点。第一变分是\textbf{关于扰动参数的一阶导数}，并非未经线性化的有限差 $\mathcal J[w+\eta]-\mathcal J[w]$。
+\end{definition}
+
+当泛函足够光滑时，
+\begin{equation}
+ \mathcal J[w+\varepsilon\eta]
+ =\mathcal J[w]+\varepsilon\delta\mathcal J[w;\eta]
+ +\frac{\varepsilon^2}{2}\delta^2\mathcal J[w;\eta,\eta]
+ +o(\varepsilon^2).
+\end{equation}
+符号 $\delta w=\eta$ 表示变分方向，$\delta w'=\eta'$；与时间导数 $\partial_tw$、物质导数 $\mathrm Dw/\mathrm Dt$ 的含义不同。对固定区域和足够光滑的函数，变分与空间、时间微分可交换。
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[>=Stealth,x=1.6cm,y=1.1cm]
+ \draw[->,gray] (-0.2,0)--(6,0) node[right] {$x$};
+ \draw[->,gray] (0,-0.2)--(0,2.4) node[above] {$w$};
+ \draw[thick,blue!70!black,domain=0:5.5,samples=80]
+  plot (\x,{0.5+0.15*\x+0.45*sin(180*\x/5.5)});
+ \draw[thick,red!70!black,dashed,domain=0:5.5,samples=80]
+  plot (\x,{0.5+0.15*\x+0.90*sin(180*\x/5.5)});
+ \fill (0,0.5) circle (1.5pt) node[left] {$A$};
+ \fill (5.5,1.325) circle (1.5pt) node[right] {$B$};
+ \node[blue!70!black] at (4.1,1.15) {$w$};
+ \node[red!70!black] at (3.2,2.15) {$w+\varepsilon\eta$};
+ \draw[<->] (2.5,1.32)--(2.5,1.76);
+ \node[left] at (2.5,1.65) {$\varepsilon\eta$};
+ \node[below] at (0,0) {$a$};
+ \node[below] at (5.5,0) {$b$};
+\end{tikzpicture}
+\caption{固定端点的允许扰动：比较的是邻近函数，端点保持不动。驻点要求所有允许方向上的第一变分均为零。}
+\end{figure}
+
+\subsection{变分基本引理：为何积分关系能推出微分方程}
+
+\begin{lemma}[变分基本引理]
+若连续函数 $F$ 满足 $\int_a^b F(x)\eta(x)\dd x=0$，对所有 $\eta\in C_c^\infty(a,b)$ 均成立，则 $F\equiv0$。若 $F$ 仅局部可积，则结论为 $F=0$ 几乎处处。
+\end{lemma}
+\begin{proof}
+对连续情形，若 $F(x_0)>0$，由连续性，它在 $x_0$ 的一个邻域中仍严格为正。取支撑在该邻域内、非负且非零的光滑 $\eta$，即有 $\int F\eta>0$，矛盾。负值情形同理。局部可积版本可由分布或光滑化论证得到，此处不展开。
+\end{proof}
+
+关键在于测试函数可以\textbf{任意局部选取}。若只有一个测试函数，积分为零通常不能推出被积函数处处为零。这与张量识别定理中“对任意向量”的条件具有相似的逻辑作用。
+
+\subsection{一维 Euler--Lagrange 方程：保留边界项逐步推导}
+
+设 $L$ 足够光滑，求导得
+\begin{align}
+ \delta\mathcal J[w;\eta]
+ &=\int_a^b(L_w\eta+L_{w'}\eta')\dd x\\
+ &=\int_a^b\left(L_w-\frac{\mathrm d}{\mathrm dx}L_{w'}\right)\eta\dd x
+ +[L_{w'}\eta]_a^b.\label{eq:variation-boundary-1d}
+\end{align}
+固定端点使 $\eta(a)=\eta(b)=0$。由基本引理，驻点必须满足
+\begin{equation}
+ \boxed{\frac{\partial L}{\partial w}
+ -\frac{\mathrm d}{\mathrm dx}\frac{\partial L}{\partial w'}=0.}
+ \label{eq:el-1d}
+\end{equation}
+若驻点足够光滑并满足端点条件，反向代入也可得到第一变分为零。这里偏导 $L_w,L_{w'}$ 将 $x,w,w'$ 暂看作独立变量；$\mathrm d/\mathrm dx$ 则沿 $w(x)$ 作全导数。
+
+\begin{example}[最短图线与驻点的几何意义]
+连接固定端点的图线长度为 $\mathcal J[w]=\int_a^b\sqrt{1+(w')^2}\dd x$。因 $L_w=0$，
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dx}\frac{w'}{\sqrt{1+(w')^2}}=0,
+\end{equation}
+故 $w'$ 为常数，驻点为连接端点的直线。其确为全局最短，还可用向量积分的三角不等式证明：$\int_a^b|(1,w')|\dd x\ge|(b-a,B-A)|$。求出 Euler--Lagrange 方程只是得到驻点；极小性需要另作论证。
+\end{example}
+
+\subsection{自然边界条件与边界能量}
+
+若只固定 $w(a)$，而 $w(b)$ 可自由变化，则 $\eta(a)=0$、$\eta(b)$ 任意。式 \eqref{eq:variation-boundary-1d} 除内部方程外还要求
+\begin{equation}
+ L_{w'}(b,w(b),w'(b))=0.
+\end{equation}
+这称为自然边界条件。若泛函另含端点能量 $\Psi(w(b))$，则条件改为
+\begin{equation}
+ L_{w'}(b)+\Psi'(w(b))=0.
+\end{equation}
+例如 $\mathcal J[w]=\int_a^b\frac{k}{2}(w')^2\dd x-F_bw(b)$ 给出右端 $kw'(b)=F_b$。如果左端也自由，它的边界项带负号，应分别检查两端，不能忽略外法向方向。
+
+\begin{keypoint}
+\textbf{本质边界条件}直接写入允许集合；\textbf{自然边界条件}由自由边界上的第一变分推出。固定端点与自由端点对应的变分空间不同，因而不能在未说明边界类型时直接丢掉分部积分的边界项。本节端点的横坐标 $a,b$ 固定；端点位置也可移动时还需横截条件。
+\end{keypoint}
+
+\subsection{多分量与多维场的 Euler--Lagrange 方程}
+
+对向量未知量 $\vct w=(w_1,\ldots,w_m)$，设
+\begin{equation}
+ \mathcal J[\vct w]=\int_\Omega L(\vct x,\vct w,\nabla\vct w)\dd V,
+ \qquad P_{aj}=\frac{\partial L}{\partial(\partial_{x_j}w_a)}.
+\end{equation}
+逐分量变分和分部积分给出
+\begin{equation}
+ \delta\mathcal J
+ =\int_\Omega(L_{w_a}-\partial_{x_j}P_{aj})\eta_a\dd V
+ +\int_{\partial\Omega}P_{aj}n_j\eta_a\dd A.
+\end{equation}
+于是内部方程为
+\begin{equation}
+ \boxed{L_{w_a}-\partial_{x_j}
+ \frac{\partial L}{\partial(\partial_{x_j}w_a)}=0,
+ \qquad a=1,\ldots,m.}\label{eq:el-field}
+\end{equation}
+标量情形就是 $L_w-\nabla\cdot L_{\nabla w}=0$。自由边界上的 $\ten P\vct n$ 对应边界通量或力；这与流体中 $\ten\sigma\vct n$ 的牵引形式一致。
+
+若泛函含二阶导数，变分时需要分部积分两次。例如
+\begin{equation}
+ \mathcal J[w]=\int_a^b L(x,w,w',w'')\dd x
+\end{equation}
+的内部方程为 $L_w-\frac{\mathrm d}{\mathrm dx}L_{w'}+\frac{\mathrm d^2}{\mathrm dx^2}L_{w''}=0$，边界项为
+\begin{equation}
+ \left[\left(L_{w'}-\frac{\mathrm d}{\mathrm dx}L_{w''}\right)\eta
+ +L_{w''}\eta'\right]_a^b.
+\end{equation}
+这解释了弯曲能、梯度能等模型为何产生更高阶方程与更多边界条件。
+
+\subsection{第一积分：没有显含变量时怎样简化}
+
+若 $L$ 不显含 $w$，则 $L_{w'}$ 沿驻点为常数。若 $L$ 不显含 $x$，则由乘积法则和 \eqref{eq:el-1d}，
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dx}(L-w'L_{w'})=L_x=0.
+\end{equation}
+因此 $L-w'L_{w'}$ 为常数，称为 Beltrami 恒等式。若独立变量是时间、$L=T-V$，则 $\dot q L_{\dot q}-L$ 对应机械能。\textbf{没有显含 $x$}并不是 $w'=0$，也不意味着沿解有 $\mathrm dL/\mathrm dx=0$。
+
+\subsection{第二变分：驻点、极小值与凸性}
+
+对一维一阶泛函，第二变分为
+\begin{equation}
+ \delta^2\mathcal J[w;\eta,\eta]
+ =\int_a^b\left(L_{ww}\eta^2
+ +2L_{ww'}\eta\eta'+L_{w'w'}(\eta')^2\right)\dd x.
+\end{equation}
+在允许双向扰动的极小点，第一变分必为零、第二变分必非负；这些通常只是必要条件。无限维空间中，充分性需要与所用范数、邻域和余项控制相配合，不能只套用有限维的“每个方向严格为正”。
+
+对于二次泛函 $\mathcal J[w]=\frac12a(w,w)-\ell(w)$，若 $a$ 对称且在变分空间上正定，则驻点 $w_*$ 满足
+\begin{equation}
+ \mathcal J[w_*+\eta]-\mathcal J[w_*]=\frac12a(\eta,\eta).
+ \label{eq:quadratic-energy-gap}
+\end{equation}
+这直接证明唯一全局极小性；若还有 $a(\eta,\eta)\ge\alpha\|\eta\|^2$，就能控制误差的大小。
+
+\begin{example}[Euler--Lagrange 方程的解也可能是鞍点]
+在 $[0,1]$ 上取齐次端点，令
+\begin{equation}
+ \mathcal J[w]=\frac12\int_0^1[(w')^2-cw^2]\dd x.
+\end{equation}
+$w=0$ 是驻点。对 $\eta_n=\sin(n\pi x)$，
+\begin{equation}
+ \delta^2\mathcal J[0;\eta_n,\eta_n]
+ =\frac{n^2\pi^2-c}{2}.
+\end{equation}
+当 $\pi^2<c<4\pi^2$ 时，第一个方向为负，第二个方向为正，因此这是鞍点。不能把“驻作用量”一概解释为“最小作用量”。
+\end{example}
+
+\subsection{约束变分与 Lagrange 乘子}
+
+若要求 $\mathcal C[w]=M$，直接变分必须沿约束集合的切方向，即 $\delta\mathcal C[w;\eta]=0$。在约束微分满足适当非退化条件时，可以引入常数乘子 $\lambda$，求
+\begin{equation}
+ \delta_w\{\mathcal J[w]-\lambda(\mathcal C[w]-M)\}=0,
+ \qquad \mathcal C[w]=M.
+\end{equation}
+一个整体积分约束通常对应一个常数乘子；每个空间点上的约束对应一个\textbf{乘子场}。不可压缩约束 $\nabla\cdot\vct u=0$ 的乘子就是压力场，第~\ref{subsec:stokes-pressure}~节将完整推导。
+
+\begin{example}[固定总量的最小梯度能]
+在 $w(0)=w(1)=0$ 及 $\int_0^1w\dd x=M$ 下，使 $\frac12\int_0^1(w')^2\dd x$ 极小。取
+\begin{equation}
+ \mathcal L[w,\lambda]=\frac12\int_0^1(w')^2\dd x
+ -\lambda\left(\int_0^1w\dd x-M\right).
+\end{equation}
+变分得 $-w''=\lambda$，故 $w=\lambda x(1-x)/2$。由积分约束得到 $\lambda=12M$，从而 $w=6Mx(1-x)$。极小性来自 \eqref{eq:quadratic-energy-gap}，其中扰动还满足 $\int\eta=0$。后面的定流量 Poiseuille 问题正是这一结构的有量纲版本。
+\end{example}
+
+\section{变分法与偏微分方程：边界条件、弱形式及近似}\label{sec:variation-weak}
+
+\subsection{Poisson 型方程：由能量推出方程和边界条件}
+
+设 $\partial\Omega=\overline{\Gamma_D}\cup\overline{\Gamma_N}$，两部分内部不交。取对称正定系数 $\ten K(\vct x)$、$c(\vct x)\ge0$，考虑
+\begin{equation}
+ \mathcal J[w]=\int_\Omega\left[
+ \frac12\nabla w\cdot\ten K\nabla w+\frac c2w^2-sw\right]\dd V
+ -\int_{\Gamma_N}h w\dd A,
+ \qquad w|_{\Gamma_D}=g_D.
+ \label{eq:poisson-functional}
+\end{equation}
+扰动只要求 $\eta|_{\Gamma_D}=0$，在 $\Gamma_N$ 上自由。因此
+\begin{align}
+ \delta\mathcal J[w;\eta]
+ &=\int_\Omega[(\ten K\nabla w)\cdot\nabla\eta+cw\eta-s\eta]\dd V
+ -\int_{\Gamma_N}h\eta\dd A\label{eq:poisson-weak}\\
+ &=\int_\Omega[-\nabla\cdot(\ten K\nabla w)+cw-s]\eta\dd V
+ +\int_{\Gamma_N}(\ten K\nabla w\cdot\vct n-h)\eta\dd A.
+\end{align}
+由内部、边界扰动的独立性得到
+\begin{equation}
+ \boxed{\begin{aligned}
+ -\nabla\cdot(\ten K\nabla w)+cw&=s&&\text{在 }\Omega,\\
+ w&=g_D&&\text{在 }\Gamma_D,\\
+ \ten K\nabla w\cdot\vct n&=h&&\text{在 }\Gamma_N.
+ \end{aligned}}\label{eq:poisson-strong}
+\end{equation}
+自然边界条件并非总是零通量：它由所选边界负载项确定。若 $w=T$ 且 $\vct q=-\ten K\nabla T$，这里 $h$ 对应 $-\vct q\cdot\vct n$，必须区分梯度通量与向外热流的符号。
+
+Robin 条件也可以来自边界能。把 $\int_{\Gamma_N}(\alpha w^2/2-hw)\dd A$ 加入体积泛函，便有
+\begin{equation}
+ \ten K\nabla w\cdot\vct n+\alpha w=h.
+\end{equation}
+这可描述边界与环境之间的线性交换。
+
+\subsection{允许函数与测试函数：为什么要引入 Sobolev 空间}\label{subsec:variation-spaces}
+
+只要 $w$ 和一阶弱导数平方可积，梯度能就有意义。这引出
+\begin{equation}
+ H^1(\Omega)=\{w\in L^2(\Omega):\partial_{x_i}w\in L^2(\Omega)\},
+ \quad \|w\|_{H^1}^2=\int_\Omega(w^2+|\nabla w|^2)\dd V.
+\end{equation}
+弱导数通过 $\int w\partial_i\eta=-\int(\partial_iw)\eta$ 对紧支撑光滑 $\eta$ 定义，不要求经典逐点导数。对 Lipschitz 区域，可以用迹解释 $H^1$ 函数的边界值。令
+\begin{equation}
+ V=\{\eta\in H^1(\Omega):\eta|_{\Gamma_D}=0\},\qquad
+ \mathcal A=g_D^{\mathrm{ext}}+V,
+\end{equation}
+其中 $g_D^{\mathrm{ext}}$ 是指定边界数据的一个 $H^1$ 延拓，假定该延拓存在。\textbf{试探函数} $w$ 满足原来的非齐次边界条件；\textbf{测试函数} $\eta$ 满足对应齐次条件。二者不必属于同一个集合。
+
+\subsection{强形式、弱形式与极小化何时等价}
+
+取
+\begin{align}
+ a(w,\eta)&=\int_\Omega[(\ten K\nabla w)\cdot\nabla\eta+cw\eta]\dd V,\\
+ \ell(\eta)&=\int_\Omega s\eta\dd V+\int_{\Gamma_N}h\eta\dd A.
+\end{align}
+弱形式是：求 $w\in\mathcal A$ 使
+\begin{equation}
+ \boxed{a(w,\eta)=\ell(\eta)\quad\text{对所有 }\eta\in V.}
+ \label{eq:weak-abstract}
+\end{equation}
+它只涉及一阶导数，弱于强形式中二阶导数的要求。对称性使它等价于 $\mathcal J$ 的驻点条件；若 $a$ 在 $V$ 上正定，则也是唯一极小化条件。光滑强解必满足弱形式；弱解若具有足够正则性，再分部积分可恢复强方程与自然边界条件。
+
+\begin{warningbox}
+弱形式或“变分形式”并不自动意味着存在一个可极小化的标量能量。对流项、非对称算子、速度--压力混合系统通常仍有弱形式，但不能直接套用正定二次能量极小化。求方程的弱解、求泛函驻点和求泛函极小点是三个需要分别核实的命题。
+\end{warningbox}
+
+\subsection{存在性、唯一性与纯 Neumann 问题}
+
+若 $\Omega$ 有界、连通且为 Lipschitz 区域，$\Gamma_D$ 有正的边界测度，$\ten K$ 有界且一致正定，$c\ge0$ 有界，负载在 $V$ 上连续，则 Poincar\'e 不等式与正定性给出
+\begin{equation}
+ a(\eta,\eta)\ge\alpha\|\eta\|_{H^1}^2,
+ \qquad |a(w,\eta)|\le C\|w\|_{H^1}\|\eta\|_{H^1}.
+\end{equation}
+作边界提升后，Lax--Milgram 定理保证唯一弱解；对称性又使其为唯一能量极小点。另一条路线是直接法：下界与强制性控制极小化序列，弱紧性提取子列，弱下半连续性保证极限取得极小值。上述函数分析定理作为已有工具使用，本节不证明一般版本。
+
+若 $c=0$ 且边界全为 Neumann，常数方向没有梯度能，必须满足兼容条件
+\begin{equation}
+ \int_\Omega s\dd V+\int_{\partial\Omega}h\dd A=0.
+\end{equation}
+此时解只确定到加法常数；在连通区域可加 $\int_\Omega w\dd V=0$ 固定常数。这个条件既可由强方程积分得到，也可在弱形式中取测试函数 $1$ 得到。
+
+\subsection{Rayleigh--Ritz 方法：把函数极值转成有限维极值}
+
+选取满足齐次本质边界条件的基函数 $\phi_1,\ldots,\phi_N$，令
+\begin{equation}
+ w_N=g_D^{\mathrm{ext}}+\sum_{j=1}^Na_j\phi_j.
+\end{equation}
+对每个系数求导，得到
+\begin{equation}
+ \sum_{j=1}^NK_{ij}a_j=F_i,\qquad
+ K_{ij}=a(\phi_j,\phi_i),\quad
+ F_i=\ell(\phi_i)-a(g_D^{\mathrm{ext}},\phi_i).
+\end{equation}
+这与取 $\phi_i$ 为测试函数的 Galerkin 方程相同。有限元法选择具有局部支撑的分片多项式基，因而得到稀疏矩阵。
+
+\begin{example}[一个可手算的 Ritz 近似]
+求 $-w''=x$，$w(0)=w(1)=0$。相应能量为
+\begin{equation}
+ \mathcal J[w]=\int_0^1\left[\frac12(w')^2-xw\right]\dd x.
+\end{equation}
+只用一个试探函数 $w_a=a x(1-x)$，因 $\int_0^1(1-2x)^2\dd x=1/3$、$\int_0^1x^2(1-x)\dd x=1/12$，
+\begin{equation}
+ \mathcal J[w_a]=\frac{a^2}{6}-\frac a{12},\qquad
+ \frac{\mathrm d}{\mathrm da}\mathcal J[w_a]=\frac a3-\frac1{12}=0.
+\end{equation}
+故 $w_R=x(1-x)/4$。精确解为 $w_*=(x-x^3)/6$，两者不同；能量分别为 $\mathcal J[w_R]=-1/96$、$\mathcal J[w_*]=-1/90$。近似是在选定子空间内极小，不能据此宣称已经满足原方程的每一点。
+\end{example}
+
+令 $\|v\|_a^2=a(v,v)$。对称正定情形有 Galerkin 正交性
+\begin{equation}
+ a(w-w_N,\eta_N)=0\quad(\eta_N\in V_N),
+\end{equation}
+并由勾股分解得 $\|w-w_N\|_a\le\|w-v_N\|_a$，对任意 $v_N\in g_D^{\mathrm{ext}}+V_N$ 成立。这说明 Ritz 解在能量范数中具有最佳逼近性质。
+
+\subsection{演化方程也能用变分：梯度流与时间离散}
+
+对齐次 Dirichlet 边界取 $\mathcal E[w]=\frac\kappa2\int|\nabla w|^2\dd V$。其 $L^2$ 梯度为 $-\kappa\Delta w$，形式上的梯度下降给出热方程
+\begin{equation}
+ w_t=-\frac{\delta\mathcal E}{\delta w}=\kappa\Delta w,
+ \qquad \frac{\mathrm d}{\mathrm dt}\mathcal E[w(t)]
+ =-\int_\Omega|w_t|^2\dd V.
+\end{equation}
+这要求足够正则性与相应边界条件；$L^2$ 梯度的具体形式依赖选用的内积，不能只写“负变分导数”而省略度量。
+
+在每个时间步极小化
+\begin{equation}
+ \frac1{2\Delta t}\|w-w^n\|_{L^2}^2+\mathcal E[w]
+\end{equation}
+得到 $(w^{n+1}-w^n)/\Delta t=\kappa\Delta w^{n+1}$，即隐式 Euler 格式。时间推进可以通过一系列极小化问题实现，但这与保守系统的 Hamilton 驻作用量原理具有不同结构。

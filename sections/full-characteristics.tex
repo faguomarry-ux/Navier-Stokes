@@ -1,0 +1,390 @@
+\section{方程逐条推导之后：矩阵、特征值与熵对称化}\label{sec:full-characteristics}
+
+前面已经分别说明了每一条守恒律、本构与熵平衡。现在把它们整理成矩阵，目的是分析波速、变量转换和黏性衰减。先计算一维完整可压缩 Euler 的三个波族，再解释三维方向特征值。\textbf{一维完整系统的三个变量不能与等熵两变量系统混淆。}
+
+\subsection{先展开三条一维方程，再读出原始变量矩阵}
+
+取无源、光滑 Euler 流。先用 $\rho,u,p$ 三个变量逐式写出
+\begin{align}
+ \rho_t+u\rho_x+\rho u_x&=0,\label{eq:primitive-rho-characteristic}\\
+ u_t+u u_x+\frac1\rho p_x&=0,\label{eq:primitive-u-characteristic}\\
+ p_t+u p_x+\rho c^2u_x&=0,\label{eq:primitive-p-characteristic}
+\end{align}
+其中压力式来自 $p=p(\rho,s)$、$\mathrm Ds/\mathrm Dt=0$，并非额外假设全场等熵。理想气体 $\rho c^2=\gamma p$。此时才定义状态列向量 $W=(\rho,u,p)^{\mathsf T}$，由三行中 $\rho_x,u_x,p_x$ 的系数读得
+\begin{equation}
+ W_t+A_WW_x=0,\qquad
+ A_W=\begin{pmatrix}
+ u&\rho&0\\0&u&1/\rho\\0&\rho c^2&u
+ \end{pmatrix}.\label{eq:primitive-euler-matrix}
+\end{equation}
+第一行的 $\rho$ 来自质量压缩项，第二行的 $1/\rho$ 来自压力梯度，第三行的 $\rho c^2$ 来自热力学压缩响应。矩阵并没有产生新方程，只是依次记录原来的三个标量关系。
+
+\subsection{特征多项式与特征向量：把计算过程写出来}
+
+用 $\ell$ 表示待求特征值，避免与第二黏度系数 $\lambda$ 混淆。沿第一列展开：
+\begin{align}
+ \det(A_W-\ell I)
+ &=(u-\ell)\det\begin{pmatrix}u-\ell&1/\rho\\\rho c^2&u-\ell\end{pmatrix}\\
+ &=(u-\ell)[(u-\ell)^2-c^2].
+\end{align}
+所以
+\begin{equation}
+ \boxed{\ell_-=u-c,\qquad\ell_0=u,\qquad\ell_+=u+c.}
+ \label{eq:full-euler-eigenvalues}
+\end{equation}
+若 $\rho>0,c>0$，它们实且互异，一维系统严格双曲。若到真空或失去热力学稳定性，不能直接沿用这一结论。
+
+令特征向量为 $r=(r_\rho,r_u,r_p)^{\mathsf T}$，逐行解 $(A_W-\ell I)r=0$：
+\begin{equation}
+ (u-\ell)r_\rho+\rho r_u=0,\quad
+ (u-\ell)r_u+r_p/\rho=0,\quad
+ \rho c^2r_u+(u-\ell)r_p=0.
+\end{equation}
+对声学根 $u\pm c$，取 $r_\rho=1$，得到 $r_u=\pm c/\rho$、$r_p=c^2$。对中间根 $u$，得到 $r_u=r_p=0$，密度扰动可以非零。因此
+\begin{equation}
+ r_-^W=\begin{pmatrix}1\\-c/\rho\\c^2\end{pmatrix},\qquad
+ r_0^W=\begin{pmatrix}1\\0\\0\end{pmatrix},\qquad
+ r_+^W=\begin{pmatrix}1\\c/\rho\\c^2\end{pmatrix}.
+\end{equation}
+声学波同时改变密度、速度和压强；接触/熵波保持速度与压强连续，却允许密度与熵变化。这也是完整系统比全场等熵系统多出一个波族的原因。
+
+把三个向量作为列组成 $R_W$，其逆矩阵的三行为
+\begin{equation}
+ R_W^{-1}=\begin{pmatrix}
+ 0&-\rho/(2c)&1/(2c^2)\\
+ 1&0&-1/c^2\\
+ 0&\rho/(2c)&1/(2c^2)
+ \end{pmatrix}.
+\end{equation}
+故 $R_W^{-1}A_WR_W=\operatorname{diag}(u-c,u,u+c)$。这些行同时给出任意小扰动的波族分解：
+\begin{equation}
+ \alpha_\pm=\frac12\left(\frac{\delta p}{c^2}\pm\frac{\rho\delta u}{c}\right),
+ \qquad\alpha_0=\delta\rho-\frac{\delta p}{c^2}.
+\end{equation}
+
+\subsection{什么时候矩阵可以真正化成独立输运方程}
+
+在\textbf{均匀常态} $W_*$ 附近线性化，$A_*=A_W(W_*)$、$R_*=R_W(W_*)$ 均为常数。令 $\alpha=R_*^{-1}\delta W$，便有
+\begin{equation}
+ (\alpha_-)_t+(u_*-c_*)(\alpha_-)_x=0,\quad
+ (\alpha_0)_t+u_*(\alpha_0)_x=0,\quad
+ (\alpha_+)_t+(u_*+c_*)(\alpha_+)_x=0.
+\end{equation}
+这时才是三个彼此独立的线性输运方程。对一般非均匀非线性解，$R_W$ 随状态变化，直接对 $R_W^{-1}(W)W$ 求导会产生额外项，不能因为每一点可对角化就宣称原系统已经全局解耦。
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[>=Stealth,scale=0.85]
+ \begin{scope}
+  \draw[->,gray] (-2.5,0)--(3.3,0) node[right] {$x$};
+  \draw[->,gray] (0,-0.2)--(0,3.4) node[above] {$t$};
+  \draw[thick,blue!70!black] (0,0)--(-2.2,2.6) node[above] {$u_*-c_*$};
+  \draw[thick,dashed] (0,0)--(.5,2.6) node[above] {$u_*$};
+  \draw[thick,red!70!black] (0,0)--(2.8,2.6) node[above] {$u_*+c_*$};
+  \node at (.3,-.7) {空间坐标：接触波随粒子移动};
+ \end{scope}
+ \begin{scope}[xshift=8cm]
+  \draw[->,gray] (-2.7,0)--(2.9,0) node[right] {$m$};
+  \draw[->,gray] (0,-0.2)--(0,3.4) node[above] {$t$};
+  \draw[thick,blue!70!black] (0,0)--(-2,2.6) node[above] {$-\rho_*c_*$};
+  \draw[thick,dashed] (0,0)--(0,2.6) node[above right] {$0$};
+  \draw[thick,red!70!black] (0,0)--(2,2.6) node[above] {$\rho_*c_*$};
+  \node at (0,-.7) {质量坐标：粒子标号保持不变};
+ \end{scope}
+\end{tikzpicture}
+\caption{均匀态附近的三个线性特征族，图形仅示意方向。质量坐标的横轴单位不同，不能与空间坐标直接比较斜率；其速度换算在下文推导。}
+\end{figure}
+
+\subsection{守恒变量与通量 Jacobian：从每个偏导算起}
+
+对于理想气体，前面推导的三个一维守恒式分别是
+\begin{equation}
+ \rho_t+(\rho u)_x=0,\qquad
+ (\rho u)_t+(\rho u^2+p)_x=0,\qquad
+ (\rho E)_t+[(\rho E+p)u]_x=0.
+\end{equation}
+现在定义 $U=(\rho,M,\mathcal E)^{\mathsf T}$，其中 $M=\rho u$ 是\textbf{动量密度}，$\mathcal E=\rho E$ 是\textbf{总能量密度}。大写 $M$ 与质量坐标 $m$ 不同。通量与闭合为
+\begin{equation}
+ F(U)=\begin{pmatrix}M\\M^2/\rho+p\\(\mathcal E+p)M/\rho\end{pmatrix},
+ \qquad p=(\gamma-1)\left(\mathcal E-\frac{M^2}{2\rho}\right).
+\end{equation}
+先计算压力的三个偏导，保持另外两个守恒变量不变：
+\begin{equation}
+ p_\rho=(\gamma-1)\frac{u^2}{2},\qquad
+ p_M=-(\gamma-1)u,\qquad p_{\mathcal E}=\gamma-1.
+\end{equation}
+第一行通量 $M$ 直接给出 $(0,1,0)$。第二行依次给出
+\begin{equation}
+ \partial_\rho F_2=-u^2+p_\rho=\frac{\gamma-3}{2}u^2,\quad
+ \partial_MF_2=2u+p_M=(3-\gamma)u,\quad
+ \partial_{\mathcal E}F_2=\gamma-1.
+\end{equation}
+令 $H=(\mathcal E+p)/\rho$，第三行 $F_3=(\mathcal E+p)u$ 给出
+\begin{align}
+ \partial_\rho F_3&=u p_\rho-uH
+ =u\left(\frac{\gamma-1}{2}u^2-H\right),\\
+ \partial_MF_3&=H+u p_M=H-(\gamma-1)u^2,\\
+ \partial_{\mathcal E}F_3&=u(1+p_{\mathcal E})=\gamma u.
+\end{align}
+因此明确的通量 Jacobian 为
+\begin{equation}
+ A_U=\frac{\partial F}{\partial U}
+ =\begin{pmatrix}
+ 0&1&0\\
+ \frac{\gamma-3}{2}u^2&(3-\gamma)u&\gamma-1\\
+ u(\frac{\gamma-1}{2}u^2-H)&H-(\gamma-1)u^2&\gamma u
+ \end{pmatrix}.\label{eq:conservative-euler-jacobian}
+\end{equation}
+光滑解可写成 $U_t+A_U(U)U_x=0$。有间断时，$A_UU_x$ 的非保守乘积通常不能替代 $\partial_xF(U)$；跳跃条件必须由守恒形式确定。
+
+\subsection{原始与守恒矩阵为什么有同一组特征值}
+
+由 $\mathcal E=p/(\gamma-1)+\rho u^2/2$，变量变换的 Jacobian 是
+\begin{equation}
+ B=\frac{\partial U}{\partial W}
+ =\begin{pmatrix}1&0&0\\u&\rho&0\\u^2/2&\rho u&1/(\gamma-1)\end{pmatrix},
+ \qquad\det B=\frac\rho{\gamma-1}>0.
+\end{equation}
+链式法则给出 $U_t=BW_t$、$U_x=BW_x$，故
+\begin{equation}
+ A_U=BA_WB^{-1}.
+\end{equation}
+于是
+\begin{equation}
+ \det(A_U-\ell I)=(u-\ell)[(u-\ell)^2-c^2].
+\end{equation}
+无需对复杂的 $3\times3$ 行列式重复盲目展开；相似变换已严格说明其特征值仍是 $u-c,u,u+c$。对应守恒变量的右特征向量由 $r^U=Br^W$ 得到
+\begin{equation}
+ r_-^U=\begin{pmatrix}1\\u-c\\H-uc\end{pmatrix},\quad
+ r_0^U=\begin{pmatrix}1\\u\\u^2/2\end{pmatrix},\quad
+ r_+^U=\begin{pmatrix}1\\u+c\\H+uc\end{pmatrix}.
+\end{equation}
+代入 $A_Ur^U=\ell r^U$ 可逐列核对。此处特征向量允许乘任意非零常数；比较不同教材时须同时比较变量顺序和归一化。
+
+\subsection{熵变量作状态：中间波为什么称作熵波}
+
+取 $Z=(\rho,u,s)^{\mathsf T}$。先写 $p_x=c^2\rho_x+p_s s_x$，三条方程为
+\begin{equation}
+ \rho_t+u\rho_x+\rho u_x=0,\quad
+ u_t+u u_x+\frac{c^2}{\rho}\rho_x+\frac{p_s}{\rho}s_x=0,\quad
+ s_t+u s_x=0.
+\end{equation}
+读出矩阵并计算特征多项式：
+\begin{equation}
+ A_Z=\begin{pmatrix}u&\rho&0\\c^2/\rho&u&p_s/\rho\\0&0&u\end{pmatrix},
+ \quad\det(A_Z-\ell I)=(u-\ell)[(u-\ell)^2-c^2].
+\end{equation}
+对 $\ell=u\pm c$，第三行要求 $\delta s=0$，所以小振幅声学扰动是等熵的。对 $\ell=u$，前两行要求 $\delta u=0$、$c^2\delta\rho+p_s\delta s=\delta p=0$，这就是熵与密度可变的接触波。
+
+如果进一步假定\textbf{全场同一个恒熵值}，只剩 $\rho,u$ 两个未知量，矩阵变为
+\begin{equation}
+ \begin{pmatrix}u&\rho\\c^2/\rho&u\end{pmatrix},
+ \qquad\ell=u\pm c.
+\end{equation}
+此时确实没有中间熵波；这是模型减少了一个自由度，而不是三变量完整系统的中间特征值被计算遗漏。
+
+对一维光滑全场等熵理想气体，还可以得到 Riemann 不变量
+\begin{equation}
+ J_\pm=u\pm\frac{2c}{\gamma-1},\qquad
+ (\partial_t+(u\pm c)\partial_x)J_\pm=0.
+\end{equation}
+推导用 $c_t+uc_x=-(\gamma-1)cu_x/2$ 和 $u_t+uu_x=-2cc_x/(\gamma-1)$，相加即得。此结论要求全场等熵闭合，不应无条件用于有熵梯度或激波的完整 Euler 流。
+
+\subsection{质量坐标的特征值与空间声速的换算}
+
+前面逐式得到 $v_t-u_m=0$、$u_t+p_m=0$、$s_t=0$。取 $p=p(v,s)$，展开动量式为 $u_t+p_vv_m+p_s^{(v)}s_m=0$，其中 $p_v$ 固定 $s$，$p_s^{(v)}$ 固定 $v$。现在才能读出
+\begin{equation}
+ A_L=\begin{pmatrix}0&-1&0\\p_v&0&p_s^{(v)}\\0&0&0\end{pmatrix},
+ \qquad\det(A_L-\ell I)=-\ell(\ell^2+p_v).
+\end{equation}
+因为 $\rho=1/v$，
+\begin{equation}
+ p_v=\left(\frac{\partial p}{\partial\rho}\right)_s\frac{\mathrm d\rho}{\mathrm dv}
+ =-\frac{c^2}{v^2}=-\rho^2c^2,
+\end{equation}
+所以质量坐标的三个特征速度为
+\begin{equation}
+ \boxed{\ell_-^L=-\rho c,\qquad\ell_0^L=0,\qquad\ell_+^L=\rho c.}
+ \label{eq:lagrangian-eigenvalues}
+\end{equation}
+声学特征向量可取 $(1,-\ell_\pm^L,0)^{\mathsf T}$，中间向量可取 $(-p_s^{(v)}/p_v,0,1)^{\mathsf T}$。对一般参考标号 $X$ 而非质量坐标 $m$，还要使用该标号的尺度，不能直接照抄这三个数。
+
+沿质量坐标特征曲线 $m=m(t)$，在物理空间中
+\begin{equation}
+ \frac{\mathrm dx}{\mathrm dt}=x_t+x_m\frac{\mathrm dm}{\mathrm dt}
+ =u+v\ell^L.
+\end{equation}
+因此分别恢复 $u-c,u,u+c$。特别是零速度只表示熵波与同一批粒子标号一起运动，绝不是它在实验室空间中静止。
+
+\subsection{三维方向矩阵：五条方程对应哪些波}
+
+取单位方向 $n$，将速度分成法向 $u_n=u\cdot n$ 和两个切向分量 $u_{t_1},u_{t_2}$。只考察该方向的主部，令 $\partial_\xi=n\cdot\nabla$，先展开为
+\begin{align}
+ \rho_t+u_n\rho_\xi+\rho(u_n)_\xi&=0,\\
+ (u_n)_t+u_n(u_n)_\xi+p_\xi/\rho&=0,\\
+ (u_{t_a})_t+u_n(u_{t_a})_\xi&=0,\qquad a=1,2,\\
+ p_t+u_np_\xi+\rho c^2(u_n)_\xi&=0.
+\end{align}
+按 $(\rho,u_n,u_{t_1},u_{t_2},p)$ 排列，系数矩阵为
+\begin{equation}
+ A_n=\begin{pmatrix}
+ u_n&\rho&0&0&0\\
+ 0&u_n&0&0&1/\rho\\
+ 0&0&u_n&0&0\\
+ 0&0&0&u_n&0\\
+ 0&\rho c^2&0&0&u_n
+ \end{pmatrix}.
+\end{equation}
+其特征多项式为 $(u_n-\ell)^3[(u_n-\ell)^2-c^2]$，所以
+\begin{equation}
+ \ell=u_n-c,\quad u_n\ (\text{三重}),\quad u_n+c.
+\end{equation}
+三重中间波分别对应一个接触/熵模态与两个切向剪切模态；后者并非黏性剪切扩散，而是无黏方程中的切向速度输运。在 $\rho,c>0$ 时有五个线性无关特征向量，系统双曲，但因重根\textbf{不是严格双曲}。一般 $d$ 维有 $d+2$ 个波，中间根 $u_n$ 的重数为 $d$。
+
+\subsection{凸数学熵与熵变量：从微分推导对称结构}
+
+回到一维理想气体的守恒变量 $U=(\rho,M,\mathcal E)$。取物理比熵式 \eqref{eq:physical-entropy-reference}，令 $\eta(U)=-\rho s$。由 Gibbs 关系及 $\mathcal E=\rho(e+u^2/2)$ 得
+\begin{equation}
+ \dd\mathcal E=(e+u^2/2)\dd\rho+\rho\dd e+\rho u\dd u,
+ \quad\dd M=u\dd\rho+\rho\dd u.
+\end{equation}
+代入 $\dd\eta=-s\dd\rho-\rho\dd s$，逐项收集 $\dd\rho,\dd M,\dd\mathcal E$：
+\begin{equation}
+ \dd\eta=\left(\frac{h-u^2/2}{T}-s\right)\dd\rho
+ +\frac uT\dd M-\frac1T\dd\mathcal E.
+\end{equation}
+所以熵变量为
+\begin{equation}
+ \boxed{\vct z=\nabla_U\eta
+ =\begin{pmatrix}(h-u^2/2)/T-s\\u/T\\-1/T\end{pmatrix}.}
+ \label{eq:physical-entropy-variables}
+\end{equation}
+对量热完全理想气体 $h=c_pT$，第一分量即 $c_p-s-u^2/(2T)$。不同文献若对熵除以 $c_v$ 或 $\gamma-1$，整个熵变量也会随归一化改变，不能只逐项比较数值。
+
+下面直接验证凸性，不省略成一句“熵天然凸”。令 $\mathcal H=\nabla_U^2\eta$，对任意守恒变量扰动，使用对应的 $\delta\rho,\delta u,\delta T$，由 $\delta\vct z\cdot\delta U$ 算得
+\begin{equation}
+ \boxed{\delta U^{\mathsf T}\mathcal H\delta U
+ =\frac R\rho(\delta\rho)^2+\frac\rho T(\delta u)^2
+ +\frac{\rho c_v}{T^2}(\delta T)^2>0\quad(\delta U\ne0).}
+ \label{eq:entropy-hessian-positive}
+\end{equation}
+其中交叉项相消，且 $U\leftrightarrow(\rho,u,T)$ 在 $\rho,T,c_v>0$ 时可逆。因此 $\eta$ 在物理正状态域上严格凸。这一 Hessian 是对\textbf{守恒变量}求导的结果，不是直接对 $-\rho s(\rho,T)$ 在原始变量中计算 Hessian。
+
+无黏熵通量为 $\psi_\eta=-\rho su$，光滑链式法则给出熵对相容关系 $(\nabla_U\psi_\eta)^{\mathsf T}=\vct z^{\mathsf T}A_U$。对它再次求导，$\sum_i z_i\nabla_U^2F_i$ 自身对称，故剩余部分也对称，即
+\begin{equation}
+ \mathcal H A_U=A_U^{\mathsf T}\mathcal H.
+\end{equation}
+由于 $\mathcal H>0$，矩阵 $\mathcal H^{1/2}A_U\mathcal H^{-1/2}$ 对称，说明 Euler 主部可对称化。以熵变量作未知量时，
+\begin{equation}
+ \mathcal H^{-1}\vct z_t+A_U\mathcal H^{-1}\vct z_x=0,
+\end{equation}
+两个系数矩阵均对称，第一个正定。它解释了熵与稳定性估计的联系；它不会改变先前算出的物理特征速度。
+
+\subsection{NSF 的矩阵形式：通量主部与扩散项分开}
+
+平面一维 NSF 先逐条写为
+\begin{align}
+ \rho_t+(\rho u)_x&=0,\\
+ (\rho u)_t+(\rho u^2+p)_x&=(a_{\mathrm v}u_x)_x,\\
+ (\rho E)_t+[(\rho E+p)u]_x
+ &=(a_{\mathrm v}u u_x+kT_x)_x.
+\end{align}
+此处无外源，$a_{\mathrm v}=2\mu+\lambda$。现在才将它们记为
+\begin{equation}
+ U_t+\partial_xF(U)=\partial_xF_{\mathrm v},\qquad
+ F_{\mathrm v}=\begin{pmatrix}0\\\pi_{\mathrm v}\\u\pi_{\mathrm v}-q\end{pmatrix}.
+\end{equation}
+\textbf{无黏通量} $F$ 的 Jacobian 与 Euler 相同，因此它仍有 $u-c,u,u+c$ 三个传播速度；但完整方程有二阶导数，不能只计算 $A_U$ 的特征值就说已完成 NSF 的谱分析。
+
+熵变量还能核对扩散符号。由式 \eqref{eq:physical-entropy-variables}，
+\begin{equation}
+ \vct z\cdot F_{\mathrm v}=q/T,\qquad
+ \vct z_x\cdot F_{\mathrm v}
+ =\frac{a_{\mathrm v}u_x^2}{T}+\frac{kT_x^2}{T^2}=\Sigma\ge0.
+\end{equation}
+故 $\eta_t+(\psi_\eta-q/T)_x=-\Sigma$，与式 \eqref{eq:math-entropy-nsf} 一致。这一检查同时验证了黏性功与导热通量的正负号。
+
+\subsection{黏性系统的时间特征根：把 Fourier 符号也算出来}
+
+在正均匀态 $(\rho_*,u_*,T_*)$ 附近线性化，取常系数、无源。黏性生热是扰动的二阶量，在线性化中消失。先逐式得到
+\begin{align}
+ \rho'_t+u_*\rho'_x+\rho_*u'_x&=0,\\
+ u'_t+u_*u'_x+\frac{RT_*}{\rho_*}\rho'_x+RT'_x&=\nu_Lu'_{xx},\\
+ T'_t+u_*T'_x+(\gamma-1)T_*u'_x&=\chi_vT'_{xx},
+\end{align}
+其中 $\nu_L=a_{\mathrm v}/\rho_*$、$\chi_v=k/(\rho_*c_v)$。这给出
+\begin{equation}
+ W'_t+A_*W'_x=B_*W'_{xx},\quad
+ A_*=\begin{pmatrix}u_*&\rho_*&0\\RT_*/\rho_*&u_*&R\\0&(\gamma-1)T_*&u_*\end{pmatrix},
+ \quad B_*=\operatorname{diag}(0,\nu_L,\chi_v).
+\end{equation}
+令 $W'=\widehat W\exp(\omega t+\mathrm i\kappa x)$。$\kappa$ 是波数，$\omega$ 是时间增长率，均不同于热导率 $k$。代入得
+\begin{equation}
+ [\omega I+\mathrm i\kappa A_*+\kappa^2B_*]\widehat W=0.
+\end{equation}
+记 $z=\omega+\mathrm i\kappa u_*$，$c_*^2=\gamma RT_*$，特征行列式明确为
+\begin{align}
+ 0&=\det\begin{pmatrix}
+ z&\mathrm i\kappa\rho_*&0\\
+ \mathrm i\kappa RT_*/\rho_*&z+\nu_L\kappa^2&\mathrm i\kappa R\\
+ 0&\mathrm i\kappa(\gamma-1)T_*&z+\chi_v\kappa^2
+ \end{pmatrix}\\
+ &=z(z+\nu_L\kappa^2)(z+\chi_v\kappa^2)
+ +c_*^2\kappa^2z+\frac{c_*^2}{\gamma}\chi_v\kappa^4.
+\end{align}
+整理为
+\begin{equation}
+ \boxed{z^3+(\nu_L+\chi_v)\kappa^2z^2
+ +(c_*^2\kappa^2+\nu_L\chi_v\kappa^4)z
+ +\frac{c_*^2\chi_v}{\gamma}\kappa^4=0.}
+ \label{eq:ns-fourier-polynomial}
+\end{equation}
+这才是该线性化一维黏性、导热系统的完整时间谱方程。它的根一般是复数，既记录传播也记录衰减。
+
+为看清物理含义，令 $D_T=\chi_v/\gamma=k/(\rho_*c_p)$，在 $\kappa\to0$ 下将根按波数展开：
+\begin{align}
+ \omega_0&=-\mathrm i\kappa u_*-D_T\kappa^2+O(\kappa^4),\\
+ \omega_\pm&=-\mathrm i\kappa(u_*\pm c_*)
+ -\frac12[\nu_L+(\gamma-1)D_T]\kappa^2+O(\kappa^3).
+\end{align}
+可由对熵根设 $z=a\kappa^2+\cdots$，先比较 $\kappa^4$ 项得 $a=-\chi_v/\gamma$；对声学根设 $z=\pm\mathrm ic_*\kappa+b\kappa^2+\cdots$，再比较 $\kappa^4$ 项得到相应 $b$。虚部给出 Euler 波速，负实部给出热扩散和声学衰减。这是长波展开，有限波数应使用完整三次式。
+
+还可用常态权矩阵
+\begin{equation}
+ S_*=\operatorname{diag}\left(\frac R{\rho_*},\frac{\rho_*}{T_*},
+ \frac{\rho_*c_v}{T_*^2}\right)
+\end{equation}
+验证 $S_*A_*$ 对称、$S_*B_*$ 半正定。对 Fourier 模态乘以共轭转置权向量，取实部得
+\begin{equation}
+ (\operatorname{Re}\omega)\widehat W^*S_*\widehat W
+ =-\kappa^2\widehat W^*S_*B_*\widehat W\le0.
+\end{equation}
+这在正黏性/导热条件下排除了线性增长，与熵耗散一致。
+
+对三维均匀态沿方向 $n$ 的 Fourier 模态，三个纵向/热模态仍由上述三次式给出，只需将 $u_*$ 换为法向速度 $u_{n,*}$。此外，两个独立切向速度还各给出一个剪切扩散根
+\begin{equation}
+ \omega_{\mathrm{sh},1}=\omega_{\mathrm{sh},2}
+ =-\mathrm i\kappa u_{n,*}-\frac\mu{\rho_*}\kappa^2.
+\end{equation}
+这样才组成三维五变量线性化的五个时间模态。一维三次式描述的是纵向/热子系统，而不是完整三维谱。
+
+\subsection{计算练习与核对结果}
+
+\begin{enumerate}
+ \item \textbf{原始变量特征计算。}取 $\rho=1.2$、$u=3$、$c=2$，写出 $A_W$ 并解特征方程。\textbf{核对：}$A_W$ 的三行分别为 $(3,1.2,0)$、$(0,3,5/6)$、$(0,4.8,3)$；特征值为 $1,3,5$。直接检验三列 $r_-^W,r_0^W,r_+^W$。
+ \item \textbf{守恒通量微分。}从 $p=(\gamma-1)(\mathcal E-M^2/(2\rho))$ 重新计算 $A_U$ 的九个元素。\textbf{核对：}第二行首项为 $(\gamma-3)u^2/2$；第三行末项为 $\gamma u$，不能漏掉压力对总能量的导数。
+ \item \textbf{坐标中的波速。}取 $\rho=2,u=3,c=4$。\textbf{核对：}质量坐标波速为 $-8,0,8$，乘 $v=1/2$ 再加 $u$，得到空间速度 $-1,3,7$。
+ \item \textbf{熵波与声波。}对一般 $p(\rho,s)$ 区分两类小扰动。\textbf{核对：}声波有 $\delta s=0$、$\delta p=c^2\delta\rho$；接触波有 $\delta u=\delta p=0$，但 $\delta\rho,\delta s$ 可变化。
+ \item \textbf{三维重根。}法向速度为 $u_n$ 时数出五个波族。\textbf{核对：}两个声学波、一个接触/熵波、两个切向输运波；中间根重数为 $3$，不能称三维方向系统严格双曲。
+ \item \textbf{黏性谱。}令 $\nu_L=\chi_v=0$ 检查式 \eqref{eq:ns-fourier-polynomial}。\textbf{核对：}$z(z^2+c_*^2\kappa^2)=0$，恢复三个无衰减 Euler 模态；系数非零时不能只保留无黏波速而遗漏扩散衰减。
+\end{enumerate}
+
+\subsection{参考阅读与推导边界}
+
+本专题的守恒律、坐标变换、Jacobians 与特征多项式均按本文符号重新推导。可对照以下公开资料：
+\begin{itemize}
+ \item Clawpack，\href{https://www.clawpack.org/riemann_book/html/Euler.html}{The Euler equations of gas dynamics}：一维 Euler 的守恒变量与波族；注意该资料把总能量密度记为 $E$，本文记为 $\mathcal E=\rho E$。
+ \item A. Ambroso 等，\href{https://chalons.perso.math.cnrs.fr/Gdt_MathComp.pdf}{Coupling of general Lagrangian systems}：质量坐标气体动力学系统及其耦合分析。
+ \item I. Tezaur 等，Sandia 报告 SAND2017-10335，\href{https://www.sandia.gov/app/uploads/sites/127/2021/10/FY17_SAND_report.pdf}{Advanced Fluid Reduced Order Models for Compressible Flow}：可压缩流的熵与熵变量背景。
+\end{itemize}
+坐标与原始变量的等价推导针对足够光滑、$\rho,T>0$、可逆运动映射；激波使用守恒跳跃关系与熵不等式。特征值描述局部主部或指定常态的线性化，不能据此宣称一般非线性流体解已被显式求出或已证明全局光滑。

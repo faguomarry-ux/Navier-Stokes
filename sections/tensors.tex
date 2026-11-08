@@ -1,0 +1,570 @@
+% 张量预备：由主文件载入，沿用 ElegantNote 的定义、定理与公式编号。
+\section{张量基础：几何对象、分量与坐标变换}\label{sec:tensor-foundations}
+
+速度需要一个方向，应力需要同时描述受力面的方向与面上的力，黏性系数则要把形变率映射为应力。它们分别自然对应一阶、二阶和四阶张量。本节先说明张量是什么，随后介绍计算规则，最后由各向同性推导 Newton 流体的黏性本构。
+
+\subsection{从向量到张量：对象不依赖坐标，分量依赖基}
+
+设 $V=\R^d$ 带有欧氏内积，$\{\vct e_i\}_{i=1}^d$ 为一组正交归一基。向量写成
+\begin{equation}
+ \vct a=a_i\vct e_i.
+\end{equation}
+向量本身与选用哪组基无关；分量 $a_i=\vct a\cdot\vct e_i$ 则随基改变。二阶张量也有相同区别：几何对象为 $\ten A$，矩阵 $[A_{ij}]$ 是它在指定基下的表示。
+
+\begin{definition}[欧氏空间中的张量]
+一个 $m$ 阶协变张量是一个对每个变量分别线性的映射
+\begin{equation}
+ \mathcal T:\underbrace{V\times\cdots\times V}_{m\text{ 个}}\longrightarrow\R.
+\end{equation}
+其分量为 $T_{i_1\cdots i_m}=\mathcal T(\vct e_{i_1},\ldots,\vct e_{i_m})$。利用欧氏内积把向量与余向量识别后，也可写成
+\begin{equation}
+ \ten T=T_{i_1\cdots i_m}\,
+ \vct e_{i_1}\otimes\cdots\otimes\vct e_{i_m}.
+\end{equation}
+零阶张量是标量，一阶张量可识别为向量。张量的\textbf{阶}是指标的个数，与矩阵的秩是不同概念。
+\end{definition}
+
+一般地，$(r,s)$ 型张量属于 $V^{\otimes r}\otimes(V^*)^{\otimes s}$，总阶数为 $r+s$；逆变指标写在上方，协变指标写在下方。本文的流体计算主要在\textbf{正交归一直角坐标}中进行，借助欧氏度量将指标统一写在下方。在一般曲线坐标中，上下指标与度量必须恢复，不能照搬全下标缩并规则。
+
+二阶张量既可看成双线性形式，也可借助内积看成线性算子：
+\begin{equation}
+ \mathcal A(\vct a,\vct b)=\vct a\cdot(\ten A\vct b)
+ =a_iA_{ij}b_j,\qquad
+ (\ten A\vct b)_i=A_{ij}b_j.
+\end{equation}
+四阶张量则可以把二阶张量映射为二阶张量：
+\begin{equation}
+ \ten B=\mathbb C:\ten A,\qquad B_{ij}=C_{ijkl}A_{kl}.
+\end{equation}
+在三维中，一般二阶张量有 $9$ 个分量，一般四阶张量有 $81$ 个分量；对称性和各向同性会显著减少独立参数。
+
+\subsection{Einstein 求和约定：先检查指标，再做计算}\label{subsec:einstein}
+
+本文约定 $i,j,k,\ldots$ 取 $1,\ldots,d$；同一乘积项中\textbf{出现两次}的指标自动求和，称为哑指标；只出现一次的指标称为自由指标。例如
+\begin{equation}
+ a_ib_i=\sum_{i=1}^d a_ib_i,\qquad
+ A_{ij}b_j=\sum_{j=1}^d A_{ij}b_j,\qquad
+ C_{ijkl}A_{kl}=\sum_{k,l=1}^d C_{ijkl}A_{kl}.
+\end{equation}
+第一式没有自由指标，是标量；第二式留一个自由指标 $i$，是向量的分量；第三式留两个自由指标 $i,j$，是二阶张量的分量。
+
+\begin{warningbox}
+等式各项的自由指标必须相同；同一乘积项中一个指标不能出现三次或更多次。例如 $A_{ij}b_j=c_i$ 合法，而 $A_{ij}b_i=c_i$ 的自由指标不匹配，$A_{ii}b_i$ 也不符合求和约定。哑指标可以整体改名，如 $A_{ij}b_j=A_{ik}b_k$；自由指标不能只在等式一侧改名。若指定某些指标值而不求和，会明确写出“不求和”。
+\end{warningbox}
+
+\subsection{正交换基与张量变换律}\label{subsec:tensor-transform}
+
+令新旧基满足
+\begin{equation}
+ \vct e'_i=Q_{ij}\vct e_j,\qquad
+ Q_{ij}=\vct e'_i\cdot\vct e_j,\qquad
+ \ten Q\ten Q^{\mathsf T}=\ten I.
+\end{equation}
+这里 $\ten Q$ 是\textbf{被动换基}的方向余弦矩阵，因此 $a'_i=Q_{ij}a_j$。由多线性可得
+\begin{align}
+ A'_{ij}&=Q_{ip}Q_{jq}A_{pq},
+ & [A']&=Q[A]Q^{\mathsf T},\label{eq:tensor-transform-two}\\
+ C'_{ijkl}&=Q_{ip}Q_{jq}Q_{kr}Q_{ls}C_{pqrs}.\label{eq:tensor-transform-four}
+\end{align}
+一般 $m$ 阶张量的每个指标各带一个 $Q$ 因子。反过来，一组分量若在所有正交换基下满足相应变换律，就定义了一个笛卡尔张量。\textbf{仅有一个多维数组的外形，尚不足以确认它具有张量意义。}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[>=Stealth,scale=0.95]
+ \draw[->,gray] (0,0)--(4,0) node[right] {$\vct e_1$};
+ \draw[->,gray] (0,0)--(0,3) node[above] {$\vct e_2$};
+ \draw[->,blue!70!black] (0,0)--(3.46,2) node[right] {$\vct e'_1$};
+ \draw[->,blue!70!black] (0,0)--(-1.4,2.42) node[above] {$\vct e'_2$};
+ \draw[->,very thick,red!70!black] (0,0)--(2.3,2.55) node[above right] {$\vct a$};
+ \draw[dashed,gray] (2.3,2.55)--(2.3,0) node[below] {$a_1$};
+ \draw[dashed,gray] (2.3,2.55)--(0,2.55) node[left] {$a_2$};
+ \draw[->] (0.8,0) arc[start angle=0,end angle=30,radius=0.8];
+ \node at (1.07,0.27) {$\theta$};
+ \node[align=left,anchor=west] at (4.5,1.7)
+ {$a'_1=a_1\cos\theta+a_2\sin\theta$\\[4pt]
+  $a'_2=-a_1\sin\theta+a_2\cos\theta$};
+\end{tikzpicture}
+\caption{坐标轴转动，向量保持不变，改变的是它的分量。张量的每个指标都遵循同样的换基规则。}
+\label{fig:tensor-bases}
+\end{figure}
+
+\begin{example}[一个二阶张量的换基计算]
+在二维取
+\begin{equation}
+ [A]=\begin{pmatrix}2&0\\0&1\end{pmatrix},\qquad
+ Q=\frac1{\sqrt2}\begin{pmatrix}1&1\\-1&1\end{pmatrix}.
+\end{equation}
+新坐标中的矩阵为
+\begin{equation}
+ [A']=Q[A]Q^{\mathsf T}
+ =\begin{pmatrix}3/2&-1/2\\-1/2&3/2\end{pmatrix}.
+\end{equation}
+分量发生变化，但迹仍为 $3$、行列式仍为 $2$，特征值仍为 $2,1$。出现非零非对角元并不意味着张量的物理性质发生了改变。
+\end{example}
+
+\section{张量的运算、性质与识别定理}\label{sec:tensor-calculus}
+
+\subsection{加法、数乘与并积（矢并、张量积）}
+
+同阶、同类型张量可以相加；标量可以乘以张量。这些运算按分量进行，而且结果仍满足张量变换律。两个张量的\textbf{并积}（tensor product，也称张量积或外积）保留所有指标：
+\begin{equation}
+ (\ten A\otimes\ten B)_{i_1\cdots i_mj_1\cdots j_n}
+ =A_{i_1\cdots i_m}B_{j_1\cdots j_n}.
+\end{equation}
+因此 $m$ 阶与 $n$ 阶张量的并积是 $m+n$ 阶张量。这是将两个对象“并置”而不求和的运算；此处的外积不指微分形式的楔积，也不指向量叉积。
+
+两个向量的并积是二阶张量：
+\begin{equation}
+ (\vct a\otimes\vct b)_{ij}=a_ib_j,\qquad
+ (\vct a\otimes\vct b)\vct c=\vct a(\vct b\cdot\vct c).
+\end{equation}
+例如 $\vct a=(1,2,0)^{\mathsf T}$、$\vct b=(0,1,1)^{\mathsf T}$ 时，
+\begin{equation}
+ [\vct a\otimes\vct b]=
+ \begin{pmatrix}0&1&1\\0&2&2\\0&0&0\end{pmatrix}.
+\end{equation}
+一般 $\vct a\otimes\vct b\ne\vct b\otimes\vct a$，但二者互为转置。动量通量 $\rho\vct u\otimes\vct u$ 正是并积的流体力学实例。
+
+并积保持张量性可直接检验，例如
+\begin{equation}
+ a'_ib'_j=Q_{ip}Q_{jq}a_pb_q,
+\end{equation}
+右侧恰好是二阶张量变换律。
+
+\subsection{缩并、单点积与双点积}\label{subsec:tensor-contraction}
+
+\textbf{缩并}是在一对指标上取相同值并求和，每缩并一对指标，阶数降低 $2$。例如
+\begin{equation}
+ \tr\ten A=A_{ii},\qquad B_{ij}=C_{ijkk}.
+\end{equation}
+在一般 $(r,s)$ 型张量中，天然缩并配对一个上指标和一个下指标；这里全下标缩并隐含使用欧氏度量。以四阶张量的缩并为例，
+\begin{align}
+ B'_{ij}=C'_{ijkk}
+ &=Q_{ip}Q_{jq}Q_{kr}Q_{ks}C_{pqrs}\\
+ &=Q_{ip}Q_{jq}\delta_{rs}C_{pqrs}
+ =Q_{ip}Q_{jq}B_{pq}.
+\end{align}
+可见缩并结果仍是张量，关键是正交性 $Q_{kr}Q_{ks}=\delta_{rs}$。
+
+两个张量先并积，再对跨越两个因子的一对或多对指标缩并，就得到点积。为避免不同教材的双点积约定混淆，本文固定如下定义：
+\begin{align}
+ \vct a\cdot\vct b&=a_ib_i,&
+ (\ten A\vct b)_i&=A_{ij}b_j,\\
+ (\ten A\ten B)_{ij}&=A_{ik}B_{kj},&
+ \ten A:\ten B&=A_{ij}B_{ij}=\tr(\ten A^{\mathsf T}\ten B),\label{eq:tensor-double-dot}\\
+ (\mathbb C:\ten A)_{ij}&=C_{ijkl}A_{kl}.&&
+\end{align}
+尤其 $\ten A:\ten B$ 一般不等于 $\tr(\ten A\ten B)=A_{ij}B_{ji}$。例如在二维取
+\begin{equation}
+ [A]=\begin{pmatrix}1&2\\0&3\end{pmatrix},\qquad
+ [B]=\begin{pmatrix}4&5\\6&7\end{pmatrix},
+\end{equation}
+则 $\ten A:\ten B=35$，而 $\tr(\ten A\ten B)=37$。
+
+Frobenius 范数定义为 $|\ten A|^2=\ten A:\ten A$。对任意正交矩阵，
+\begin{equation}
+ \ten A':\ten B'=\ten A:\ten B,
+ \qquad |\ten A'|=|\ten A|.
+\end{equation}
+这说明应力功率中的双点积是与坐标选择无关的标量。
+
+\subsection{Kronecker 符号与 Levi--Civita 符号}
+
+单位张量的分量为
+\begin{equation}
+ \delta_{ij}=\begin{cases}1,&i=j,\\0,&i\ne j.\end{cases}
+ \qquad \delta_{ij}a_j=a_i,\quad
+ \delta_{ij}\delta_{jk}=\delta_{ik},\quad\delta_{ii}=d.
+\end{equation}
+注意 $\delta_{ii}$ 按约定求和，值为 $d$，不是 $1$。
+
+三维中定义 $\varepsilon_{ijk}$：$(i,j,k)$ 为 $(1,2,3)$ 的偶排列时取 $1$，奇排列时取 $-1$，存在重复指标时取 $0$。于是
+\begin{equation}
+ (\vct a\times\vct b)_i=\varepsilon_{ijk}a_jb_k,
+ \qquad (\nabla\times\vct u)_i=\varepsilon_{ijk}\partial_{x_j}u_k.
+\end{equation}
+最常用的缩并恒等式是
+\begin{equation}
+ \varepsilon_{ijk}\varepsilon_{imn}
+ =\delta_{jm}\delta_{kn}-\delta_{jn}\delta_{km}.
+ \label{eq:epsilon-delta}
+\end{equation}
+其验证只需分情况：若 $j=k$ 或 $m=n$，两侧均为零；否则两侧仅在有序指标对 $(j,k)$ 与 $(m,n)$ 相同或相反时非零，分别为 $1$ 或 $-1$。例如它立即给出
+\begin{align}
+ |\vct a\times\vct b|^2
+ &=\varepsilon_{ijk}\varepsilon_{imn}a_jb_ka_mb_n\\
+ &=|\vct a|^2|\vct b|^2-(\vct a\cdot\vct b)^2.
+\end{align}
+
+\begin{warningbox}
+对任意正交矩阵，$Q_{ip}Q_{jq}Q_{kr}\varepsilon_{pqr}=(\det Q)\varepsilon_{ijk}$。因此固定数值的 $\varepsilon_{ijk}$ 对保向旋转 $SO(3)$ 不变，遇到反射则变号；它在包含反射的 $O(3)$ 下应视为伪张量（或带定向的体积形式来处理）。叉积和涡量也具有轴向量的变换性质。后文四阶表示定理会明确说明所用的不变群。
+\end{warningbox}
+
+\subsection{转置、对称分解、球形部分与偏量}
+
+二阶张量的转置定义为 $(\ten A^{\mathsf T})_{ij}=A_{ji}$，任意二阶张量唯一分解为
+\begin{equation}
+ \ten A=\ten S+\ten W,\qquad
+ \ten S=\frac{\ten A+\ten A^{\mathsf T}}2,\quad
+ \ten W=\frac{\ten A-\ten A^{\mathsf T}}2.
+\end{equation}
+其中 $\ten S^{\mathsf T}=\ten S$、$\ten W^{\mathsf T}=-\ten W$。对称张量与反对称张量正交，因为
+\begin{equation}
+ S_{ij}W_{ij}=S_{ji}W_{ji}=-S_{ij}W_{ij},
+ \qquad\therefore\quad \ten S:\ten W=0.
+\end{equation}
+对称性在正交换基下保持；对称张量还可由正交基对角化，其特征方向称为主方向。
+
+进一步定义球形部分与偏量：
+\begin{equation}
+ \ten A=\frac{\tr\ten A}{d}\ten I+\dev\ten A,\qquad
+ \dev\ten A=\ten A-\frac{\tr\ten A}{d}\ten I,
+ \qquad\tr(\dev\ten A)=0.
+\end{equation}
+三维二阶张量的三个主不变量为
+\begin{equation}
+ I_1=\tr\ten A,\qquad
+ I_2=\frac12[(\tr\ten A)^2-\tr(\ten A^2)],\qquad
+ I_3=\det\ten A.
+\end{equation}
+它们在正交相似变换下不变，但\textbf{拥有不变量不等于张量本身各向同性}。
+
+\subsection{张量识别定理（商定理）及其证明}\label{subsec:tensor-quotient}
+
+\begin{theorem}[二阶张量的识别]
+设每组正交基中都有一组数 $A_{ij}$。若对\textbf{任意}向量 $\vct b$，关系 $c_i=A_{ij}b_j$ 在所有这些坐标系中成立，且 $\vct c$ 按向量变换，则 $A_{ij}$ 按二阶张量变换。
+\end{theorem}
+\begin{proof}
+由 $c'_i=A'_{ij}b'_j$ 及向量变换律，
+\begin{equation}
+ A'_{ij}b'_j=Q_{ip}c_p
+ =Q_{ip}A_{pq}b_q
+ =Q_{ip}A_{pq}Q_{jq}b'_j.
+\end{equation}
+因此
+\begin{equation}
+ (A'_{ij}-Q_{ip}Q_{jq}A_{pq})b'_j=0.
+\end{equation}
+依次取 $\vct b'$ 为各个基向量，即得每个括号中的系数都为零，这正是 \eqref{eq:tensor-transform-two}。
+\end{proof}
+
+更一般地，若对任意 $n$ 阶张量 $\ten B$，一个未知数组与 $\ten B$ 缩并后总产生给定阶数的张量，则可用相同论证识别未知数组。也可通过与任意向量组完全缩并得到标量来识别：若
+\begin{equation}
+ T_{i_1\cdots i_m}a^{(1)}_{i_1}\cdots a^{(m)}_{i_m}
+\end{equation}
+对所有独立选取的向量 $\vct a^{(1)},\ldots,\vct a^{(m)}$ 都是坐标不变量，则 $T$ 是 $m$ 阶张量。
+
+\begin{warningbox}
+“任意”不能省略。仅知道 $A_{ij}b_j$ 对某一个固定 $\vct b$ 是向量，无法确定 $\ten A$ 在其他方向上的作用。若只检验 $C_{ijkl}D_{kl}$ 且 $\ten D$ 只能取对称张量，则只能识别 $C_{ij(kl)}=(C_{ijkl}+C_{ijlk})/2$；对 $k,l$ 反对称的部分被缩并消去。同样，仅凭 $a_iA_{ij}a_j$ 是标量，只能识别 $\ten A$ 的对称部分。
+\end{warningbox}
+
+\begin{example}[应力张量为什么是二阶张量]
+Cauchy 应力定理给出牵引与面法向的线性关系 $t_i(\vct n)=\sigma_{ij}n_j$。牵引和法向都是向量，而且关系对所有面方向成立，因而商定理说明 $\sigma_{ij}$ 是二阶张量。单位法向已足够：线性性允许把结论延拓到任意向量。商定理确认其变换性质；牵引的线性性仍来自 Cauchy 应力定理，不能由商定理替代。
+\end{example}
+
+\subsection{张量场的微分与流体中的计算}
+
+对固定的、相互作刚性正交换基的直角坐标，$Q$ 与空间位置无关，因此
+\begin{equation}
+ \partial_{x'_j}=Q_{jq}\partial_{x_q},\qquad
+ \partial_{x'_j}u'_i=Q_{ip}Q_{jq}\partial_{x_q}u_p.
+\end{equation}
+所以本文的速度梯度 $L_{ij}=\partial_{x_j}u_i$ 是二阶张量；梯度使阶数增加 $1$，散度再缩并一个指标对，使阶数降低 $1$。具体为
+\begin{equation}
+ (\nabla\vct u)_{ij}=\partial_{x_j}u_i,\quad
+ \nabla\cdot\vct u=\partial_{x_i}u_i,\quad
+ (\nabla\cdot\ten A)_i=\partial_{x_j}A_{ij}.
+\end{equation}
+在曲线坐标中，基向量随位置变化，需要协变导数；原始分量的偏导数一般不构成张量。
+
+记 $\ten L=\ten D+\ten W$，其中 $D_{ij}=(L_{ij}+L_{ji})/2$、$W_{ij}=(L_{ij}-L_{ji})/2$。若应力对称，便有
+\begin{equation}
+ \ten\sigma:\nabla\vct u=\ten\sigma:\ten D,
+ \qquad \ten\sigma:\ten W=0.
+\end{equation}
+这正是应力功率只与形变率有关的代数原因。对称张量 $\ten A$ 的功率通量恒等式也可逐指标核对：
+\begin{align}
+ \nabla\cdot(\ten A\vct u)
+ &=\partial_{x_i}(A_{ij}u_j)\\
+ &=(\partial_{x_i}A_{ij})u_j+A_{ij}\partial_{x_i}u_j\\
+ &=u_i\partial_{x_j}A_{ij}+A_{ij}\partial_{x_j}u_i.
+\end{align}
+最后一行使用了 $A_{ij}=A_{ji}$ 并改名哑指标。一般非对称 $\ten A$ 对应的正确形式为
+\begin{equation}
+ \nabla\cdot(\ten A^{\mathsf T}\vct u)
+ =\vct u\cdot(\nabla\cdot\ten A)+\ten A:\nabla\vct u.
+\end{equation}
+
+\section{各向同性、各向异性与四阶张量表示}\label{sec:tensor-isotropy}
+
+\subsection{换基协变与各向同性是两个不同要求}
+
+\begin{definition}[各向同性张量]
+若同一个张量在所有正交换基下分量的数值均保持相同，即
+\begin{equation}
+ T_{i_1\cdots i_m}
+ =Q_{i_1j_1}\cdots Q_{i_mj_m}T_{j_1\cdots j_m}
+ \quad\text{对所有 }Q\in O(d),
+\end{equation}
+就称它为相对于 $O(d)$ 的各向同性张量。不满足此条件的称为各向异性张量。若只要求 $Q\in SO(d)$，则需注明仅考虑保向旋转。
+\end{definition}
+
+所有张量都满足变换律；各向同性另要求变换后\textbf{数值不变}。二阶张量的各向同性条件为
+\begin{equation}
+ Q[A]Q^{\mathsf T}=[A]\quad\text{对所有正交 }Q.
+\end{equation}
+“在某一组坐标中对角化”只是选到了主方向，不能推出各向同性。
+
+\subsection{二阶各向同性张量与有优先方向的例子}
+
+\begin{proposition}[二阶各向同性张量]
+在 $d\ge2$ 的欧氏空间中，相对于 $O(d)$ 的二阶各向同性张量恰为 $\ten A=a\ten I$。
+\end{proposition}
+\begin{proof}
+把任一坐标轴反向，即令 $Q$ 为仅一个对角元为 $-1$ 的对角矩阵。任意非对角分量 $A_{ij}$ 可在此变换中单独获得一个负号，因此必须为零。再置换任意两根坐标轴，可知所有对角分量相等，于是 $A_{ij}=a\delta_{ij}$。反之，由 $Q_{ip}Q_{jp}=\delta_{ij}$，$a\delta_{ij}$ 对任意正交变换不变。
+\end{proof}
+
+各向异性热传导的一个模型是
+\begin{equation}
+ \vct q=-\ten K\nabla T,\qquad
+ \ten K=k_\perp\ten I+(k_\parallel-k_\perp)\vct a\otimes\vct a,
+ \qquad |\vct a|=1.
+\end{equation}
+沿材料优先方向 $\vct a$ 的导热系数为 $k_\parallel$，垂直方向的系数为 $k_\perp$。当两者不相等时，$\ten K$ 是各向异性的；但它仍按二阶张量变换。只有 $k_\parallel=k_\perp=k$ 时才退化为各向同性 Fourier 定律 $\vct q=-k\nabla T$。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[>=Stealth,scale=0.9]
+ \begin{scope}
+  \draw[->,gray] (-2,0)--(2.2,0);
+  \draw[->,gray] (0,-1.7)--(0,1.9);
+  \draw[thick,blue!65!black] (0,0) circle (1.4);
+  \foreach \a in {0,45,90,135,180,225,270,315}
+   {\draw[->,blue!65!black] (0,0)--(\a:1.4);}
+  \node at (0,-2.2) {$\ten K=k\ten I$：各方向相同};
+ \end{scope}
+ \begin{scope}[xshift=6.3cm]
+  \draw[->,gray] (-2.2,0)--(2.4,0) node[right] {$\vct a$};
+  \draw[->,gray] (0,-1.7)--(0,1.9);
+  \draw[thick,red!70!black] (0,0) ellipse (2 and 1);
+  \draw[->,red!70!black,thick] (0,0)--(2,0) node[above] {$k_\parallel$};
+  \draw[->,red!70!black,thick] (0,0)--(0,1) node[above right] {$k_\perp$};
+  \node at (0,-2.2) {有优先方向：各向异性};
+ \end{scope}
+\end{tikzpicture}
+\caption{对称正定导热张量将单位方向球映射为椭球（图示为二维截面）。圆形与椭圆形分别示意各向同性与各向异性；此图不是温度等值线。}
+\end{figure}
+
+\begin{keypoint}
+材料各向同性是\textbf{本构映射}的性质，不意味着任意流动中的应力状态都是各向同性。各向同性流体在剪切流中仍可有非零剪应力。材料均匀性则表示本构参数不随位置变化，与是否具有优先方向是另一回事。
+\end{keypoint}
+
+\subsection{四阶各向同性张量的 Einstein 表示：定理}
+
+\begin{theorem}[四阶各向同性表示]\label{thm:isotropic-four}
+在三维欧氏空间中，一个四阶真张量对所有正交变换不变，当且仅当存在三个标量 $\alpha,\beta,\gamma$，使
+\begin{equation}
+ \boxed{C_{ijkl}=\alpha\delta_{ij}\delta_{kl}
+ +\beta\delta_{ik}\delta_{jl}
+ +\gamma\delta_{il}\delta_{jk}.}\label{eq:isotropic-four}
+\end{equation}
+此处不预先假设指标交换对称性。相应的线性算子为
+\begin{equation}
+ \boxed{\mathbb C:\ten A
+ =\alpha(\tr\ten A)\ten I+\beta\ten A+\gamma\ten A^{\mathsf T}.}
+ \label{eq:isotropic-four-action}
+\end{equation}
+对三维四阶真张量，仅假设 $SO(3)$ 不变也得到同样结论。
+\end{theorem}
+
+这里“Einstein 表示”指采用求和约定的指标表示；\eqref{eq:isotropic-four} 本身没有重复求和的自由指标，真正的缩并发生在 $C_{ijkl}A_{kl}$ 中。下面用坐标轴反向、轴置换和一次 $45^\circ$ 旋转给出完整证明。
+
+\subsection{四阶表示的推导：从 81 个分量到三个系数}
+
+\begin{proof}
+\textbf{第一步：由坐标轴反向排除奇数次出现的指标。}
+取 $Q=\operatorname{diag}(s_1,s_2,s_3)$，其中 $s_a\in\{1,-1\}$。对固定的 $i,j,k,l$（不求和），不变性给出
+\begin{equation}
+ C_{ijkl}=s_is_js_ks_l C_{ijkl}.
+\end{equation}
+若某个坐标标号出现奇数次，只反向该轴，便有 $C_{ijkl}=-C_{ijkl}$，因此该分量为零。故可能非零的指标模式仅有“同一标号出现四次”和“两个不同标号各出现两次”。
+
+\textbf{第二步：由轴置换将剩余分量分成四类。}
+由于任意置换坐标轴都不改变张量，对任意不同的 $a,b$，定义
+\begin{equation}
+ h=C_{aaaa},\qquad
+ \alpha=C_{aabb},\qquad
+ \beta=C_{abab},\qquad
+ \gamma=C_{abba}\quad\text{（均不求和）}.
+\end{equation}
+这些值与具体轴标号无关。同类中还包括 $C_{bbaa}=\alpha$、$C_{baba}=\beta$、$C_{baab}=\gamma$。这里置换的是\textbf{坐标轴的标号}，并未假设可以任意交换张量的指标位置。
+
+\textbf{第三步：用 $45^\circ$ 旋转找出四类之间的约束。}
+在 $1$--$2$ 平面取 $\vct e'_1=(\vct e_1+\vct e_2)/\sqrt2$，补成一组保向正交基。不变性及多线性给出
+\begin{align}
+ h=C'_{1111}
+ &=\frac14\sum_{p,q,r,s\in\{1,2\}}C_{pqrs}\\
+ &=\frac14[2h+2\alpha+2\beta+2\gamma].
+\end{align}
+第一步消去了含奇数个 $1$ 或 $2$ 的项；余下两个四同项与六个两两配对项。因此
+\begin{equation}
+ h=\alpha+\beta+\gamma.\label{eq:isotropic-four-diagonal}
+\end{equation}
+
+\textbf{第四步：统一写出全部分量，并验证充分性。}
+式 \eqref{eq:isotropic-four} 在四同指标上等于 $\alpha+\beta+\gamma=h$，在三种两两配对上分别等于 $\alpha,\beta,\gamma$，其他分量均为零，故它覆盖所有情形。反过来，$Q_{ip}Q_{jq}\delta_{pq}=\delta_{ij}$ 保证每个 $\delta\delta$ 项都在任意正交变换下不变。因此该形式既必要又充分。取 $C_{1122}$、$C_{1212}$、$C_{1221}$ 可分别恢复三个系数，故表示唯一。
+
+最后说明 $SO(3)$ 的情形：若 $Q\in O(3)$ 且 $\det Q=-1$，则 $R=-Q\in SO(3)$。四阶变换含四个 $Q$ 因子，$(-1)^4=1$，所以 $R$ 与 $Q$ 对四阶真张量的作用相同。故三维四阶的旋转不变性已蕴含反射不变性，可以使用上述证明。
+\end{proof}
+
+相同的 $O(d)$ 证明也适用于 $d\ge2$。但二维仅要求 $SO(2)$ 时，不能利用 $-Q$ 把反射变成旋转，可能有额外的定向相关项；本文二维本构采用包含反射的通常各向同性假设。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[>=Stealth,every node/.style={font=\small}]
+ \foreach \x/\lab in {0/i,1/j,2/k,3/l}
+  {\node (a\lab) at (\x,0) {$\lab$};}
+ \draw[thick,blue!65!black] (ai.north) to[bend left=50] (aj.north);
+ \draw[thick,blue!65!black] (ak.north) to[bend left=50] (al.north);
+ \node at (1.5,-0.65) {$\alpha\delta_{ij}\delta_{kl}$};
+ \begin{scope}[xshift=4.1cm]
+  \foreach \x/\lab in {0/i,1/j,2/k,3/l}
+   {\node (b\lab) at (\x,0) {$\lab$};}
+  \draw[thick,red!70!black] (bi.north) to[bend left=40] (bk.north);
+  \draw[thick,red!70!black] (bj.south) to[bend right=40] (bl.south);
+  \node at (1.5,-0.95) {$\beta\delta_{ik}\delta_{jl}$};
+ \end{scope}
+ \begin{scope}[xshift=8.2cm]
+  \foreach \x/\lab in {0/i,1/j,2/k,3/l}
+   {\node (c\lab) at (\x,0) {$\lab$};}
+  \draw[thick,green!45!black] (ci.north) to[bend left=35] (cl.north);
+  \draw[thick,green!45!black] (cj.north) to[bend left=35] (ck.north);
+  \node at (1.5,-0.65) {$\gamma\delta_{il}\delta_{jk}$};
+ \end{scope}
+\end{tikzpicture}
+\caption{四个指标的三种两两配对，对应四阶各向同性表示的三个基张量。配对图帮助记忆；完备性由前面的分量证明保证。}
+\end{figure}
+
+\subsection{缩并计算、系数恢复与对称性}
+
+把 \eqref{eq:isotropic-four} 与 $A_{kl}$ 缩并：
+\begin{align}
+ C_{ijkl}A_{kl}
+ &=\alpha\delta_{ij}A_{kk}+\beta A_{ij}+\gamma A_{ji},
+\end{align}
+这证明了 \eqref{eq:isotropic-four-action}。若 $\ten A$ 对称，只剩 $\beta+\gamma$ 可被观测；若 $\ten A$ 反对称，则只剩 $\beta-\gamma$。
+
+不选特定坐标分量，也可由三个完全缩并不变量恢复系数。令
+\begin{equation}
+ S_1=C_{iijj},\qquad S_2=C_{ijij},\qquad S_3=C_{ijji}.
+\end{equation}
+注意这些表达式中的重复指标均求和。三维时有
+\begin{equation}
+ \begin{pmatrix}S_1\\S_2\\S_3\end{pmatrix}
+ =\begin{pmatrix}9&3&3\\3&9&3\\3&3&9\end{pmatrix}
+ \begin{pmatrix}\alpha\\\beta\\\gamma\end{pmatrix},
+\end{equation}
+因此
+\begin{equation}
+ \alpha=\frac{4S_1-S_2-S_3}{30},\quad
+ \beta=\frac{4S_2-S_1-S_3}{30},\quad
+ \gamma=\frac{4S_3-S_1-S_2}{30}.
+\end{equation}
+但只计算这三个缩并值\textbf{不能证明未知张量各向同性}；使用恢复公式之前须已确认其属于 \eqref{eq:isotropic-four} 的形式。
+
+若再要求任一对小对称性 $C_{ijkl}=C_{jikl}$ 或 $C_{ijkl}=C_{ijlk}$，则必须 $\beta=\gamma$，从三个系数降为两个。大对称性 $C_{ijkl}=C_{klij}$ 则已由此三参数形式自动满足，单独施加它不会令 $\beta=\gamma$。若要求四个指标完全对称，进一步有 $\alpha=\beta=\gamma$，仅余一个系数。
+
+\subsection{四阶单位张量与投影：把计算拆成三个部分}
+
+定义四阶单位、对称和反对称投影张量：
+\begin{align}
+ (\mathbb I_4)_{ijkl}&=\delta_{ik}\delta_{jl},\\
+ (\mathbb I_{\mathrm s})_{ijkl}
+ &=\tfrac12(\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk}),\\
+ (\mathbb I_{\mathrm a})_{ijkl}
+ &=\tfrac12(\delta_{ik}\delta_{jl}-\delta_{il}\delta_{jk}).
+\end{align}
+它们作用于 $\ten A$ 分别得到 $\ten A$、$\ten S$、$\ten W$。再定义球形和对称无迹投影
+\begin{equation}
+ (\mathbb P_{\mathrm{vol}})_{ijkl}=\frac1d\delta_{ij}\delta_{kl},
+ \qquad \mathbb P_{\mathrm{dev}}=\mathbb I_{\mathrm s}-\mathbb P_{\mathrm{vol}}.
+\end{equation}
+令 $\ten S_0=\ten S-(\tr\ten A)\ten I/d$，则
+\begin{equation}
+ \ten A=\frac{\tr\ten A}{d}\ten I+\ten S_0+\ten W,
+\end{equation}
+三个部分对 Frobenius 内积两两正交。四阶各向同性算子可改写为
+\begin{equation}
+ \mathbb C=(d\alpha+\beta+\gamma)\mathbb P_{\mathrm{vol}}
+ +(\beta+\gamma)\mathbb P_{\mathrm{dev}}
+ +(\beta-\gamma)\mathbb I_{\mathrm a}.
+\end{equation}
+所以它对体积变化、对称剪切和反对称转动三个子空间分别只是标量乘法。相应二次型为
+\begin{equation}
+ \ten A:(\mathbb C:\ten A)
+ =\left(\alpha+\frac{\beta+\gamma}{d}\right)(\tr\ten A)^2
+ +(\beta+\gamma)|\ten S_0|^2+(\beta-\gamma)|\ten W|^2.
+\end{equation}
+这也是检验各向同性线性算子正定性和耗散性的便捷方式。
+
+\subsection{从四阶各向同性到 Newton 黏性本构}\label{subsec:tensor-newton}
+
+在固定热力学状态下，假定黏性应力对\textbf{对称形变率}线性、零形变率时黏性应力为零：
+\begin{equation}
+ \tau_{ij}=C_{ijkl}D_{kl},\qquad D_{ij}=D_{ji}.
+\end{equation}
+各向同性本构映射的要求是，对所有对称 $\ten D$ 及所有正交 $Q$，
+\begin{equation}
+ \mathcal L(Q\ten DQ^{\mathsf T})=Q\mathcal L(\ten D)Q^{\mathsf T}.
+\end{equation}
+由于只在对称输入空间定义映射，可以选取小对称的四阶代表 $C_{ijkl}=C_{ijlk}$；应力对称还允许 $C_{ijkl}=C_{jikl}$。也可先用 $\mathcal L(\operatorname{sym}\ten A)$ 将它延拓到全部二阶张量，再应用定理~\ref{thm:isotropic-four}。由 $\beta=\gamma$，令 $\alpha=\lambda$、$\beta=\gamma=\mu$，得到
+\begin{align}
+ C_{ijkl}&=\lambda\delta_{ij}\delta_{kl}
+ +\mu(\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk}),\label{eq:newton-four}\\
+ \tau_{ij}&=\lambda D_{kk}\delta_{ij}+2\mu D_{ij}.
+\end{align}
+因 $D_{kk}=\partial_{x_k}u_k=\nabla\cdot\vct u$，故
+\begin{equation}
+ \boxed{\ten\tau=2\mu\ten D+\lambda(\nabla\cdot\vct u)\ten I.}
+\end{equation}
+这就解释了后文 Newton 本构为何恰含两个独立黏度系数。完整应力还包含平衡压强 $-p\ten I$；压强项不属于这里假定为零截距的黏性映射。
+
+\textbf{客观性与各向同性也须区分。}客观性要求更换随时间刚体转动的观察者后，物理定律保持一致。若 $\vct x^*=Q(t)\vct x+\vct c(t)$，则速度梯度变为
+\begin{equation}
+ \ten L^*=Q\ten LQ^{\mathsf T}+\dot Q Q^{\mathsf T},\qquad
+ \ten D^*=Q\ten DQ^{\mathsf T}.
+\end{equation}
+$\dot Q Q^{\mathsf T}$ 是反对称张量。因此 $\ten D$ 具有所需的客观变换性质，而 $\ten L$ 带有额外转动项。这说明选取 $\ten D$ 作为本构变量的理由；它不是由材料各向同性单独推出的。
+
+再将 $\ten D=\ten D_0+(\nabla\cdot\vct u)\ten I/d$ 代入，得到
+\begin{equation}
+ \ten\tau=2\mu\ten D_0+\zeta(\nabla\cdot\vct u)\ten I,
+ \qquad \zeta=\lambda+\frac{2\mu}{d}.
+\end{equation}
+利用对称与反对称部分正交、偏量无迹，
+\begin{equation}
+ \boxed{\ten\tau:\nabla\vct u=\ten\tau:\ten D
+ =2\mu|\ten D_0|^2+\zeta(\nabla\cdot\vct u)^2.}
+\end{equation}
+要求对所有对称形变率均非负，等价于 $\mu\ge0$、$\zeta\ge0$。第二黏度 $\lambda$ 本身可以为负；三维 Stokes 假设 $\lambda=-2\mu/3$ 是令体积黏度为零的附加模型假设。
+
+\begin{example}[简单剪切：各向同性材料仍可有剪应力]
+取三维速度 $\vct u=(\dot\gamma x_2,0,0)^{\mathsf T}$，其中 $\dot\gamma$ 为常数，则
+\begin{equation}
+ [D]=\frac{\dot\gamma}{2}
+ \begin{pmatrix}0&1&0\\1&0&0\\0&0&0\end{pmatrix},\qquad
+ [\tau]=\mu\dot\gamma
+ \begin{pmatrix}0&1&0\\1&0&0\\0&0&0\end{pmatrix}.
+\end{equation}
+它满足 $\nabla\cdot\vct u=0$，黏性耗散为 $\ten\tau:\nabla\vct u=\mu\dot\gamma^2$。本构映射各向同性，而此时的应力张量并非球形张量。
+\end{example}
+
+\subsection{计算自检与参考阅读}
+
+处理张量公式时可按以下顺序检查：先确定阶数和自由指标，再核对哑指标的配对；区分并积、矩阵乘法和双点积；最后检查变换律、对称性及物理量纲。尤其应记住：\textbf{对称性、无迹性、各向同性是三个不同性质}。
+
+本节可对照以下公开课程资料阅读。上述四阶表示采用轴反向、轴置换和 $45^\circ$ 旋转的分量证明，并明确区分 $O(d)$ 与 $SO(d)$；并非把参考资料的公式作为未证明的前提。
+\begin{itemize}
+ \item David Tong，\emph{Vector Calculus}，第 6 章 Cartesian Tensors，特别是商定理与指标对称性：\href{https://www.damtp.cam.ac.uk/user/tong/vc/vc6.pdf}{剑桥大学课程讲义}。
+ \item Richard Fitzpatrick，\emph{Fluid Mechanics}，附录 Cartesian Tensors，\href{https://farside.ph.utexas.edu/teaching/336L/Fluid/node252.html}{Isotropic Tensors}；该节给出低阶各向同性张量及四阶表示的另一种推导。
+\end{itemize}

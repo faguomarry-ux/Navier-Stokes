@@ -1,0 +1,230 @@
+\section{Euler 方程组：从物质粒子到空间守恒律}\label{sec:euler-three-views}
+
+本节先逐条解释质量、三个方向的动量与总能量，再说明拉格朗日和欧拉形式如何互换，最后通过 Gibbs 关系得到熵方程。\textbf{矩阵只是后续整理和分析的工具}；通量 Jacobian 与特征值将在第~\ref{sec:full-characteristics}~节、各条方程均已推导之后计算。
+
+这里“拉格朗日角度”指\textbf{用粒子标号描述运动}，与前面的 Hamilton 变分原理是相关但不同的概念。物质导数形式仍用空间坐标表示场，严格的参考构形形式则用 $\vct X$ 表示自变量；下面会同时给出。
+
+\subsection{模型、未知量与符号：先明确要推导哪些方程}
+
+先考虑三维、单相、无质量源的简单可压缩流体。未知量为密度 $\rho$、速度向量 $\vct u$ 与比内能 $e$。速度有三个分量，压强与温度由热力学闭合确定。单位质量总能量为 $E=e+|\vct u|^2/2$。Euler 模型取
+\begin{equation}
+ \ten\sigma=-p\ten I,\qquad\ten\tau=0,\qquad\vct q=0.
+\end{equation}
+即截面只承受压力，不考虑黏性和导热。为使各项来源清楚，本节主要推导无体力、无供热的系统；加入单位质量体力 $\vct f$ 与供热率 $r$ 的位置会另行注明。
+
+\subsection{质量方程：同一批粒子的质量保持不变}
+
+设 $B(t)=\vct\chi(B_0,t)$ 是物质体。质量守恒的起点是
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}\int_{B(t)}\rho\dd V=0.
+\end{equation}
+令 $F=\nabla_{\vct X}\vct\chi$、$J=\det F>0$，将积分拉回固定参考区域：
+\begin{equation}
+ \int_{B(t)}\rho\dd V=\int_{B_0}\rho^{\mathrm L}J\dd V_0,
+ \qquad \rho^{\mathrm L}(\vct X,t)=\rho(\vct\chi(\vct X,t),t).
+\end{equation}
+由于 $B_0$ 任意，$\partial_t(\rho^{\mathrm L}J)=0$。若初始映射为恒等映射，则
+\begin{equation}
+ \boxed{\rho^{\mathrm L}J=\rho_0(\vct X).}\label{eq:euler-reference-mass}
+\end{equation}
+同一粒子的质量不变，但它占据的当前体积随 $J$ 改变。
+
+用 $\dot J=J\nabla\cdot\vct u$ 展开上述时间导数，得到
+\begin{equation}
+ \boxed{\Dt\rho=-\rho\nabla\cdot\vct u.}\label{eq:euler-mass-primitive}
+\end{equation}
+再展开物质导数，即
+\begin{align}
+ \partial_t\rho+u_1\partial_{x_1}\rho+u_2\partial_{x_2}\rho
+ +u_3\partial_{x_3}\rho
+ +\rho(\partial_{x_1}u_1+\partial_{x_2}u_2+\partial_{x_3}u_3)&=0,\\
+ \boxed{\partial_t\rho+\partial_{x_1}(\rho u_1)
+ +\partial_{x_2}(\rho u_2)+\partial_{x_3}(\rho u_3)=0.}&
+ \label{eq:euler-mass-detail}
+\end{align}
+这就是欧拉空间中的连续性方程。对固定控制体 $K$ 积分，得到相同内容的通量表述：
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}\int_K\rho\dd V
+ +\int_{\partial K}\rho\vct u\cdot\vct n\dd A=0.
+ \label{eq:euler-mass-integral}
+\end{equation}
+第一项是控制体内质量的变化，第二项是净向外质量流率。它与物质体质量不变是同一个守恒规律的两种观察方式。
+
+\subsection{三条动量方程：压力梯度如何推动粒子}
+
+Newton 第二定律作用于同一物质体：
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}\int_{B(t)}\rho u_i\dd V
+ =-\int_{\partial B(t)}p n_i\dd A,
+ \qquad i=1,2,3.
+\end{equation}
+左端利用质量守恒化为 $\int_B\rho\mathrm Du_i/\mathrm Dt$，右端由 Gauss 公式化为 $-\int_B\partial_{x_i}p$。局部化后分别得到
+\begin{align}
+ \rho(\partial_tu_1+u_1\partial_{x_1}u_1+u_2\partial_{x_2}u_1+u_3\partial_{x_3}u_1)&=-\partial_{x_1}p,\\
+ \rho(\partial_tu_2+u_1\partial_{x_1}u_2+u_2\partial_{x_2}u_2+u_3\partial_{x_3}u_2)&=-\partial_{x_2}p,\\
+ \rho(\partial_tu_3+u_1\partial_{x_1}u_3+u_2\partial_{x_2}u_3+u_3\partial_{x_3}u_3)&=-\partial_{x_3}p.
+\end{align}
+每行对应一个方向的加速度，三个对流项表示粒子移动时采样到邻近位置的速度。统一写为
+\begin{equation}
+ \boxed{\rho\Dt\vct u+\nabla p=0.}\label{eq:euler-momentum-primitive}
+\end{equation}
+压力 $p>0$ 表示压缩性法向应力；决定粒子加速度的是压力的\textbf{空间差异}，不是压强数值本身。
+
+为转成欧拉守恒形式，先对第一个动量分量使用乘积法则：
+\begin{align}
+ &\partial_t(\rho u_1)+\sum_{j=1}^3\partial_{x_j}(\rho u_1u_j)\notag\\
+ &=\rho\left(\partial_tu_1+\sum_{j=1}^3u_j\partial_{x_j}u_1\right)
+ +u_1\left[\partial_t\rho+\sum_{j=1}^3\partial_{x_j}(\rho u_j)\right].
+\end{align}
+方括号由质量方程为零。三个方向依次得到
+\begin{align}
+ \partial_t(\rho u_1)+\partial_{x_1}(\rho u_1^2+p)
+ +\partial_{x_2}(\rho u_1u_2)+\partial_{x_3}(\rho u_1u_3)&=0,\\
+ \partial_t(\rho u_2)+\partial_{x_1}(\rho u_1u_2)
+ +\partial_{x_2}(\rho u_2^2+p)+\partial_{x_3}(\rho u_2u_3)&=0,\\
+ \partial_t(\rho u_3)+\partial_{x_1}(\rho u_1u_3)
+ +\partial_{x_2}(\rho u_2u_3)+\partial_{x_3}(\rho u_3^2+p)&=0.
+\end{align}
+汇总为
+\begin{equation}
+ \partial_t(\rho\vct u)+\nabla\cdot(\rho\vct u\otimes\vct u+p\ten I)=0.
+ \label{eq:euler-momentum-detail}
+\end{equation}
+其固定控制体形式为
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}\int_K\rho\vct u\dd V
+ +\int_{\partial K}\rho\vct u(\vct u\cdot\vct n)\dd A
+ =-\int_{\partial K}p\vct n\dd A.
+ \label{eq:euler-momentum-integral}
+\end{equation}
+向外的动量通量包含对流携带和压力传递两部分；这解释了为何压力出现在通量中。
+
+\subsection{总能量方程：必须保留压力做功}
+
+物质体的第一热力学定律在本模型中为
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}\int_{B(t)}\rho E\dd V
+ =-\int_{\partial B(t)}p\vct u\cdot\vct n\dd A.
+\end{equation}
+右端是面力 $-p\vct n$ 与速度的点积。向外流动的截面上，外界压力做负功。局部化给出
+\begin{equation}
+ \boxed{\rho\Dt E=-\nabla\cdot(p\vct u).}\label{eq:euler-total-material}
+\end{equation}
+利用质量方程，$\rho\mathrm DE/\mathrm Dt=\partial_t(\rho E)+\nabla\cdot(\rho E\vct u)$，因此
+\begin{equation}
+ \boxed{\partial_t(\rho E)+\sum_{j=1}^3\partial_{x_j}[(\rho E+p)u_j]=0.}
+ \label{eq:euler-energy-detail}
+\end{equation}
+固定控制体的同一关系是
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}\int_K\rho E\dd V
+ +\int_{\partial K}\rho E\vct u\cdot\vct n\dd A
+ =-\int_{\partial K}p\vct u\cdot\vct n\dd A.
+ \label{eq:euler-energy-integral}
+\end{equation}
+所以能量通量是 $\rho E\vct u+p\vct u$。若只写 $\rho E\vct u$，会漏掉流体之间通过压力传递的功。定义比焓 $h=e+p/\rho$ 和总比焓 $H=E+p/\rho$，该通量也可写成 $\rho H\vct u$。
+
+\subsection{动能、内能：把压缩升温单独算出来}
+
+将三条动量方程分别乘以 $u_1,u_2,u_3$ 后相加：
+\begin{equation}
+ \rho\Dt\left(\frac12|\vct u|^2\right)=-\vct u\cdot\nabla p
+ =-\nabla\cdot(p\vct u)+p\nabla\cdot\vct u.
+ \label{eq:euler-kinetic}
+\end{equation}
+从总能量式减去它，得到
+\begin{equation}
+ \boxed{\rho\Dt e=-p\nabla\cdot\vct u.}\label{eq:euler-internal}
+\end{equation}
+对压缩粒子，$\nabla\cdot\vct u<0$，右端为正，内能增加；对膨胀粒子则相反。体力若存在，会同时出现在总能量和动能方程中并在相减时抵消，因而内能不会直接出现 $\rho\vct f\cdot\vct u$ 项。
+
+\subsection{严格的参考构形形式：质量、动量、能量各怎样拉回去}
+
+记 $\vct V=\partial_t\vct\chi=\vct u\circ\vct\chi$，$p^{\mathrm L}=p\circ\vct\chi$、$E^{\mathrm L}=E\circ\vct\chi$。为简洁，以下参考构形公式中的 $J,F,p^{\mathrm L},\vct V$ 都在同一 $(\vct X,t)$ 取值。Nanson 面积公式为
+\begin{equation}
+ \vct n\dd A=JF^{-\mathsf T}\vct N\dd A_0.
+\end{equation}
+因此参考面上的压力合力密度为 $-Jp^{\mathrm L}F^{-\mathsf T}\vct N$，参考应力为
+\begin{equation}
+ P=-Jp^{\mathrm L}F^{-\mathsf T}.
+\end{equation}
+参考区域固定，分别局部化动量和能量积分便得到
+\begin{align}
+ \rho_0\partial_t V_i&=\partial_{X_A}P_{iA},\qquad i=1,2,3,\label{eq:euler-reference-momentum}\\
+ \rho_0\partial_t E^{\mathrm L}
+ &=\partial_{X_A}(P_{iA}V_i)
+ =-\Div_{\vct X}(Jp^{\mathrm L}F^{-1}\vct V).
+ \label{eq:euler-reference-energy}
+\end{align}
+这里空间指标 $i$ 和参考指标 $A$ 分别求和，$\partial_t$ 固定 $\vct X$。内能式为
+\begin{equation}
+ \rho_0\partial_t e^{\mathrm L}=P:\partial_t F
+ =-p^{\mathrm L}\partial_tJ.
+\end{equation}
+最后一步来自 $\partial_tJ=J\tr(F^{-1}\partial_tF)$。将质量关系与运动学补齐，才是完整拉格朗日系统：
+\begin{equation}
+ \begin{gathered}
+ \partial_t\vct\chi=\vct V,\quad F=\nabla_{\vct X}\vct\chi,
+ \quad\rho^{\mathrm L}J=\rho_0,\\
+ \rho_0\partial_t\vct V=\Div_{\vct X}P,\qquad
+ \rho_0\partial_tE^{\mathrm L}=\Div_{\vct X}(P^{\mathsf T}\vct V).
+ \end{gathered}
+\end{equation}
+它不会因为跟随粒子就变成彼此独立的 ODE：$P$ 依赖 $\nabla_{\vct X}\vct\chi$，压力通过空间导数耦合不同粒子。
+
+反向验证用到 $\partial_{x_j}=(F^{-1})_{Aj}\partial_{X_A}$、Piola 恒等式 $\partial_{X_A}[J(F^{-1})_{Ai}]=0$，于是 $\Div_XP=J(\nabla_x\cdot\sigma)^{\mathrm L}$。这些换算在运动映射足够光滑且可逆时成立；跨激波时应回到守恒弱形式。
+
+\subsection{热力学闭合：温度、压强和熵方程如何逐个得到}
+
+对量热完全理想气体取常数 $c_v>0$、$R>0$：
+\begin{equation}
+ e=c_vT,\qquad p=\rho RT=(\gamma-1)\rho e,
+ \quad c_p=c_v+R,\quad\gamma=c_p/c_v>1.
+\end{equation}
+内能式先给出温度式
+\begin{equation}
+ \Dt T=-\frac p{\rho c_v}\nabla\cdot\vct u
+ =-(\gamma-1)T\nabla\cdot\vct u.
+\end{equation}
+再沿粒子对 $p=\rho RT$ 求导，而不是凭经验写下压力式：
+\begin{align}
+ \Dt p&=RT\Dt\rho+\rho R\Dt T\\
+ &=-p\nabla\cdot\vct u-(\gamma-1)p\nabla\cdot\vct u,
+\end{align}
+故 $\mathrm Dp/\mathrm Dt+\gamma p\nabla\cdot\vct u=0$。
+
+Gibbs 关系为 $T\dd s=\dd e+p\dd(1/\rho)$。沿粒子代入质量和内能式：
+\begin{equation}
+ \rho T\Dt s=\rho\Dt e+p\nabla\cdot\vct u=0.
+\end{equation}
+对光滑正温度解，$\mathrm Ds/\mathrm Dt=0$，参考坐标中即 $\partial_ts^{\mathrm L}=0$，欧拉守恒形式则为
+\begin{equation}
+ \partial_t(\rho s)+\nabla\cdot(\rho s\vct u)=0.
+\end{equation}
+对一般热力学闭合 $p=p(\rho,s)$，定义
+\begin{equation}
+ c^2=\left(\frac{\partial p}{\partial\rho}\right)_s>0,
+ \qquad p_s=\left(\frac{\partial p}{\partial s}\right)_\rho.
+\end{equation}
+链式法则同样给出 $\mathrm Dp/\mathrm Dt=-\rho c^2\nabla\cdot\vct u$。这就是后面声速与特征值的热力学来源。
+
+\subsection{逐式推导之后的系统汇总与适用条件}
+
+现在才将已推导的质量、三条动量和能量并列：
+\begin{equation}
+ \boxed{\begin{aligned}
+ \partial_t\rho+\nabla\cdot(\rho\vct u)&=0,\\
+ \partial_t(\rho\vct u)+\nabla\cdot(\rho\vct u\otimes\vct u+p\ten I)&=0,\\
+ \partial_t(\rho E)+\nabla\cdot[(\rho E+p)\vct u]&=0.
+ \end{aligned}}\label{eq:euler}
+\end{equation}
+这是五条标量守恒方程。理想气体闭合可直接写为
+\begin{equation}
+ \boxed{p=(\gamma-1)\left(\rho E-\frac{|\rho\vct u|^2}{2\rho}\right).}
+ \label{eq:pressure-conservative}
+\end{equation}
+若加入体力与供热，动量右端为 $\rho\vct f$，总能量右端为 $\rho\vct f\cdot\vct u+\rho r$，内能右端另加 $\rho r$，比熵满足 $\mathrm Ds/\mathrm Dt=r/T$。因此“无黏、无导热”仍需另说明是否有外部供热。
+
+\begin{warningbox}
+光滑无源 Euler 流只保证每个粒子自己的熵不变；不同粒子的熵可以不同。只有初始熵在全场一致时，才能对整个光滑流场用同一个常数写 $p=K\rho^\gamma$。出现激波后，一般还必须保留总能量守恒与熵不等式，不能把它们替换为处处 $\mathrm Ds/\mathrm Dt=0$。
+\end{warningbox}

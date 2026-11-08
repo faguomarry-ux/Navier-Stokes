@@ -1,0 +1,363 @@
+% 放在不可压缩 Navier--Stokes 方程之后，承接前面的变分基础。
+\section{流体的变分形式：Stokes 流、压力与黏性耗散}\label{sec:variation-stokes}
+
+前面的变分法现在用来回答三个流体问题：压力为何是乘子，低 Reynolds 数流动为何能由极小化求出，以及弱形式如何连接有限元。为避免混淆，以下记 $\vct g=\rho_0\vct f$ 为\textbf{单位体积体力}，$\vct f$ 仍保留全文的单位质量体力约定。
+
+\subsection{Stokes 模型与应力形式}
+
+对常密度、不可压缩 Newton 流体，在稳态且惯性相对黏性可忽略的低 Reynolds 数条件下，方程约化为
+\begin{equation}
+ \boxed{-\nabla\cdot(2\mu\ten D(\vct u))+\nabla p=\vct g,
+ \qquad\nabla\cdot\vct u=0.}\label{eq:stokes-strong-variational}
+\end{equation}
+这里 $\ten D(\vct u)=[\nabla\vct u+(\nabla\vct u)^{\mathsf T}]/2$，$\mu>0$。若 $\mu$ 常数，第一项等于 $-\mu\Delta\vct u$。稳态条件本身并不会消除 $\rho_0(\vct u\cdot\nabla)\vct u$；忽略它另需低惯性假设或特殊流动结构。
+
+设 $\ten\sigma=-p\ten I+2\mu\ten D$，则方程为 $-\nabla\cdot\ten\sigma=\vct g$。对边界条件
+\begin{equation}
+ \vct u=\vct u_D\text{ 在 }\Gamma_D,\qquad
+ \ten\sigma\vct n=\vct t_N\text{ 在 }\Gamma_N,
+\end{equation}
+测试函数满足 $\vct v=0$ 于 $\Gamma_D$。由张量分部积分和应力对称性得
+\begin{equation}
+ \int_\Omega2\mu\ten D(\vct u):\ten D(\vct v)\dd V
+ -\int_\Omega p\nabla\cdot\vct v\dd V
+ =\int_\Omega\vct g\cdot\vct v\dd V
+ +\int_{\Gamma_N}\vct t_N\cdot\vct v\dd A.
+ \label{eq:stokes-mixed-boundary}
+\end{equation}
+这同时保留了压力符号、应力牵引和对称梯度。即使体内 $\mu\Delta\vct u=\nabla\cdot(2\mu\ten D)$，在有自然边界时也不能随意用 $\mu\partial_n\vct u$ 替代物理牵引。
+
+\subsection{压力作为不可压缩约束的乘子}\label{subsec:stokes-pressure}
+
+先取全边界齐次无滑移，令
+\begin{equation}
+ V=[H^1_0(\Omega)]^d,\qquad
+ Z=\{\vct v\in V:\nabla\cdot\vct v=0\},\qquad
+ Q=L^2_0(\Omega)=\{q\in L^2(\Omega):\int_\Omega q\dd V=0\}.
+\end{equation}
+假定 $\Omega$ 有界、连通且为 Lipschitz 区域，$\vct g\in[L^2]^d$。在无散空间 $Z$ 上考虑
+\begin{equation}
+ \mathcal J[\vct u]=\int_\Omega\mu|\ten D(\vct u)|^2\dd V
+ -\int_\Omega\vct g\cdot\vct u\dd V.
+ \label{eq:stokes-min-functional}
+\end{equation}
+其第一项是\textbf{总黏性耗散率的一半}，整个泛函具有功率的量纲，不是流体储存的机械能。若通过乘子解除无散约束，定义
+\begin{equation}
+ \mathcal L[\vct u,p]=\mathcal J[\vct u]
+ -\int_\Omega p\nabla\cdot\vct u\dd V.
+ \label{eq:stokes-lagrangian}
+\end{equation}
+分别对速度和压力变分：
+\begin{align}
+ \delta_{\vct u}\mathcal L[\vct v]
+ &=\int_\Omega2\mu\ten D(\vct u):\ten D(\vct v)\dd V
+ -\int_\Omega p\nabla\cdot\vct v\dd V
+ -\int_\Omega\vct g\cdot\vct v\dd V=0,\\
+ \delta_p\mathcal L[q]&=-\int_\Omega q\nabla\cdot\vct u\dd V=0.
+\end{align}
+因此压力项在强形式中给出 $+\nabla p$，恰好恢复 \eqref{eq:stokes-strong-variational}。
+
+$q$ 只遍历零均值空间时，第二式先说明 $\nabla\cdot\vct u$ 是常数；再由 $\vct u=0$ 于边界，$\int\nabla\cdot\vct u=0$，故此常数为零。压力只确定到加法常数，零均值是固定这一自由度的规范。若边界上指定了绝对牵引，则压力常数可能已被边界数据确定，不能再任意强加零均值。
+
+\begin{warningbox}
+速度在满足约束的空间中极小化 $\mathcal J$；速度与压力共同求解时，$\mathcal L$ 是鞍点问题。它对 $p$ 是线性的：对不满足约束的速度，沿某个压力方向可使其无界，因而不能把 $\mathcal L$ 对两个变量一起作普通无约束极小化。
+\end{warningbox}
+
+\subsection{极小化原理的证明：外力功不能漏掉}
+
+设 $\vct u_*$ 满足无散弱形式。对任何同样满足边界条件及无散条件的 $\vct u_*+\vct w$，有
+\begin{align}
+ \mathcal J[\vct u_*+\vct w]-\mathcal J[\vct u_*]
+ &=2\int_\Omega\mu\ten D(\vct u_*):\ten D(\vct w)\dd V
+ -\int_\Omega\vct g\cdot\vct w\dd V\\
+ &\quad+\int_\Omega\mu|\ten D(\vct w)|^2\dd V\\
+ &=\int_\Omega\mu|\ten D(\vct w)|^2\dd V\ge0.
+ \label{eq:stokes-energy-gap}
+\end{align}
+Korn 不等式在此无滑移变分空间中排除非零刚体运动，故等号仅当 $\vct w=0$。这证明唯一全局极小性；结合 Korn、Poincar\'e 与 Lax--Milgram 可在 $Z$ 上证明速度存在唯一。
+
+若 $\vct g=0$、全部边界速度已给定且存在无散延拓，则确实是在同一边界速度与不可压缩约束下最小化耗散。若存在体力或边界牵引，则必须保留对应的线性功率项。不能把所有受驱动黏性流都概括成“耗散越小越好”。部分自然边界时还要检查刚体模态及负载兼容性；上面的唯一性结论采用全边界无滑移条件。
+
+\subsection{完整例题：用变分法推导平面 Poiseuille 流}
+
+考虑两块静止平板 $y=0,H$ 间的充分发展流 $\vct u=(U(y),0,0)$。取无体力且恒定压力梯度 $G=-\partial_xp>0$，则不可压缩自动成立，对流加速度也为零。每单位流向长度、单位展向宽度上的泛函为
+\begin{equation}
+ \mathcal J[U]=\int_0^H\left[\frac\mu2(U')^2-GU\right]\dd y,
+ \qquad U(0)=U(H)=0.\label{eq:poiseuille-functional}
+\end{equation}
+因为 $D_{12}=D_{21}=U'/2$，$\mu|\ten D|^2=\mu(U')^2/2$，这里的因子与三维泛函完全一致。压力梯度已作为等效流向驱动力 $G$ 写入，不能再重复计入一份压力功。
+
+\textbf{第一步：变分并积分分部。}
+\begin{equation}
+ \delta\mathcal J[U;\eta]=\int_0^H(\mu U'\eta'-G\eta)\dd y
+ =\int_0^H(-\mu U''-G)\eta\dd y.
+\end{equation}
+\textbf{第二步：由基本引理及边界条件解方程。}
+\begin{equation}
+ -\mu U''=G,\qquad
+ \boxed{U(y)=\frac G{2\mu}y(H-y).}\label{eq:poiseuille-variation-solution}
+\end{equation}
+\textbf{第三步：核对流量与耗散。}单位展向宽度的体积流量为
+\begin{equation}
+ Q_{\mathrm{flow}}=\int_0^H U\dd y=\frac{GH^3}{12\mu},\qquad
+ \Phi=\int_0^H\mu(U')^2\dd y
+ =\frac{G^2H^3}{12\mu}=GQ_{\mathrm{flow}}.
+\end{equation}
+输入的压力功率与黏性耗散率相等。第二变分为 $\int_0^H\mu(\eta')^2\dd y>0$（非零齐次端点扰动），故这确为唯一极小点。
+
+\textbf{定压差与定流量的区别。}若已知流量 $Q_0$ 而未知 $G$，则极小化 $\frac\mu2\int(U')^2\dd y$，约束 $\int U\dd y=Q_0$。乘子泛函为
+\begin{equation}
+ \frac\mu2\int_0^H(U')^2\dd y
+ -G\left(\int_0^H U\dd y-Q_0\right),
+\end{equation}
+恢复相同的抛物线，并得到 $G=12\mu Q_0/H^3$。此时 $G$ 作为整体流量约束的常数乘子出现。作为对照，无压差而上板以 $U_0$ 移动的 Couette 流，通过同一梯度泛函和非齐次边界得到 $U(y)=U_0y/H$。
+
+\subsection{混合弱形式、有限元与 inf--sup 条件}
+
+记
+\begin{equation}
+ a(\vct u,\vct v)=\int_\Omega2\mu\ten D(\vct u):\ten D(\vct v)\dd V,
+ \quad b(\vct v,q)=-\int_\Omega q\nabla\cdot\vct v\dd V.
+\end{equation}
+混合弱形式为求 $(\vct u,p)\in V\times Q$，使
+\begin{equation}
+ \begin{aligned}
+ a(\vct u,\vct v)+b(\vct v,p)&=\ell(\vct v)&& (\vct v\in V),\\
+ b(\vct u,q)&=0&&(q\in Q).
+ \end{aligned}\label{eq:stokes-mixed-abstract}
+\end{equation}
+压力控制来自 inf--sup 条件
+\begin{equation}
+ \inf_{q\in Q\setminus\{0\}}\sup_{\vct v\in V\setminus\{0\}}
+ \frac{|b(\vct v,q)|}{\|\vct v\|_{H^1}\|q\|_{L^2}}\ge\beta>0.
+\end{equation}
+在上述有界连通 Lipschitz 区域、全边界速度条件下，连续问题满足此条件；其一般证明不在本节展开。它与 $a$ 在无散核上的强制性共同保证压力恢复和稳定性。仅用 $a(\vct u,\vct u)$ 无法控制压力，因而不能对整个 $V\times Q$ 直接套普通强制型 Lax--Milgram 定理。
+
+离散后得到
+\begin{equation}
+ \begin{pmatrix}A&B^{\mathsf T}\\B&0\end{pmatrix}
+ \begin{pmatrix}U\\P\end{pmatrix}
+ =\begin{pmatrix}F\\0\end{pmatrix}.
+\end{equation}
+这个矩阵通常是不定的。速度与压力空间必须满足与网格大小无关的离散 inf--sup 条件，或使用有理论保证的稳定化。二维形状正则三角网格上的连续二次速度、连续一次压力 Taylor--Hood 配对是常用选择，稳定性须在相应网格假设下核实；不能仅凭两个空间各自能逼近函数就认定混合离散稳定。
+
+\subsection{非定常 Stokes 的隐式时间步也是极小化}
+
+给定 $\vct u^n$，在 $Z$ 上极小化
+\begin{equation}
+ \mathcal J_{\Delta t}[\vct v]
+ =\frac{\rho_0}{2\Delta t}\int_\Omega|\vct v-\vct u^n|^2\dd V
+ +\int_\Omega\mu|\ten D(\vct v)|^2\dd V
+ -\int_\Omega\vct g^{n+1}\cdot\vct v\dd V.
+\end{equation}
+引入压力约束并作第一变分，得到
+\begin{equation}
+ \rho_0\frac{\vct u^{n+1}-\vct u^n}{\Delta t}
+ -\nabla\cdot(2\mu\ten D(\vct u^{n+1}))+\nabla p^{n+1}
+ =\vct g^{n+1},\quad\nabla\cdot\vct u^{n+1}=0.
+\end{equation}
+这是非定常 Stokes 的隐式 Euler 步。时间差罚项与黏性项共同控制新速度；这里没有完整 Navier--Stokes 的非线性对流项。
+
+\subsection{Navier--Stokes 有弱形式，但不直接沿用稳态极小化}
+
+对光滑常密度不可压缩解，保留惯性得到
+\begin{align}
+ \rho_0\langle\partial_t\vct u,\vct v\rangle
+ +\rho_0 c(\vct u;\vct u,\vct v)
+ +a(\vct u,\vct v)+b(\vct v,p)&=\ell(\vct v),\\
+ b(\vct u,q)&=0,
+\end{align}
+其中 $c(\vct w;\vct u,\vct v)=\int_\Omega[(\vct w\cdot\nabla)\vct u]\cdot\vct v\dd V$。若 $\nabla\cdot\vct w=0$ 且边界通量消失，则
+\begin{equation}
+ c(\vct w;\vct u,\vct v)=-c(\vct w;\vct v,\vct u),
+ \qquad c(\vct u;\vct u,\vct u)=0.
+\end{equation}
+所以光滑解取 $\vct v=\vct u$ 时，压力约束和对流项消失，恢复
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}\frac{\rho_0}{2}\|\vct u\|_{L^2}^2
+ +2\mu\|\ten D(\vct u)\|_{L^2}^2
+ =\int_\Omega\vct g\cdot\vct u\dd V.
+\end{equation}
+无滑移且无散时，$2\int|\ten D|^2=\int|\nabla\vct u|^2$，与前文能量式一致。取测试函数为解本身，在低正则性情况下需要逼近论证；三维 Leray--Hopf 弱解采用能量不等式，不能未经论证就写成等式。
+
+为降低对时间导数的要求，还可用在 $t=T$ 为零的时空光滑测试函数 $\vct\varphi$：
+\begin{align}
+ &\int_0^T\!\int_\Omega\bigl[-\rho_0\vct u\cdot\partial_t\vct\varphi
+ -\rho_0(\vct u\otimes\vct u):\nabla\vct\varphi\notag\\
+ &\hspace{4em}+2\mu\ten D(\vct u):\ten D(\vct\varphi)
+ -p\nabla\cdot\vct\varphi\bigr]\dd V\dd t\notag\\
+ &=\int_0^T\!\int_\Omega\vct g\cdot\vct\varphi\dd V\dd t
+ +\rho_0\int_\Omega\vct u_0\cdot\vct\varphi(0)\dd V.
+\end{align}
+全边界无滑移时取 $\vct\varphi=0$ 于边界；若进一步只用无散测试函数，压力项消失，压力可在合适条件下另行恢复。此式先由光滑解推导；对一般弱解还要明确速度、压力、初值的函数空间与积分意义。
+
+\begin{keypoint}
+对流算子具有反对称结构，通常不是前面那个对称正定二次泛函的梯度。完整 Navier--Stokes 的弱形式、时间推进与耗散估计都能使用变分思想，但不能把稳态 Stokes 的极小化泛函直接照搬为完整动力学原理。
+\end{keypoint}
+
+\section{流体的作用量原理：Euler 方程与受约束路径}\label{sec:variation-action}
+
+\subsection{Hamilton 原理与三种变分思想的区别}
+
+对有限维保守系统，作用量为
+\begin{equation}
+ S[q]=\int_{t_0}^{t_1}\left[\frac m2|\dot q|^2-V(q)\right]\dd t.
+\end{equation}
+固定起终位置，$\delta q(t_0)=\delta q(t_1)=0$，时间分部积分给出
+\begin{equation}
+ \delta S=-\int_{t_0}^{t_1}(m\ddot q+\nabla V)\cdot\delta q\dd t=0,
+\end{equation}
+从而得到 Newton 方程。它对整条路径求驻点，并不保证作用量最小。对应到流体，需要比较\textbf{整条允许的粒子运动映射}，不能把每个时刻的速度任意独立扰动。
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{p{0.23\linewidth}p{0.31\linewidth}p{0.36\linewidth}}
+\toprule
+形式 & 比较的对象 & 本文典型用途 \\
+\midrule
+静态能量极小化 & 满足边界和约束的场 & Poisson、稳态 Stokes \\
+Hamilton 驻作用量 & 固定起终配置的运动路径 & 无黏 Euler 流 \\
+弱形式与虚功 & 对所有测试方向的积分关系 & Stokes、Navier--Stokes、有限元 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{不可压缩 Euler：粒子映射与允许扰动}
+
+为简化边界处理，以下在周期空间盒中作光滑形式推导。设粒子位置为 $\vct X(\vct a,t)$，初始参考密度为常数 $\rho_0$，不可压缩要求
+\begin{equation}
+ \det\nabla_{\vct a}\vct X=1,\qquad
+ \vct u(\vct X(\vct a,t),t)=\partial_t\vct X(\vct a,t).
+\end{equation}
+无外力时作用量为
+\begin{equation}
+ S[\vct X]=\frac{\rho_0}{2}\int_{t_0}^{t_1}\!\int_\Omega
+ |\partial_t\vct X|^2\dd V_{\vct a}\dd t
+ =\frac{\rho_0}{2}\int_{t_0}^{t_1}\!\int_\Omega|\vct u|^2\dd V\dd t.
+\end{equation}
+取一族保体积映射 $\vct X_\varepsilon$，在时间两端固定整张粒子配置。把位移变分写回空间坐标：
+\begin{equation}
+ \vct\xi(\vct x,t)=\delta\vct X(\vct a,t)
+ \big|_{\vct a=\vct X^{-1}(\vct x,t)},\qquad
+ \nabla\cdot\vct\xi=0,\quad\vct\xi(t_0)=\vct\xi(t_1)=0.
+\end{equation}
+无散条件来自行列式变分 $\delta(\det F)=(\det F)\tr(F^{-1}\delta F)$。它限制了路径扰动，而不仅是给最终速度加上一个方程。
+
+\subsection{速度的受约束变分：逐步推导关键公式}
+
+对 $\vct u_\varepsilon(\vct X_\varepsilon,t)=\partial_t\vct X_\varepsilon$ 求变分，链式法则给出
+\begin{equation}
+ \delta\vct u+(\vct\xi\cdot\nabla)\vct u
+ =\partial_t\delta\vct X
+ =\partial_t\vct\xi+(\vct u\cdot\nabla)\vct\xi.
+\end{equation}
+因此
+\begin{equation}
+ \boxed{\delta\vct u=\partial_t\vct\xi
+ +(\vct u\cdot\nabla)\vct\xi
+ -(\vct\xi\cdot\nabla)\vct u.}\label{eq:euler-constrained-variation}
+\end{equation}
+这三个项分别记录路径扰动的时间变化、沿原流动的输运，以及由于采样点移动造成的速度改变。该公式常写为 $\delta\vct u=\partial_t\vct\xi+[\vct u,\vct\xi]$。
+
+\begin{warningbox}
+不能把 $\delta\vct u$ 当成每个时空点上完全自由的变量，直接对 $\int\rho_0|\vct u|^2/2$ 求变分；这样会错误地得到 $\vct u=0$。即使只加瞬时无散约束，也没有编码固定起终粒子路径及其运动学联系。式 \eqref{eq:euler-constrained-variation} 正是不可省略的联系。
+\end{warningbox}
+
+\subsection{作用量变分如何给出对流项与压力}
+
+将受约束变分代入，利用周期边界、时间端点固定及 $\nabla\cdot\vct u=0$，
+\begin{align}
+ \delta S
+ &=\rho_0\int_{t_0}^{t_1}\!\int_\Omega
+ u_i(\partial_t\xi_i+u_j\partial_{x_j}\xi_i-\xi_j\partial_{x_j}u_i)\dd V\dd t\\
+ &=-\rho_0\int_{t_0}^{t_1}\!\int_\Omega
+ \left[\partial_t\vct u+(\vct u\cdot\nabla)\vct u
+ +\nabla\frac{|\vct u|^2}{2}\right]\cdot\vct\xi\dd V\dd t.
+\end{align}
+最后一个梯度项与无散 $\vct\xi$ 的积分为零。周期空间中，与所有光滑无散向量场正交的场是梯度场（Helmholtz 分解），故驻作用量等价于存在压力使
+\begin{equation}
+ \boxed{\rho_0[\partial_t\vct u+(\vct u\cdot\nabla)\vct u]
+ =-\nabla p,\qquad\nabla\cdot\vct u=0.}
+\end{equation}
+压力又一次承担约束力的角色。中间的梯度 $\nabla(|\vct u|^2/2)$ 可以吸收到梯度乘子中，不能因此在最终物理压力项外另加一份同样的力。
+
+这与从动量守恒得到的不可压缩 Euler 方程一致。这里给出的是光滑路径上的形式变分推导，没有据此证明三维 Euler 解的全局存在，也没有为激波或其他低正则性解建立作用量原理。
+
+\subsection{可压缩正压流：内能变分给出压强}
+
+再考虑无黏、无热传导的正压流，单位质量内能仅依赖密度：$e=e(\rho)$。这适用于相应的等熵/正压闭合，不代表一般非等熵 Euler 系统。取参考密度 $\rho_{\mathrm{ref}}(\vct a)$，令
+\begin{equation}
+ F=\nabla_{\vct a}\vct X,\qquad J=\det F>0,\qquad
+ \rho(\vct X,t)=\frac{\rho_{\mathrm{ref}}}{J}.
+\end{equation}
+质量守恒已经包含在这一关系中。对单位质量外势 $\Psi(\vct x)$，作用量为
+\begin{equation}
+ S[\vct X]=\int_{t_0}^{t_1}\!\int_{\Omega_0}\rho_{\mathrm{ref}}
+ \left[\frac12|\partial_t\vct X|^2-e\left(\frac{\rho_{\mathrm{ref}}}{J}\right)
+ -\Psi(\vct X)\right]\dd V_{\vct a}\dd t.
+\end{equation}
+这里路径扰动不再要求保体积。记 $\vct\xi=\delta\vct X\circ\vct X^{-1}$，随粒子的密度变分满足
+\begin{equation}
+ \delta J=J\nabla\cdot\vct\xi,\qquad
+ \delta_{\mathrm L}\rho=-\rho\nabla\cdot\vct\xi.
+\end{equation}
+$\delta_{\mathrm L}$ 表示随粒子的拉格朗日变分；固定空间点的欧拉变分则为 $\delta\rho=-\nabla\cdot(\rho\vct\xi)$。
+
+利用 $\rho_{\mathrm{ref}}\dd V_{\vct a}=\rho\dd V$，内部能量项的变分为
+\begin{equation}
+ \delta\left[-\int_{\Omega_0}\rho_{\mathrm{ref}}e(\rho)\dd V_{\vct a}\right]
+ =\int_\Omega\rho^2e'(\rho)\nabla\cdot\vct\xi\dd V.
+\end{equation}
+因此识别出压强
+\begin{equation}
+ \boxed{p(\rho)=\rho^2e'(\rho).}
+\end{equation}
+它也与 Gibbs 关系在熵固定时的 $\mathrm de=p\mathrm d\rho/\rho^2$ 一致。周期边界下，将压力项空间分部积分、动能项时间分部积分，得到
+\begin{equation}
+ \delta S=-\int_{t_0}^{t_1}\!\int_\Omega
+ [\rho\Dt\vct u+\nabla p+\rho\nabla\Psi]\cdot\vct\xi\dd V\dd t.
+\end{equation}
+故 $\rho\Dt\vct u=-\nabla p-\rho\nabla\Psi$，配合已内建的质量守恒即为正压 Euler 系统。若有实体边界，还必须处理边界压力功；自由表面问题需要把边界运动及可能的表面能一并纳入，不能沿用“周期项自动消失”。
+
+\subsection{黏性怎样进入：虚功扩展与耗散}
+
+普通保守作用量 $\int(T-V)\dd t$ 没有提供黏性耗散项。对前面的不可压缩光滑路径，可以用 Lagrange--d'Alembert 虚功原理加入非保守力：
+\begin{equation}
+ \delta S+\int_{t_0}^{t_1}\!\int_\Omega
+ [\vct g+\nabla\cdot(2\mu\ten D)]\cdot\vct\xi\dd V\dd t=0.
+\end{equation}
+这给出 $\rho_0\Dt\vct u=-\nabla p+\nabla\cdot(2\mu\ten D)+\vct g$。这里额外的积分是\textbf{力的虚功}，不是把它当成另一项作用量后再作完整变分。黏性应力由本构和第二定律给出，虚功原理只把该力纳入运动方程。
+
+对应的 Rayleigh 耗散泛函是
+\begin{equation}
+ \mathcal R[\vct u]=\int_\Omega\mu|\ten D(\vct u)|^2\dd V
+ =\frac12\Phi[\vct u],\qquad
+ \delta\mathcal R[\vct u;\vct v]
+ =\int_\Omega2\mu\ten D(\vct u):\ten D(\vct v)\dd V.
+\end{equation}
+在相应边界条件下，其负梯度对应黏性力 $\nabla\cdot(2\mu\ten D)$。耗散率是 $\Phi=2\mathcal R$，不能漏掉因子 $2$。将 $-\mathcal R$ 直接加到普通作用量中并任意变分，一般不能替代上述受约束的非保守虚功处理。
+
+\subsection{课堂复习路线、易错点与带核对结果的练习}
+
+建议先独立推导 \eqref{eq:el-1d} 和 \eqref{eq:poisson-strong}，再推导压力乘子形式 \eqref{eq:stokes-lagrangian}，完成 Poiseuille 例题，最后理解式 \eqref{eq:euler-constrained-variation} 的来源。基础题优先掌握前三步，路径约束推导作为流体结构的进一步理解。
+
+自检时依次确认：变的是场还是路径，边界哪些固定，约束是整体还是逐点，边界项为何消失，得到的是驻点还是极小点，以及压力、体力与耗散的符号和量纲是否一致。
+
+\begin{enumerate}
+ \item \textbf{自由端与边界弹簧。}对 $\mathcal J[w]=\frac12\int_0^1(w')^2\dd x+\frac k2w(1)^2-Fw(1)$，仅固定 $w(0)=0$，求驻点。\textbf{核对：}$w''=0$，$w'(1)+kw(1)=F$；当 $k\ge0$ 时唯一极小解为 $w(x)=Fx/(1+k)$。
+ \item \textbf{纯通量边界。}从 $-\Delta w=s$、$\partial_nw=h$ 推导兼容条件。\textbf{核对：}$\int_\Omega s+\int_{\partial\Omega}h=0$，还需固定加法常数才有唯一解。
+ \item \textbf{两项 Ritz 近似。}对 $-w''=x$ 取基 $\phi_1=x(1-x)$、$\phi_2=x^2(1-x)$。\textbf{核对：}$K_{11}=1/3$、$K_{12}=1/6$、$K_{22}=2/15$，$F=(1/12,1/20)^{\mathsf T}$；系数均为 $1/6$，此次恰好恢复精确解，因为它属于试探空间。
+ \item \textbf{固定流量。}已知平板间流量 $Q_0$，由约束变分求速度与压力梯度。\textbf{核对：}$U(y)=6Q_0y(H-y)/H^3$，$G=12\mu Q_0/H^3$，$\Phi=12\mu Q_0^2/H^3$。
+ \item \textbf{压力消失到哪里。}说明为何无散测试函数使压力项为零，而强方程仍有压力。\textbf{核对：}压力梯度与无散测试空间正交；它是恢复完整动量方程时的约束力，不是物理上等于零。
+ \item \textbf{Euler 路径变分。}从 $\vct u_\varepsilon(\vct X_\varepsilon,t)=\partial_t\vct X_\varepsilon$ 重推受约束变分式，并指出若把 $\delta\vct u$ 任意独立选取会失去什么。\textbf{核对：}必须保留采样点位移项 $(\vct\xi\cdot\nabla)\vct u$ 及路径端点、保体积约束。
+\end{enumerate}
+
+\subsection{参考阅读与适用范围}
+
+本专题推导以本文的应力、梯度和体力约定为准，例题重新计算。可对照以下公开教学资料阅读：
+\begin{itemize}
+ \item David Tong，\emph{Classical Dynamics}，\href{https://www.damtp.cam.ac.uk/user/tong/dynamics.html}{剑桥大学课程页面}：作用量、Euler--Lagrange 方程与约束力学。
+ \item David Tong，\emph{Fluid Mechanics}，\href{https://www.damtp.cam.ac.uk/user/tong/fluids/fluids1.pdf}{关于无黏流动及其变分原理的讲义}：流体作用量与运动学约束的进一步讨论。
+ \item \emph{Finite Element Course}，\href{https://finite-element.github.io/L6_stokes.html}{Stokes equation}：速度--压力混合形式、inf--sup 条件及有限元离散。
+\end{itemize}
+本文证明基本变分公式、所列极小化恒等式和光滑流体的形式作用量推导。Sobolev 迹、Korn 不等式、Poincar\'e 不等式、Lax--Milgram 定理、Helmholtz 分解和混合稳定性定理作为外部工具使用。本专题不将形式推导视为一般流体方程存在性或正则性的证明。

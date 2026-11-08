@@ -1,0 +1,222 @@
+\section{一维拉格朗日质量坐标：逐条重写 Euler 与 NSF}\label{sec:mass-coordinate}
+
+固定参考构形适用于多维连续介质；气体动力学课堂还常用一维\textbf{质量坐标}，将方程写得更直接。本节说明坐标怎样定义、每个导数怎样改变，以及为什么粒子坐标下的声学特征速度不是直接写 $\pm c$。
+
+\subsection{坐标变换：空间坐标与质量坐标并非改名}
+
+考虑三维流体的平面一维运动 $\vct u=(u(x,t),0,0)$，所有量只随 $x,t$ 变化。取随流动的左端 $a(t)$，$a'(t)=u(a(t),t)$，定义每单位横截面积的累积质量
+\begin{equation}
+ m(x,t)=\int_{a(t)}^x\rho(z,t)\dd z.
+\end{equation}
+由质量方程和变限积分公式，在固定 $x$ 求导：
+\begin{align}
+ m_x&=\rho,\\
+ m_t&=\int_{a(t)}^x\rho_t\dd z-\rho(a,t)a'(t)
+ =-\rho(x,t)u(x,t).
+\end{align}
+所以 $m_t+u m_x=0$，每个粒子的质量标号 $m$ 不变。设 $x=x(m,t)$，定义比体积
+\begin{equation}
+ v=\frac1\rho>0,\qquad
+ x_m=v,\qquad x_t|_m=u.
+\end{equation}
+本节 $v$ 是标量比体积，不是速度向量。链式法则给出
+\begin{equation}
+ \boxed{\partial_x=\rho\partial_m=\frac1v\partial_m,
+ \qquad \partial_t|_m=\partial_t|_x+u\partial_x=\Dt.}
+ \label{eq:mass-coordinate-derivatives}
+\end{equation}
+面积单位已固定，$m$ 的量纲是质量/面积；它与长度坐标 $x$ 的量纲不同。
+
+\subsection{Euler 质量方程：体积的变化由两端速度差决定}
+
+由 $x_m=v$ 与 $x_t=u$ 交换偏导，
+\begin{equation}
+ \boxed{v_t-u_m=0.}\label{eq:lag-mass}
+\end{equation}
+也可直接从 $\rho_t|_m=-\rho u_x$ 得 $v_t=v u_x=u_m$。若相邻质量粒子的右侧速度较大，$u_m>0$，它们之间的空间间隔变大，比体积增加；质量本身始终保持不变。
+
+\subsection{Euler 动量方程：一个质量区间两端的压力差}
+
+对单位横截面积、质量标号 $[m_1,m_2]$ 的物质体，总动量为 $\int_{m_1}^{m_2}u\dd m$，两端压力合力为 $p(m_1)-p(m_2)$。因此
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}\int_{m_1}^{m_2}u\dd m
+ =-\int_{m_1}^{m_2}p_m\dd m,
+ \qquad\boxed{u_t+p_m=0.}\label{eq:lag-momentum}
+\end{equation}
+这也由 $\rho\mathrm Du/\mathrm Dt=-p_x$ 与 $p_x=\rho p_m$ 得到。没有显式的 $uu_x$ 项，是因为时间导数已经沿粒子取值，并非对流效应被物理上删除了。
+
+\subsection{Euler 总能量、内能与熵：三个式子怎样互相核对}
+
+质量区间的总能量为 $\int E\dd m$，两端压力做功是 $p u|_{m_1}-p u|_{m_2}$，故
+\begin{equation}
+ \boxed{E_t+(pu)_m=0,\qquad E=e+\tfrac12u^2.}\label{eq:lag-energy}
+\end{equation}
+将动量式乘以 $u$：$(u^2/2)_t=-up_m$。从总能量式中减去它：
+\begin{equation}
+ e_t=-(pu)_m+up_m=-p u_m,
+ \qquad \boxed{e_t+p v_t=0.}\label{eq:lag-internal}
+\end{equation}
+Gibbs 关系现在直接给出 $T s_t=e_t+p v_t=0$。因而在光滑、无源且 $T>0$ 的区域，$s_t=0$。比内能不一定不变，等熵压缩时它会随着比体积减小而增加。
+
+量热完全理想气体在此坐标下有 $e=c_vT$、$p=RT/v$。由 $e_t=-pu_m$ 先得
+\begin{equation}
+ T_t=-(\gamma-1)\frac T v u_m,
+\end{equation}
+再对 $p=RT/v$ 求导并用 $v_t=u_m$，得到
+\begin{equation}
+ p_t+\frac{\gamma p}{v}u_m=0.
+\end{equation}
+它与欧拉形式 $\mathrm Dp/\mathrm Dt+\gamma p u_x=0$ 完全相同。
+
+\subsection{NSF 质量坐标：先变换应力和热流}
+
+虽然流场只随一个空间坐标变化，本构仍是三维 Newton 流体的平面限制。因此流向黏性应力为
+\begin{equation}
+ \pi_{\mathrm v}=\tau_{11}=a_{\mathrm v}u_x,
+ \qquad a_{\mathrm v}=2\mu+\lambda=\frac43\mu+\zeta,
+ \qquad q=-kT_x.
+\end{equation}
+$\pi_{\mathrm v}$ 表示黏性正应力，区别于压力 $p$ 和比体积 $v$。先用导数变换得到
+\begin{equation}
+ \boxed{\pi_{\mathrm v}=\frac{a_{\mathrm v}}v u_m,
+ \qquad q=-\frac{k}{v}T_m.}\label{eq:lag-viscous-fluxes}
+\end{equation}
+即使 $a_{\mathrm v},k$ 为常数，质量坐标下仍有 $1/v$ 的变系数，不能直接改写成常系数 $u_{mm}$、$T_{mm}$。
+
+质量式保持 $v_t-u_m=0$。动量式的两端总法向应力是 $-p+\pi_{\mathrm v}$，故
+\begin{equation}
+ \boxed{u_t+(p-\pi_{\mathrm v})_m=f,}\label{eq:lag-ns-momentum}
+\end{equation}
+其中 $f$ 是流向单位质量体力。总能量通量的压力、黏性功和导热逐项合并为
+\begin{equation}
+ \boxed{E_t+[(p-\pi_{\mathrm v})u+q]_m=fu+r.}\label{eq:lag-ns-energy}
+\end{equation}
+将动量式乘以 $u$ 并从能量式相减：
+\begin{equation}
+ \boxed{e_t+p u_m=\pi_{\mathrm v}u_m-q_m+r.}\label{eq:lag-ns-internal}
+\end{equation}
+内能中的黏性项是 $\pi_{\mathrm v}u_m=a_{\mathrm v}u_m^2/v\ge0$。导热项是 $-q_m=(kT_m/v)_m$，并非不带几何系数的 $kT_{mm}$。
+
+再除以温度、整理 $q/T$ 的导数，得到
+\begin{equation}
+ \boxed{s_t+(q/T)_m
+ =\frac{a_{\mathrm v}}{vT}u_m^2
+ +\frac{k}{vT^2}T_m^2+\frac rT.}\label{eq:lag-ns-entropy}
+\end{equation}
+这表明换成跟随粒子的坐标并不会消除熵产生。对任意固定质量区间，积分此式即可得到“熵变化 = 边界熵流入 + 内部产生 + 热源交换”。
+
+\subsection{坐标转换的逐式对照与边界数据}
+
+在无源情况下，三条 Euler 关系分别对应
+\begin{align}
+ \rho_t+(\rho u)_x=0&\quad\longleftrightarrow\quad v_t-u_m=0,\\
+ \rho\Dt u+p_x=0&\quad\longleftrightarrow\quad u_t+p_m=0,\\
+ \rho\Dt E+(pu)_x=0&\quad\longleftrightarrow\quad E_t+(pu)_m=0.
+\end{align}
+初始数据不能随意照抄：需先由初始密度构造 $m(x,0)$，再把 $u,e,s$ 拉回 $m$。物质壁面的标号固定；固定空间开口一般有流体穿过，不是固定质量端点。上述积分推导采用物质端点，若研究开口则应额外处理穿越端点的通量。
+
+\section{从熵的角度读方程组：闭合、可逆性与激波选择}\label{sec:entropy-three-views}
+
+\subsection{物理熵怎样从内能与质量方程推出来}
+
+比熵 $s$ 是单位质量的热力学状态函数；$\rho s$ 是单位当前体积的熵。Gibbs 关系
+\begin{equation}
+ T\dd s=\dd e+p\dd(1/\rho)
+\end{equation}
+将质量和内能联系起来。第二定律要求内部产生非负，但\textbf{单凭第二定律不能独立重建质量、动量和完整能量方程}；必须先有第一定律与状态方程。
+
+理想气体中将 $e=c_vT$、$p=\rho RT$ 代入：
+\begin{equation}
+ \dd s=c_v\frac{\dd T}{T}-R\frac{\dd\rho}{\rho}.
+\end{equation}
+取固定正参考态 $(\rho_*,T_*,p_*),\ p_*=\rho_*RT_*$，积分为
+\begin{equation}
+ s=s_*+c_v\ln\frac T{T_*}-R\ln\frac\rho{\rho_*}
+ =s_*+c_v\ln\left[\frac{p/p_*}{(\rho/\rho_*)^\gamma}\right].
+ \label{eq:physical-entropy-reference}
+\end{equation}
+参考量使对数的自变量无量纲；改变 $s_*$ 只改变熵零点，不改变熵产生和特征速度。
+
+\subsection{用熵替换能量变量：需要保留什么信息}
+
+对光滑无源 Euler 流，可用 $p=p(\rho,s)$ 和以下逐式关系闭合：
+\begin{equation}
+ \Dt\rho=-\rho\theta,\qquad
+ \Dt u_i=-\frac1\rho\partial_{x_i}p,\qquad
+ \Dt s=0.
+\end{equation}
+因为 $\mathrm De/\mathrm Dt=T\mathrm Ds/\mathrm Dt-p\mathrm D(1/\rho)/\mathrm Dt$，它可以反推出内能，再结合动量恢复总能量。这个等价性依赖光滑链式法则和热力学闭合。
+
+对 NSF 则应写
+\begin{equation}
+ \Dt s=\frac{\mathcal Q}{\rho T},\qquad
+ \Dt p=-\rho c^2\theta+\frac{p_s}{\rho T}\mathcal Q,
+ \quad \mathcal Q=\tau:\nabla u-\nabla\cdot q+\rho r.
+ \label{eq:entropy-pressure-general}
+\end{equation}
+其中第二式直接来自 $\mathrm Dp/\mathrm Dt=c^2\mathrm D\rho/\mathrm Dt+p_s\mathrm Ds/\mathrm Dt$。理想气体 $p_s=p/c_v$，故 $p_s/(\rho T)=\gamma-1$，恢复前节压力方程。熵成为变量之后，黏性和导热引起的加热仍必须保留。
+
+\subsection{局部熵产生与物质体总熵：三种坐标中同一个规律}
+
+欧拉空间的局部式为
+\begin{equation}
+ \partial_t(\rho s)+\nabla\cdot(\rho s u+q/T)=\rho r/T+\Sigma.
+\end{equation}
+对跟随粒子的物质体，Reynolds 定理给出
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}\int_{B(t)}\rho s\dd V
+ =-\int_{\partial B(t)}\frac{q\cdot n}{T}\dd A
+ +\int_{B(t)}\left(\frac{\rho r}{T}+\Sigma\right)\dd V.
+\end{equation}
+拉回固定参考区域，右侧内部产生项成为 $\int_{B_0}J\Sigma^{\mathrm L}\dd V_0$，边界熵流成为 $Q\cdot N/T^{\mathrm L}$。一维质量坐标中则是式 \eqref{eq:lag-ns-entropy}。由于 $J,v,T$ 为正，坐标变换不会改变内部产生的非负性。
+
+\begin{keypoint}
+光滑无源 Euler：熵沿粒子不变，压力功可逆地交换动能与内能。NSF：黏性、导热使内部熵产生非负，机械能可转为内能。绝热封闭系统无外供热时，总能量守恒与总熵增加可以同时成立，二者并不冲突。
+\end{keypoint}
+
+\subsection{出现激波时，为什么不能继续使用光滑熵等式}
+
+在一维光滑区，Euler 的三个标量守恒律已经分别推导为
+\begin{equation}
+ \rho_t+(\rho u)_x=0,\quad
+ (\rho u)_t+(\rho u^2+p)_x=0,\quad
+ (\rho E)_t+[(\rho E+p)u]_x=0.
+\end{equation}
+若间断以速度 $S$ 移动，沿间断两侧积分守恒律，记 $[a]=a_R-a_L$，分别得到 Rankine--Hugoniot 条件
+\begin{align}
+ S[\rho]&=[\rho u],\\
+ S[\rho u]&=[\rho u^2+p],\\
+ S[\rho E]&=[(\rho E+p)u].
+\end{align}
+这三条跳跃关系仍然表达质量、动量和总能量守恒，但光滑链式法则不再适用于跨越间断的推导。物理熵应满足分布不等式
+\begin{equation}
+ \partial_t(\rho s)+\partial_x(\rho us)\ge0,
+ \quad [\rho us]-S[\rho s]\ge0.
+\end{equation}
+质量跳跃关系说明 $j=\rho_L(u_L-S)=\rho_R(u_R-S)$，所以熵条件是
+\begin{equation}
+ \boxed{j[s]\ge0.}\label{eq:shock-entropy-mass-flux}
+\end{equation}
+若 $j>0$，物质从左流向右，要求 $s_R\ge s_L$；若 $j<0$ 则方向相反。不能不检查流向就一律写成“右侧熵较大”。
+
+例如静止理想气体正激波，上游 Mach 数为 $2$、$\gamma=1.4$ 时，守恒跳跃关系给出 $\rho_R/\rho_L=8/3$、$p_R/p_L=4.5$，故
+\begin{equation}
+ \frac{s_R-s_L}{c_v}=\ln4.5-1.4\ln(8/3)>0.
+\end{equation}
+这是沿流向的熵增。黏性、导热很小时，薄层内的正熵产生可以在无黏极限中形成非零的激波熵增；不能把 Euler 的光滑熵等式直接延伸到间断上。
+
+\subsection{物理熵与数学熵：为什么符号相反}
+
+数学分析常取 $\eta=-\rho s$，并定义无黏熵通量 $\vct\psi_\eta=-\rho s\vct u$。无源 Euler 光滑解满足
+\begin{equation}
+ \eta_t+\nabla\cdot\vct\psi_\eta=0,
+\end{equation}
+物理可接受的间断解满足 $\eta_t+\nabla\cdot\vct\psi_\eta\le0$。负号是为了在合适热力学条件下得到守恒变量上的凸函数，不表示物理熵减少。
+
+对 NSF，完整数学熵通量还含导热部分：
+\begin{equation}
+ \partial_t\eta+\nabla\cdot(-\rho s\vct u-\vct q/T)
+ =-\rho r/T-\Sigma.
+ \label{eq:math-entropy-nsf}
+\end{equation}
+后面引入守恒变量之后，会从 $\eta$ 的微分显式求出熵变量，并说明它如何把 Euler 的矩阵主部对称化。这里先保留物理含义，不提前用矩阵替代各条守恒律。

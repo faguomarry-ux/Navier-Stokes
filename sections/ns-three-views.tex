@@ -1,0 +1,229 @@
+\section{Navier--Stokes--Fourier 方程组：每条方程中的黏性与导热}\label{sec:ns-three-views}
+
+本节仍从同一批粒子的守恒律出发。与 Euler 相比，改变的是应力、热流的\textbf{本构关系}，不是质量、动量和第一热力学定律本身。全文 $\vct f$ 表示单位质量体力，$r$ 表示单位质量、单位时间供热。
+
+\subsection{先写出每个黏性应力分量，再代入方程}
+
+第~\ref{subsec:tensor-newton}~节的四阶各向同性表示给出
+\begin{equation}
+ \boxed{\ten\tau=2\mu\ten D+\lambda\theta\ten I,
+ \quad D_{ij}=\tfrac12(\partial_{x_j}u_i+\partial_{x_i}u_j),
+ \quad\theta=\nabla\cdot\vct u.}\label{eq:newton-stress}
+\end{equation}
+三维中的六个独立分量为
+\begin{align}
+ \tau_{11}&=2\mu\partial_{x_1}u_1+\lambda\theta,&
+ \tau_{22}&=2\mu\partial_{x_2}u_2+\lambda\theta,&
+ \tau_{33}&=2\mu\partial_{x_3}u_3+\lambda\theta,\\
+ \tau_{12}&=\mu(\partial_{x_2}u_1+\partial_{x_1}u_2),&
+ \tau_{13}&=\mu(\partial_{x_3}u_1+\partial_{x_1}u_3),&
+ \tau_{23}&=\mu(\partial_{x_3}u_2+\partial_{x_2}u_3).
+\end{align}
+其余由对称性得到。热流的三个分量为 $q_j=-k\partial_{x_j}T$。允许 $\mu,\lambda,k$ 依赖温度或其他热力学状态，计算散度时应保留导数对系数的作用。
+
+\subsection{质量方程：黏性不会凭空产生质量}
+
+质量不产生、不损失，也没有组分扩散或相变质量源，所以仍有
+\begin{equation}
+ \partial_t\rho+\partial_{x_1}(\rho u_1)+\partial_{x_2}(\rho u_2)
+ +\partial_{x_3}(\rho u_3)=0,
+ \qquad\rho^{\mathrm L}J=\rho_0.
+\end{equation}
+本模型中质量方程没有 $\Delta\rho$ 项；密度与黏性、温度的耦合通过速度、压强和能量方程实现，不能因为“黏性有扩散”就给质量方程任意补一个密度扩散项。
+
+\subsection{三条动量方程：每个面上的黏性力如何进入}
+
+物质体的第 $i$ 个动量平衡为
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}\int_{B(t)}\rho u_i\dd V
+ =\int_{\partial B(t)}(-p\delta_{ij}+\tau_{ij})n_j\dd A
+ +\int_{B(t)}\rho f_i\dd V.
+\end{equation}
+局部化得到三条明确的粒子加速度方程：
+\begin{align}
+ \rho\Dt u_1&=-\partial_{x_1}p+\partial_{x_1}\tau_{11}
+ +\partial_{x_2}\tau_{12}+\partial_{x_3}\tau_{13}+\rho f_1,\\
+ \rho\Dt u_2&=-\partial_{x_2}p+\partial_{x_1}\tau_{12}
+ +\partial_{x_2}\tau_{22}+\partial_{x_3}\tau_{23}+\rho f_2,\\
+ \rho\Dt u_3&=-\partial_{x_3}p+\partial_{x_1}\tau_{13}
+ +\partial_{x_2}\tau_{23}+\partial_{x_3}\tau_{33}+\rho f_3.
+\end{align}
+它们统一为
+\begin{equation}
+ \boxed{\rho\Dt\vct u=-\nabla p+\nabla\cdot\ten\tau+\rho\vct f.}
+ \label{eq:cns-momentum-primitive}
+\end{equation}
+例如第一行沿 $x_1$ 的法向应力给 $\partial_{x_1}\tau_{11}$，另外两个方向的剪切应力给 $\partial_{x_2}\tau_{12}$ 和 $\partial_{x_3}\tau_{13}$。对照应力分量才能确认每个二阶导数的来源。
+
+再用质量方程把加速度转换为对流动量通量。逐个方向为
+\begin{align}
+ \partial_t(\rho u_1)+\sum_j\partial_{x_j}(\rho u_1u_j+p\delta_{1j}-\tau_{1j})&=\rho f_1,\\
+ \partial_t(\rho u_2)+\sum_j\partial_{x_j}(\rho u_2u_j+p\delta_{2j}-\tau_{2j})&=\rho f_2,\\
+ \partial_t(\rho u_3)+\sum_j\partial_{x_j}(\rho u_3u_j+p\delta_{3j}-\tau_{3j})&=\rho f_3.
+\end{align}
+这里每个 $j$ 明确取 $1,2,3$。汇总写成
+\begin{equation}
+ \partial_t(\rho\vct u)+\nabla\cdot(\rho\vct u\otimes\vct u+p\ten I-\ten\tau)
+ =\rho\vct f.\label{eq:cns-momentum-cons}
+\end{equation}
+黏性力在右端是 $+\nabla\cdot\tau$，移入左端总通量后是 $-\tau$，二者没有符号矛盾。
+
+若 $\mu,\lambda$ 为常数，逐指标展开为
+\begin{align}
+ \partial_{x_j}\tau_{ij}
+ &=\mu\partial_{x_jx_j}u_i+\mu\partial_{x_jx_i}u_j
+ +\lambda\partial_{x_i}\theta\\
+ &=\mu\Delta u_i+(\mu+\lambda)\partial_{x_i}\theta,
+\end{align}
+即
+\begin{equation}
+ \nabla\cdot\ten\tau=\mu\Delta\vct u+(\mu+\lambda)\nabla\theta.
+ \label{eq:div-tau}
+\end{equation}
+变系数时另有 $(\partial_{x_j}\mu)(\partial_{x_j}u_i+\partial_{x_i}u_j)
+ +(\partial_{x_i}\lambda)\theta$，不能把 $\mu(T)$ 当常数移出微分算子。
+
+\subsection{总能量：四类边界通量和两个体源}
+
+对同一物质体写第一定律：
+\begin{align}
+ \frac{\mathrm d}{\mathrm dt}\int_{B(t)}\rho E\dd V
+ &=\int_{\partial B(t)}(\ten\sigma\vct n)\cdot\vct u\dd A
+ -\int_{\partial B(t)}\vct q\cdot\vct n\dd A\notag\\
+ &\quad+\int_{B(t)}(\rho\vct f\cdot\vct u+\rho r)\dd V.
+\end{align}
+应力对称保证 $(\sigma n)\cdot u=(\sigma u)\cdot n$。局部化给出
+\begin{equation}
+ \rho\Dt E=\partial_{x_j}(\sigma_{ij}u_i)-\partial_{x_j}q_j
+ +\rho f_i u_i+\rho r.
+\end{equation}
+转换成固定控制体表述，是
+\begin{align}
+ \frac{\mathrm d}{\mathrm dt}\int_K\rho E\dd V
+ +\int_{\partial K}\rho E\vct u\cdot\vct n\dd A
+ &=\int_{\partial K}(\sigma n)\cdot u\dd A-\int_{\partial K}q\cdot n\dd A\notag\\
+ &\quad+\int_K(\rho\vct f\cdot\vct u+\rho r)\dd V.
+ \label{eq:cns-energy-integral}
+\end{align}
+把边界项移到左侧，再由 Gauss 公式得到
+\begin{equation}
+ \boxed{\partial_t(\rho E)+\partial_{x_j}
+ \left[(\rho E+p)u_j-u_i\tau_{ij}+q_j\right]
+ =\rho f_i u_i+\rho r.}\label{eq:cns-energy-cons}
+\end{equation}
+第 $j$ 方向的四类通量依次是 $\rho E u_j$（携带）、$pu_j$（压力功）、$-u_i\tau_{ij}$（黏性应力功）、$q_j$（导热）。没有哪一类可在未说明近似前省略。特别是 $q_j=-kT_{x_j}$ 已经包含“热流向低温”的负号。
+
+\subsection{内能：逐项扣除动能，辨认黏性生热}
+
+把第 $i$ 条动量式乘以 $u_i$ 后求和。乘积法则给出
+\begin{equation}
+ u_i\partial_{x_j}\sigma_{ij}
+ =\partial_{x_j}(u_i\sigma_{ij})-\sigma_{ij}\partial_{x_j}u_i.
+\end{equation}
+所以动能式为
+\begin{equation}
+ \rho\Dt\frac{|\vct u|^2}{2}
+ =\partial_{x_j}(u_i\sigma_{ij})-\sigma_{ij}\partial_{x_j}u_i
+ +\rho f_i u_i.\label{eq:cns-kinetic}
+\end{equation}
+将它从总能量式中减去：应力功通量和体力功完全抵消，留下
+\begin{align}
+ \rho\Dt e&=\sigma_{ij}\partial_{x_j}u_i-\partial_{x_j}q_j+\rho r\\
+ &=\boxed{-p\theta+\tau_{ij}\partial_{x_j}u_i-\partial_{x_j}q_j+\rho r.}
+ \label{eq:cns-internal-detail}
+\end{align}
+压缩功 $-p\theta$ 可以正也可以负，是可逆的机械能与内能转换；黏性项在可接受本构下非负，是不可逆生热；$-\nabla\cdot q$ 表示局部热量的汇入；$\rho r$ 是外部供热。
+
+用 $\nabla u=D+W$、$\tau:W=0$、$D=D_0+\theta I/3$，逐步算得
+\begin{align}
+ \tau:\nabla u&=(2\mu D+\lambda\theta I):D
+ =2\mu|D|^2+\lambda\theta^2\\
+ &=2\mu|D_0|^2+\left(\lambda+\frac{2\mu}{3}\right)\theta^2.
+\end{align}
+因此三维的体积黏度为 $\zeta=\lambda+2\mu/3$。要求所有形变率均有非负黏性生热，等价于 $\mu\ge0,\zeta\ge0$。$\lambda$ 自身不必非负，Stokes 假设 $\zeta=0$ 也不是守恒律的结论。
+
+\subsection{温度、压强：从内能与状态方程推导}
+
+对量热完全理想气体，$e=c_vT$，故
+\begin{equation}
+ \boxed{\rho c_v\Dt T=-p\theta+\tau:\nabla u
+ +\nabla\cdot(k\nabla T)+\rho r.}\label{eq:cns-temperature}
+\end{equation}
+若 $k$ 随温度变化，$\nabla\cdot(k\nabla T)=k\Delta T+\nabla k\cdot\nabla T$。记
+\begin{equation}
+ \mathcal Q=\tau:\nabla u-\nabla\cdot q+\rho r.
+\end{equation}
+沿粒子对 $p=(\gamma-1)\rho e$ 求导，代入质量与内能式：
+\begin{align}
+ \Dt p&=(\gamma-1)\left(e\Dt\rho+\rho\Dt e\right)\\
+ &=-p\theta+(\gamma-1)(-p\theta+\mathcal Q),
+\end{align}
+所以 $\mathrm Dp/\mathrm Dt+\gamma p\theta=(\gamma-1)\mathcal Q$。温度式、压力式和内能式在这些光滑正状态及闭合假设下等价，不是还要额外增添的三条独立守恒律。
+
+\subsection{熵平衡：压缩功消去，导热熵通量留下}
+
+Gibbs 关系与质量式给出
+\begin{equation}
+ \rho T\Dt s=\rho\Dt e+p\theta=\mathcal Q.
+\end{equation}
+再展开导热熵通量：
+\begin{equation}
+ \nabla\cdot(q/T)=\frac{\nabla\cdot q}{T}-\frac{q\cdot\nabla T}{T^2}.
+\end{equation}
+利用 $\rho\mathrm Ds/\mathrm Dt=\partial_t(\rho s)+\nabla\cdot(\rho s u)$，得到
+\begin{equation}
+ \boxed{\begin{aligned}
+ \partial_t(\rho s)+\nabla\cdot(\rho s\vct u+\vct q/T)
+ &=\rho r/T+\Sigma,\\
+ \Sigma&=\frac{2\mu|D_0|^2+\zeta\theta^2}{T}
+ +\frac{k|\nabla T|^2}{T^2}\ge0.
+ \end{aligned}}\label{eq:cns-entropy-detail}
+\end{equation}
+这里假定 $\rho,T>0$、$\mu,\zeta,k\ge0$。熵的增加来自\textbf{内部产生}与\textbf{通过边界或热源交换}，不能仅由 $\Sigma\ge0$ 断言开放系统的总熵必增加。绝热封闭、无外热源的物质体才满足总熵非减。
+
+\subsection{参考构形中的完整 NSF 系统：热流也必须变换}
+
+继续用 $\vct V=\vct u\circ\chi$，上标 L 表示拉回参考坐标。定义参考应力与参考热流
+\begin{equation}
+ P=J\sigma^{\mathrm L}F^{-\mathsf T},\qquad
+ \vct Q=JF^{-1}\vct q^{\mathrm L}.
+\end{equation}
+它们满足 $P N\dd A_0=\sigma n\dd A$ 和 $Q\cdot N\dd A_0=q\cdot n\dd A$，所以力与热的边界积分均保持物理值。逐条拉回得到
+\begin{align}
+ \rho^{\mathrm L}J&=\rho_0,\qquad\partial_t\chi=\vct V,\label{eq:ns-reference-mass}\\
+ \rho_0\partial_tV_i&=\partial_{X_A}P_{iA}+\rho_0 f_i^{\mathrm L},\label{eq:ns-reference-momentum}\\
+ \rho_0\partial_t E^{\mathrm L}
+ &=\partial_{X_A}(P_{iA}V_i-Q_A)
+ +\rho_0\vct f^{\mathrm L}\cdot\vct V+\rho_0 r^{\mathrm L},\label{eq:ns-reference-total}\\
+ \rho_0\partial_te^{\mathrm L}&=P:\partial_tF-\Div_XQ+\rho_0r^{\mathrm L},\label{eq:ns-reference-internal}\\
+ \partial_t(\rho_0s^{\mathrm L})+\Div_X(Q/T^{\mathrm L})
+ &=\rho_0r^{\mathrm L}/T^{\mathrm L}+J\Sigma^{\mathrm L}.
+ \label{eq:ns-reference-entropy}
+\end{align}
+内能式来自总能量减动能，并用
+\begin{equation}
+ P:\partial_tF=J\sigma^{\mathrm L}:
+ (\nabla_X\vct V F^{-1})
+ =-p^{\mathrm L}\partial_tJ+J\tau^{\mathrm L}:(\nabla_xu)^{\mathrm L}.
+\end{equation}
+物质体积改变的压力功与黏性生热在参考坐标中仍然分开。这里的本构必须用实际空间速度梯度
+\begin{equation}
+ (\nabla_xu)^{\mathrm L}=\nabla_X\vct V F^{-1},\qquad
+ Q=-Jk^{\mathrm L}F^{-1}F^{-\mathsf T}\nabla_XT^{\mathrm L}.
+\end{equation}
+不可直接用 $\nabla_XV$ 替代空间梯度；热流拉回后出现的几何系数也不能省略。初边值问题还应给出 $\chi(\vct X,0)$、$V(\vct X,0)$、温度或能量初值，以及相应速度/牵引和温度/热流边界条件。
+
+\subsection{把已推导的五条方程汇总：闭合条件不可遗漏}
+
+完整可压缩 Navier--Stokes--Fourier 系统为
+\begin{equation}
+ \boxed{\begin{aligned}
+ \partial_t\rho+\nabla\cdot(\rho\vct u)&=0,\\
+ \partial_t(\rho\vct u)+\nabla\cdot(\rho\vct u\otimes\vct u+pI-\tau)&=\rho\vct f,\\
+ \partial_t(\rho E)+\nabla\cdot[(\rho E+p)\vct u-\tau\vct u+\vct q]
+ &=\rho\vct f\cdot\vct u+\rho r.
+ \end{aligned}}\label{eq:cnsf}
+\end{equation}
+还需 $E=e+|u|^2/2$、状态方程、量热关系、Newton 应力和 Fourier 热流。例如 $p=\rho RT$、$e=c_vT$、$\mu(T),\lambda(T),k(T)$。若只写质量与动量却仍把 $T,p,\rho$ 全部视为未知，通常没有闭合。
+
+令黏性、导热系数与外源全为零，才退回前节 Euler 系统。若额外施加不可压缩约束，则压力的角色、未知量数目与声学结构都会改变；这与仅仅令 $\mu=0$ 或令 $k=0$ 是不同的模型操作。

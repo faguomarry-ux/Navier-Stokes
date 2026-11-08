@@ -1,0 +1,74 @@
+# LaTeX build products (keep .tex/.cls/.sty/.bib and source figures)
+*.aux
+*.log
+*.toc
+*.out
+*.lof
+*.lot
+*.lol
+*.loa
+*.loe
+*.thm
+*.bbl
+*.blg
+*.bcf
+*.run.xml
+*.fls
+*.fdb_latexmk
+*.synctex
+*.synctex.gz
+*.synctex(busy)
+*.xdv
+*.dvi
+*.idx
+*.ilg
+*.ind
+*.nav
+*.snm
+*.vrb
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.nlg
+*.nlo
+*.nls
+_minted*/
+
+# Local compilation, rendering and verification scratch space
+/tmp/
+/build/
+/.cache/
+/compile-*.txt
+
+# The root PDF duplicates the published copy under output/pdf/.
+/fluid_mechanics_from_conservation_to_ns.pdf
+
+# Track one reviewed PDF; ignore other generated output.
+/output/*
+!/output/pdf/
+/output/pdf/*
+!/output/pdf/fluid_mechanics_from_conservation_to_ns.pdf
+
+# Python environments and bytecode used by verification scripts
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Local environment settings and editor/OS files
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/
+*.swp
+*.swo
+*.bak
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini

@@ -1,0 +1,1506 @@
+%!TEX program = xelatex
+\documentclass[cn,hazy,blue,11pt,normal]{elegantnote}
+
+\usepackage{amssymb,mathtools,bm}
+\usepackage{longtable,array,float}
+\setCJKfamilyfont{notekai}[AutoFakeBold=2]{KaiTi}
+\renewcommand{\kaishu}{\CJKfamily{notekai}}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!55!black,
+  urlcolor=blue!55!black,
+  pdftitle={从守恒律到 Euler 与 Navier--Stokes 方程},
+  pdfauthor={学习笔记}
+}
+\setlist{nosep,leftmargin=2em}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.25em}
+\numberwithin{equation}{section}
+\makeatletter
+\renewcommand*\l@subsection{\@dottedtocline{2}{1.5em}{3.2em}}
+\makeatother
+
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\Dt}{\frac{\mathrm D}{\mathrm Dt}}
+\newcommand{\vct}[1]{\bm{#1}}
+\newcommand{\ten}[1]{\bm{#1}}
+\newcommand{\Div}{\operatorname{Div}}
+\newcommand{\Grad}{\operatorname{Grad}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\dev}{\operatorname{dev}}
+\newcommand{\R}{\mathbb R}
+
+\newenvironment{keypoint}{%
+  \par\medskip\noindent\color{blue!60!black}\rule{0.8em}{0.8em}\quad
+  \begin{minipage}{0.91\linewidth}\color{black}\textbf{要点}\quad
+}{\end{minipage}\par\medskip}
+
+\newenvironment{warningbox}{%
+  \par\medskip\noindent\color{red!65!black}\rule{0.8em}{0.8em}\quad
+  \begin{minipage}{0.91\linewidth}\color{black}\textbf{易错点}\quad
+}{\end{minipage}\par\medskip}
+
+\title{从守恒律到 Euler 与 Navier--Stokes 方程}
+\author{流体力学偏微分方程学习笔记}
+\institute{连续介质力学与偏微分方程}
+\version{1.5}
+\date{\zhdate{2026/11/09}}
+
+\begin{document}
+\maketitle
+\begingroup
+\small
+\setlength{\parskip}{0pt}
+\makeatletter
+\patchcmd{\l@section}{1.0em}{0.7em}{}{}
+\makeatother
+\tableofcontents
+\endgroup
+\clearpage
+
+\section{这份笔记要回答什么}
+
+流体方程不是凭空写出的，而是由三层结构逐步组成：
+\begin{enumerate}
+  \item \textbf{运动学：}如何描述物质粒子和空间中的流场；
+  \item \textbf{守恒律：}质量、动量、能量对任意物质体都必须成立；
+  \item \textbf{本构关系与状态方程：}应力、热流、压强如何依赖于速度梯度和热力学变量。
+\end{enumerate}
+Euler 方程采用无黏、无热传导本构；Navier--Stokes 方程采用牛顿黏性本构，完整的可压缩系统通常还包含 Fourier 热传导。
+
+全文采用如下符号约定：
+\begin{itemize}
+  \item 空间维数为 $d=2$ 或 $3$，空间点为 $\vct{x}\in\Omega\subset\R^d$；
+  \item 速度为 $\vct{u}$，密度为 $\rho>0$，压强为 $p$，单位质量内能为 $e$；
+  \item 单位质量总能量为 $E=e+\frac12|\vct{u}|^2$；
+  \item Cauchy 应力采用拉应力为正的约定
+  \[
+    \ten{\sigma}=-p\ten{I}+\ten{\tau},
+  \]
+  其中 $\ten{\tau}$ 是黏性应力；
+  \item $\vct{q}$ 是热流密度，Fourier 定律写作 $\vct{q}=-k\nabla T$；
+  \item $\vct{f}$ 是单位质量体力，$r$ 是单位质量、单位时间的外部供热率。
+\end{itemize}
+
+\input{sections/tensors}
+
+\section{数学预备：梯度、散度、旋度与积分公式}
+
+本节统一设 $\Omega\subset\R^3$ 是具有分片光滑边界的有界区域，$\partial\Omega$ 的单位外法向为 $\vct n$。二维公式可视为三维公式在 $z$ 方向无变化的特例。以下函数均假设具有使相应微分和积分成立的足够光滑性。
+
+\subsection{标量场、向量场与 Nabla 算子}
+
+标量场把每个空间点映射为一个数，例如温度 $T(\vct x,t)$、密度 $\rho(\vct x,t)$ 和压强 $p(\vct x,t)$；向量场把每个点映射为一个向量，例如速度
+\begin{equation}
+ \vct u(\vct x,t)=(u_1,u_2,u_3)^{\mathsf T}.
+\end{equation}
+在直角坐标系中，形式微分算子为
+\begin{equation}
+ \nabla=\left(\frac{\partial}{\partial x_1},
+ \frac{\partial}{\partial x_2},
+ \frac{\partial}{\partial x_3}\right)^{\mathsf T}.
+\end{equation}
+它与标量、向量或张量组合后分别产生梯度、散度和旋度。
+
+\subsection{梯度：增长最快的方向}
+
+对标量场 $\phi(\vct x)$，梯度定义为
+\begin{equation}
+ \boxed{\nabla\phi=
+ \left(\partial_{x_1}\phi,\partial_{x_2}\phi,
+ \partial_{x_3}\phi\right)^{\mathsf T}.}
+\end{equation}
+若沿单位方向 $\vct a$ 移动，则方向导数为
+\begin{align}
+ D_{\vct a}\phi(\vct x)
+ &=\lim_{h\to0}\frac{\phi(\vct x+h\vct a)-\phi(\vct x)}{h}\\
+ &=\nabla\phi(\vct x)\cdot\vct a.
+\end{align}
+由 Cauchy--Schwarz 不等式，
+\begin{equation}
+ |D_{\vct a}\phi|\le|\nabla\phi|\,|\vct a|=|\nabla\phi|.
+\end{equation}
+等号在 $\vct a$ 与 $\nabla\phi$ 同向时成立，因此梯度指向标量场增长最快的方向，其模长是最大增长率。梯度还垂直于等值面 $\phi=\text{常数}$。
+
+对向量场 $\vct u$，本文采用
+\begin{equation}
+ (\nabla\vct u)_{ij}=\partial_{x_j}u_i,
+\end{equation}
+即第 $i$ 行是分量 $u_i$ 的梯度。明确这一约定很重要，因为不同教材可能使用转置约定。
+
+\subsection{散度：单位体积的净流出率}
+
+向量场 $\vct u$ 的散度定义为
+\begin{equation}
+ \boxed{\nabla\cdot\vct u
+ =\partial_{x_1}u_1+\partial_{x_2}u_2+\partial_{x_3}u_3.}
+\end{equation}
+其局部几何意义可由一个以 $\vct x$ 为中心的小体积 $V_\varepsilon$ 表示：
+\begin{equation}
+ \nabla\cdot\vct u(\vct x)
+ =\lim_{|V_\varepsilon|\to0}
+ \frac1{|V_\varepsilon|}
+ \int_{\partial V_\varepsilon}\vct u\cdot\vct n\,\dd A.
+\end{equation}
+所以 $\nabla\cdot\vct u>0$ 表示该点附近净流出，流体微团倾向于膨胀；小于零表示净流入，微团倾向于压缩；等于零表示局部体积不变。
+
+若 $\ten A$ 是二阶张量，本文把散度定义为
+\begin{equation}
+ (\nabla\cdot\ten A)_i=\partial_{x_j}A_{ij}.
+\end{equation}
+这一定义保证 Cauchy 动量方程中的应力项写成 $\nabla\cdot\ten\sigma$。
+
+\subsection{旋度：局部环流与转动}
+
+三维向量场 $\vct u$ 的旋度定义为
+\begin{equation}
+ \boxed{
+ \nabla\times\vct u=
+ \begin{pmatrix}
+ \partial_{x_2}u_3-\partial_{x_3}u_2\\
+ \partial_{x_3}u_1-\partial_{x_1}u_3\\
+ \partial_{x_1}u_2-\partial_{x_2}u_1
+ \end{pmatrix}.}
+\end{equation}
+流体力学中定义涡量
+\begin{equation}
+ \vct\omega=\nabla\times\vct u.
+\end{equation}
+若取法向为单位向量 $\vct n$ 的小曲面 $S_\varepsilon$，则
+\begin{equation}
+ (\nabla\times\vct u)\cdot\vct n
+ =\lim_{|S_\varepsilon|\to0}
+ \frac1{|S_\varepsilon|}
+ \oint_{\partial S_\varepsilon}\vct u\cdot\dd\vct l.
+\end{equation}
+因此旋度是在给定法向上单位面积的局部环流。流体微团的刚体角速度是 $\vct\omega/2$，而不是 $\vct\omega$ 本身。
+
+二维速度 $\vct u=(u,v)$ 的旋度通常视为垂直于平面的标量
+\begin{equation}
+ \omega=\partial_xv-\partial_yu.
+\end{equation}
+
+\subsection{Laplacian 与常用恒等式}
+
+标量场的 Laplacian 是梯度的散度：
+\begin{equation}
+ \boxed{\Delta\phi=\nabla\cdot(\nabla\phi)
+ =\partial_{x_1x_1}\phi+\partial_{x_2x_2}\phi+
+ \partial_{x_3x_3}\phi.}
+\end{equation}
+向量 Laplacian 按分量定义：
+\begin{equation}
+ \Delta\vct u=(\Delta u_1,\Delta u_2,\Delta u_3)^{\mathsf T}.
+\end{equation}
+后续反复使用的乘积公式包括
+\begin{align}
+ \nabla\cdot(\phi\vct u)
+ &=\nabla\phi\cdot\vct u+\phi\nabla\cdot\vct u, \label{eq:product-div-vector}\\
+ \nabla\cdot(\ten A\vct u)
+ &=\vct u\cdot(\nabla\cdot\ten A)+\ten A:\nabla\vct u
+ \quad(\ten A=\ten A^{\mathsf T}), \label{eq:product-div-tensor}\\
+ \nabla\times(\nabla\phi)&=\vct0,
+ \qquad \nabla\cdot(\nabla\times\vct u)=0. \label{eq:curl-identities}
+\end{align}
+这里 $\ten A:\ten B=A_{ij}B_{ij}$ 是双点积。
+
+\section{Gauss--Green、Green 公式与 Stokes 公式}
+
+\subsection{Gauss--Green 散度定理}
+
+Gauss--Green 公式把区域内部的散度积分转化为边界上的法向通量：
+\begin{equation}
+ \boxed{\int_\Omega\nabla\cdot\vct F\,\dd V
+ =\int_{\partial\Omega}\vct F\cdot\vct n\,\dd A.} \label{eq:gauss-green}
+\end{equation}
+
+先在长方体 $[a_1,b_1]\times[a_2,b_2]\times[a_3,b_3]$ 上观察第一分量。由微积分基本定理，
+\begin{align}
+ \int_\Omega\partial_{x_1}F_1\,\dd V
+ &=\int_{a_2}^{b_2}\int_{a_3}^{b_3}
+ [F_1(b_1,x_2,x_3)-F_1(a_1,x_2,x_3)]\,\dd x_3\dd x_2.
+\end{align}
+右端正是与 $x_1$ 垂直的两个面的外向通量之和：在 $x_1=b_1$ 上 $n_1=1$，在 $x_1=a_1$ 上 $n_1=-1$。对 $F_2,F_3$ 重复并相加，就得到长方体上的散度定理。一般光滑区域可分割成许多小体积；内部公共面上的通量因法向相反而两两抵消，极限中只留下外边界通量。这给出了公式的几何推导。
+
+取 $\vct F=\phi\vct e_i$，可得到分量形式
+\begin{equation}
+ \boxed{\int_\Omega\partial_{x_i}\phi\,\dd V
+ =\int_{\partial\Omega}\phi n_i\,\dd A.} \label{eq:gauss-component}
+\end{equation}
+对张量逐行使用散度定理，还得到
+\begin{equation}
+ \boxed{\int_\Omega\nabla\cdot\ten A\,\dd V
+ =\int_{\partial\Omega}\ten A\vct n\,\dd A.} \label{eq:gauss-tensor}
+\end{equation}
+这正是把边界应力 $\ten\sigma\vct n$ 化为体积力密度 $\nabla\cdot\ten\sigma$ 的依据。
+
+\subsection{Gauss--Green 分部积分公式}
+
+对乘积 $\phi\vct F$ 使用 \eqref{eq:gauss-green} 和乘积公式 \eqref{eq:product-div-vector}：
+\begin{equation}
+ \int_\Omega(\nabla\phi\cdot\vct F+\phi\nabla\cdot\vct F)\,\dd V
+ =\int_{\partial\Omega}\phi\vct F\cdot\vct n\,\dd A.
+\end{equation}
+移项得到多维分部积分公式
+\begin{equation}
+ \boxed{\int_\Omega\phi\nabla\cdot\vct F\,\dd V
+ =-\int_\Omega\nabla\phi\cdot\vct F\,\dd V
+ +\int_{\partial\Omega}\phi\vct F\cdot\vct n\,\dd A.} \label{eq:gauss-integration-parts}
+\end{equation}
+这是从守恒律强形式转为弱形式、有限元形式以及能量估计时最常用的公式之一。
+
+\subsection{Green 第一公式}
+
+这里的 Green 第一、第二公式有时也被称为由高斯公式推出的第一、第二恒等式。令 $\vct F=\nabla v$，则 $\nabla\cdot\vct F=\Delta v$。把它代入 \eqref{eq:gauss-integration-parts}，并令 $\phi=u$：
+\begin{equation}
+ \int_\Omega u\Delta v\,\dd V
+ =-\int_\Omega\nabla u\cdot\nabla v\,\dd V
+ +\int_{\partial\Omega}u\nabla v\cdot\vct n\,\dd A.
+\end{equation}
+定义外法向导数
+\begin{equation}
+ \frac{\partial v}{\partial n}=\nabla v\cdot\vct n,
+\end{equation}
+便得到 Green 第一公式
+\begin{equation}
+ \boxed{\int_\Omega
+ (u\Delta v+\nabla u\cdot\nabla v)\,\dd V
+ =\int_{\partial\Omega}u\frac{\partial v}{\partial n}\,\dd A.} \label{eq:green-first}
+\end{equation}
+它本质上就是“散度定理加乘积法则”。取 $u=v$ 时，
+\begin{equation}
+ \int_\Omega u\Delta u\,\dd V
+ =-\int_\Omega|\nabla u|^2\,\dd V
+ +\int_{\partial\Omega}u\frac{\partial u}{\partial n}\,\dd A,
+\end{equation}
+这解释了为什么 Laplacian 在适当齐次边界条件下产生耗散。
+
+\subsection{Green 第二公式}
+
+交换 Green 第一公式中的 $u,v$，得到
+\begin{equation}
+ \int_\Omega(v\Delta u+\nabla v\cdot\nabla u)\,\dd V
+ =\int_{\partial\Omega}v\frac{\partial u}{\partial n}\,\dd A.
+\end{equation}
+用原式减去此式，交叉梯度项相消：
+\begin{equation}
+ \boxed{\int_\Omega(u\Delta v-v\Delta u)\,\dd V
+ =\int_{\partial\Omega}
+ \left(u\frac{\partial v}{\partial n}
+ -v\frac{\partial u}{\partial n}\right)\dd A.} \label{eq:green-second}
+\end{equation}
+Green 第二公式常用于证明 Laplace 算子的对称性、解的唯一性以及推导基本解表示公式。
+
+\subsection{Stokes 旋度公式}
+
+对有向光滑曲面 $S$ 及其按右手定则定向的边界曲线 $\partial S$，Stokes 公式为
+\begin{equation}
+ \boxed{\int_S(\nabla\times\vct u)\cdot\vct n\,\dd A
+ =\oint_{\partial S}\vct u\cdot\dd\vct l.} \label{eq:stokes}
+\end{equation}
+它说明穿过曲面的总涡量通量等于边界上的速度环流。把曲面划分为许多小曲面后，各内部边界被相反方向走过而相互抵消，只留下外边界，这与 Gauss 定理中内部面通量抵消的思想完全平行。
+
+\input{sections/variational-foundations}
+
+\section{变限积分、运动区域与物质导数}
+
+\subsection{一维变限积分：Leibniz 公式}
+
+先考虑
+\begin{equation}
+ I(t)=\int_{a(t)}^{b(t)}f(x,t)\,\dd x.
+\end{equation}
+取 $f$ 关于 $x$ 的一个原函数 $F$，即 $\partial_xF=f$，则
+\begin{equation}
+ I(t)=F(b(t),t)-F(a(t),t).
+\end{equation}
+对时间使用链式法则：
+\begin{align}
+ \frac{\dd I}{\dd t}
+ &=\partial_tF(b(t),t)+\partial_xF(b(t),t)b'(t)\\
+ &\quad-\partial_tF(a(t),t)-\partial_xF(a(t),t)a'(t).
+\end{align}
+又因为
+\begin{equation}
+ \partial_tF(b,t)-\partial_tF(a,t)
+ =\int_a^b\partial_tf(x,t)\,\dd x,
+\end{equation}
+所以
+\begin{equation}
+ \boxed{\frac{\dd}{\dd t}\int_{a(t)}^{b(t)}f(x,t)\,\dd x
+ =\int_{a(t)}^{b(t)}\partial_tf\,\dd x
+ +f(b(t),t)b'(t)-f(a(t),t)a'(t).} \label{eq:leibniz-1d}
+\end{equation}
+右端第一项是积分区域内部函数随时间的变化，后两项是右、左端点运动扫过的贡献。多维 Reynolds 输运定理就是这一公式的几何推广。
+
+\subsection{物质导数的链式法则推导}
+
+设标号为 $\vct X$ 的流体粒子轨迹为
+\begin{equation}
+ \vct x=\vct\chi(\vct X,t),
+ \qquad \partial_t\vct\chi(\vct X,t)=\vct u(\vct\chi(\vct X,t),t).
+\end{equation}
+欧拉场 $a(\vct x,t)$ 在这个粒子上取值为复合函数
+\begin{equation}
+ \widetilde a(\vct X,t)=a(\vct\chi(\vct X,t),t).
+\end{equation}
+固定粒子标号 $\vct X$ 对时间求导，使用多元链式法则：
+\begin{align}
+ \left.\frac{\partial\widetilde a}{\partial t}\right|_{\vct X}
+ &=\left.\frac{\partial a}{\partial t}\right|_{\vct x}
+ +\frac{\partial a}{\partial x_i}
+   \left.\frac{\partial\chi_i}{\partial t}\right|_{\vct X}\\
+ &=\partial_ta+u_i\partial_{x_i}a
+ =\partial_ta+\vct u\cdot\nabla a.
+\end{align}
+于是定义
+\begin{equation}
+ \boxed{\Dt a=\partial_ta+(\vct u\cdot\nabla)a.} \label{eq:material-derivative-detail}
+\end{equation}
+其中 $\partial_ta$ 是固定空间点观察到的局部变化，$\vct u\cdot\nabla a$ 是粒子移动到空间中不同位置造成的对流变化。对向量和张量场按分量使用同一公式。
+
+特别地，粒子速度为 $\vct u(\vct\chi(\vct X,t),t)$，再求一次时间导数得到粒子加速度
+\begin{equation}
+ \boxed{\frac{\dd^2\vct\chi}{\dd t^2}
+ =\Dt\vct u
+ =\partial_t\vct u+(\vct u\cdot\nabla)\vct u.} \label{eq:particle-acceleration}
+\end{equation}
+即使流场不显含时间，$\partial_t\vct u=0$，粒子沿空间非均匀速度场运动时仍可能有对流加速度。
+
+\subsection{运动区域上的积分求导}
+
+设参考区域 $\Omega_0$ 固定，当前区域由映射
+\begin{equation}
+ \Omega(t)=\vct\chi(\Omega_0,t)
+\end{equation}
+给出。定义变形梯度和 Jacobian
+\begin{equation}
+ \ten F=\frac{\partial\vct\chi}{\partial\vct X},
+ \qquad J=\det\ten F>0,
+\end{equation}
+则体积元变换为 $\dd V=J\dd V_0$。对任意体积密度 $g(\vct x,t)$，先把变动区域积分拉回固定参考区域：
+\begin{equation}
+ I(t)=\int_{\Omega(t)}g(\vct x,t)\,\dd V
+ =\int_{\Omega_0}g(\vct\chi(\vct X,t),t)J(\vct X,t)\,\dd V_0. \label{eq:pullback-integral}
+\end{equation}
+现在积分上下限固定，可以直接对被积函数求导：
+\begin{equation}
+ \frac{\dd I}{\dd t}
+ =\int_{\Omega_0}
+ \left[\Dt g\,J+g\dot J\right]\dd V_0. \label{eq:transport-before-J}
+\end{equation}
+
+下面计算 $\dot J$。Jacobi 行列式求导公式给出
+\begin{equation}
+ \dot J=J\tr(\ten F^{-1}\dot{\ten F}).
+\end{equation}
+另一方面，逐分量计算
+\begin{align}
+ \dot F_{iJ}
+ &=\frac{\partial}{\partial X_J}\left(\frac{\partial\chi_i}{\partial t}\right)
+ =\frac{\partial}{\partial X_J}u_i(\vct\chi(\vct X,t),t)\\
+ &=\frac{\partial u_i}{\partial x_k}\frac{\partial\chi_k}{\partial X_J},
+\end{align}
+所以
+\begin{equation}
+ \dot{\ten F}=(\nabla\vct u)\ten F.
+\end{equation}
+利用迹的循环不变性，
+\begin{align}
+ \dot J
+ &=J\tr[\ten F^{-1}(\nabla\vct u)\ten F]\\
+ &=J\tr(\nabla\vct u)
+ =J\nabla\cdot\vct u. \label{eq:Jdot-detailed}
+\end{align}
+把它代回 \eqref{eq:transport-before-J}，再推回当前区域：
+\begin{align}
+ \frac{\dd}{\dd t}\int_{\Omega(t)}g\,\dd V
+ &=\int_{\Omega(t)}
+ \left(\Dt g+g\nabla\cdot\vct u\right)\dd V\\
+ &=\int_{\Omega(t)}
+ \left[\partial_tg+\nabla\cdot(g\vct u)\right]\dd V. \label{eq:RTT-detailed}
+\end{align}
+因此物质体上的 Reynolds 输运定理为
+\begin{equation}
+ \boxed{\frac{\dd}{\dd t}\int_{\Omega(t)}g\,\dd V
+ =\int_{\Omega(t)}[\partial_tg+\nabla\cdot(g\vct u)]\,\dd V.} \label{eq:RTT-boxed}
+\end{equation}
+再用 Gauss--Green 公式，也可写成
+\begin{equation}
+ \boxed{\frac{\dd}{\dd t}\int_{\Omega(t)}g\,\dd V
+ =\int_{\Omega(t)}\partial_tg\,\dd V
+ +\int_{\partial\Omega(t)}g\vct u\cdot\vct n\,\dd A.} \label{eq:RTT-boundary}
+\end{equation}
+它与一维公式 \eqref{eq:leibniz-1d} 完全对应：第二项就是运动边界扫过体积所带来的贡献。
+
+\begin{keypoint}
+拉格朗日描述中固定的是粒子标号区域 $\Omega_0$，不是当前空间中的体积 $\Omega(t)$。当前物质体可以平移、变形、膨胀或压缩；通过映射 $\vct\chi$ 把它拉回 $\Omega_0$，才可以在固定区域上安全地求导。
+\end{keypoint}
+
+\subsection{一般控制体与物质体的区别}
+
+若区域边界以给定速度 $\vct w$ 运动，而不一定跟随流体，则一般输运公式为
+\begin{equation}
+ \boxed{\frac{\dd}{\dd t}\int_{\Omega(t)}g\,\dd V
+ =\int_{\Omega(t)}\partial_tg\,\dd V
+ +\int_{\partial\Omega(t)}g\vct w\cdot\vct n\,\dd A.} \label{eq:general-transport}
+\end{equation}
+三种常见情况是：
+\begin{itemize}
+ \item 固定欧拉控制体：$\vct w=0$；
+ \item 物质体：$\vct w=\vct u$，边界由同一批粒子组成；
+ \item 任意运动网格：$\vct w$ 与 $\vct u$ 不同，流体可穿过控制面。
+\end{itemize}
+
+若 $g=\rho\psi$，其中 $\psi$ 是单位质量物理量，则物质体公式展开为
+\begin{align}
+ \frac{\dd}{\dd t}\int_{\Omega(t)}\rho\psi\,\dd V
+ &=\int_{\Omega(t)}
+ [\partial_t(\rho\psi)+\nabla\cdot(\rho\psi\vct u)]\,\dd V\\
+ &=\int_{\Omega(t)}\left\{
+ \rho\Dt\psi
+ +\psi[\partial_t\rho+\nabla\cdot(\rho\vct u)]\right\}\dd V.
+\end{align}
+一旦质量守恒给出方括号为零，便有非常重要的简化
+\begin{equation}
+ \boxed{\frac{\dd}{\dd t}\int_{\Omega(t)}\rho\psi\,\dd V
+ =\int_{\Omega(t)}\rho\Dt\psi\,\dd V.} \label{eq:material-extensive}
+\end{equation}
+后面从 Newton 第二定律推导动量方程、从第一热力学定律推导能量方程，都会使用这个公式。
+
+\section{连续介质与两种描述}
+
+\subsection{拉格朗日描述：跟着粒子走}
+
+取参考时刻的物质区域 $\Omega_0$，用物质坐标 $\vct{X}\in\Omega_0$ 标记粒子。运动映射
+\begin{equation}
+  \vct{x}=\vct{\chi}(\vct{X},t)
+\end{equation}
+给出粒子 $\vct{X}$ 在时刻 $t$ 的位置。定义
+\begin{equation}
+  \ten{F}=\frac{\partial\vct{\chi}}{\partial\vct{X}},
+  \qquad J=\det\ten{F}>0,
+  \qquad \vct{V}(\vct{X},t)=\partial_t\vct{\chi}(\vct{X},t).
+\end{equation}
+$\ten{F}$ 是变形梯度，$J$ 描述体积变化：
+\begin{equation}
+  \dd\vct{x}=J\,\dd\vct{X}.
+\end{equation}
+拉格朗日观点的优势是物质区域固定为 $\Omega_0$，但空间微分算子经常要通过 $\ten{F}$ 转换。
+
+\subsection{欧拉描述：站在空间点观察}
+
+若 $\vct{x}=\vct{\chi}(\vct{X},t)$，则欧拉速度定义为
+\begin{equation}
+  \vct{u}(\vct{x},t)=\vct{V}(\vct{X},t)
+  =\partial_t\vct{\chi}(\vct{\chi}^{-1}(\vct{x},t),t).
+\end{equation}
+密度、温度和压强也写成空间场 $\rho(\vct{x},t)$、$T(\vct{x},t)$、$p(\vct{x},t)$。
+
+设标量场 $a(\vct{x},t)$。沿某个粒子轨迹观察它：
+\begin{align}
+  \frac{\dd}{\dd t}a(\vct{\chi}(\vct{X},t),t)
+  &=\partial_t a+\frac{\dd\vct{\chi}}{\dd t}\cdot\nabla a \\
+  &=\partial_t a+\vct{u}\cdot\nabla a.
+\end{align}
+因此定义\textbf{物质导数}
+\begin{equation}
+  \boxed{\Dt=\partial_t+\vct{u}\cdot\nabla.}
+\end{equation}
+粒子的加速度不是单纯的 $\partial_t\vct{u}$，而是
+\begin{equation}
+  \boxed{\vct{a}=\Dt\vct{u}
+  =\partial_t\vct{u}+(\vct{u}\cdot\nabla)\vct{u}.}
+\end{equation}
+第二项是对流加速度，也是流体方程非线性的主要来源。
+
+\subsection{Jacobian 的演化}
+
+由行列式求导公式
+\begin{equation}
+  \dot J=J\,\tr(\ten{F}^{-1}\dot{\ten{F}}).
+\end{equation}
+又因为 $\dot{\ten{F}}=(\nabla\vct{u})\ten{F}$，所以
+\begin{equation}
+  \boxed{\dot J=J\nabla\cdot\vct{u}.}
+\end{equation}
+因此 $\nabla\cdot\vct{u}$ 是局部相对体积变化率；不可压缩运动满足 $J$ 不变，等价于 $\nabla\cdot\vct{u}=0$。
+
+\section{从积分守恒律到局部方程}
+
+\subsection{物质体和 Reynolds 输运定理}
+
+物质体 $\Omega(t)=\vct{\chi}(\Omega_0,t)$ 始终由同一批粒子组成。对任意单位质量物理量 $\psi$，Reynolds 输运定理给出
+\begin{align}
+ \frac{\dd}{\dd t}\int_{\Omega(t)}\rho\psi\,\dd V
+ &=\int_{\Omega(t)}\left[\partial_t(\rho\psi)
+   +\nabla\cdot(\rho\psi\vct{u})\right]\dd V. \label{eq:RTT}
+\end{align}
+其来源可直接由参考构形看出：
+\begin{equation}
+ \int_{\Omega(t)}\rho\psi\,\dd V
+ =\int_{\Omega_0}\rho(\vct{\chi},t)\psi(\vct{\chi},t)J\,\dd V_0,
+\end{equation}
+对时间求导并使用 $\dot J=J\nabla\cdot\vct{u}$ 即得 \eqref{eq:RTT}。
+
+若积分恒等式对所有足够光滑的子区域都成立，则由局部化原理可令被积函数几乎处处相等。这一步把整体守恒律变成偏微分方程。
+
+\subsection{固定控制体版本}
+
+对空间中固定的控制体 $K$，守恒量 $U$ 的一般形式为
+\begin{equation}
+ \frac{\dd}{\dd t}\int_K U\,\dd V
+ +\int_{\partial K}\vct{F}\cdot\vct{n}\,\dd A
+ =\int_K S\,\dd V,
+\end{equation}
+其中 $\vct{F}$ 是向外的通量，$S$ 是源项。Gauss 定理给出局部形式
+\begin{equation}
+ \boxed{\partial_t U+\nabla\cdot\vct{F}=S.}
+\end{equation}
+这是守恒型偏微分方程的基本模板。
+
+\section{质量守恒}
+
+\subsection{积分形式与连续性方程}
+
+物质体不产生也不损失质量：
+\begin{equation}
+ \frac{\dd}{\dd t}\int_{\Omega(t)}\rho\,\dd V=0.
+\end{equation}
+使用 Reynolds 定理并局部化：
+\begin{equation}
+ \boxed{\partial_t\rho+\nabla\cdot(\rho\vct{u})=0.} \label{eq:mass-cons}
+\end{equation}
+展开散度可得非守恒形式
+\begin{equation}
+ \boxed{\Dt\rho+\rho\nabla\cdot\vct{u}=0.} \label{eq:mass-material}
+\end{equation}
+
+\subsection{拉格朗日形式}
+
+因为 $\dot J=J\nabla\cdot\vct{u}$，
+\begin{equation}
+ \frac{\dd}{\dd t}(\rho J)
+ =J\left(\Dt\rho+\rho\nabla\cdot\vct{u}\right)=0.
+\end{equation}
+若参考密度为 $\rho_0(\vct{X})$，则
+\begin{equation}
+ \boxed{\rho(\vct{\chi}(\vct{X},t),t)J(\vct{X},t)=\rho_0(\vct{X}).}
+\end{equation}
+这就是质量守恒的拉格朗日表达。它说明密度增大恰好对应体积缩小。
+
+\section{动量守恒与 Cauchy 动量方程}
+
+\subsection{力的分类}
+
+对物质体，Newton 第二定律写作
+\begin{equation}
+ \frac{\dd}{\dd t}\int_{\Omega(t)}\rho\vct{u}\,\dd V
+ =\int_{\Omega(t)}\rho\vct{f}\,\dd V
+ +\int_{\partial\Omega(t)}\vct{t}(\vct{n})\,\dd A.
+\end{equation}
+$\rho\vct f$ 是体力密度；Cauchy 应力原理给出面力
+\begin{equation}
+ \vct{t}(\vct{n})=\ten{\sigma}\vct{n}.
+\end{equation}
+由 Gauss 定理
+\begin{equation}
+ \int_{\partial\Omega(t)}\ten{\sigma}\vct{n}\,\dd A
+ =\int_{\Omega(t)}\nabla\cdot\ten{\sigma}\,\dd V.
+\end{equation}
+再使用 Reynolds 定理和质量方程，可得
+\begin{equation}
+ \boxed{\rho\Dt\vct{u}=\nabla\cdot\ten{\sigma}+\rho\vct{f}.} \label{eq:cauchy-momentum}
+\end{equation}
+若不存在偶力，角动量守恒还给出
+\begin{equation}
+ \ten{\sigma}=\ten{\sigma}^{\mathsf T}.
+\end{equation}
+
+\subsection{守恒形式}
+
+利用质量方程，可验证
+\begin{equation}
+ \partial_t(\rho\vct{u})+\nabla\cdot(\rho\vct{u}\otimes\vct{u})
+ =\rho\Dt\vct{u}.
+\end{equation}
+因此
+\begin{equation}
+ \boxed{\partial_t(\rho\vct{u})
+ +\nabla\cdot(\rho\vct{u}\otimes\vct{u}-\ten{\sigma})
+ =\rho\vct{f}.} \label{eq:momentum-cons-general}
+\end{equation}
+代入 $\ten{\sigma}=-p\ten I+\ten\tau$，得到
+\begin{equation}
+ \partial_t(\rho\vct{u})
+ +\nabla\cdot(\rho\vct{u}\otimes\vct{u}+p\ten I-\ten\tau)
+ =\rho\vct{f}.
+\end{equation}
+
+\subsection{拉格朗日动量方程}
+
+定义第一类 Piola--Kirchhoff 应力
+\begin{equation}
+ \ten P=J\ten\sigma\ten F^{-\mathsf T}.
+\end{equation}
+利用 Piola 变换，欧拉方程 \eqref{eq:cauchy-momentum} 等价于
+\begin{equation}
+ \boxed{\rho_0\,\partial_{tt}\vct\chi
+ =\Div_{\vct X}\ten P+\rho_0\vct f.}
+\end{equation}
+这里的未知量是运动映射 $\vct\chi(\vct X,t)$；欧拉形式的未知量则是在当前空间坐标上定义的场。
+
+\section{总能量守恒与内能方程}
+
+\subsection{热力学第一定律}
+
+物质体的总能量由内能和动能组成：
+\begin{equation}
+ E=e+\frac12|\vct{u}|^2.
+\end{equation}
+外界对物质体做功，并通过热流和体热源传递能量：
+\begin{align}
+ \frac{\dd}{\dd t}\int_{\Omega(t)}\rho E\,\dd V
+ &=\int_{\Omega(t)}\rho\vct f\cdot\vct u\,\dd V
+ +\int_{\partial\Omega(t)}(\ten\sigma\vct n)\cdot\vct u\,\dd A \\
+ &\quad-\int_{\partial\Omega(t)}\vct q\cdot\vct n\,\dd A
+ +\int_{\Omega(t)}\rho r\,\dd V.
+\end{align}
+注意 $\vct q\cdot\vct n>0$ 表示热量流出，因此前面有负号。局部化得到
+\begin{equation}
+ \boxed{\rho\Dt E
+ =\nabla\cdot(\ten\sigma\vct u)-\nabla\cdot\vct q
+ +\rho\vct f\cdot\vct u+\rho r.} \label{eq:total-energy-material}
+\end{equation}
+相应的守恒形式为
+\begin{equation}
+ \boxed{\partial_t(\rho E)
+ +\nabla\cdot\left(\rho E\vct u-\ten\sigma\vct u+\vct q\right)
+ =\rho\vct f\cdot\vct u+\rho r.} \label{eq:total-energy-cons}
+\end{equation}
+
+\subsection{从总能量扣除动能}
+
+将动量方程点乘 $\vct u$：
+\begin{equation}
+ \rho\vct u\cdot\Dt\vct u
+ =\vct u\cdot(\nabla\cdot\ten\sigma)+\rho\vct f\cdot\vct u.
+\end{equation}
+使用恒等式
+\begin{equation}
+ \nabla\cdot(\ten\sigma\vct u)
+ =\vct u\cdot(\nabla\cdot\ten\sigma)+\ten\sigma:\nabla\vct u,
+\end{equation}
+并从总能量方程中减去动能方程，得到内能方程
+\begin{equation}
+ \boxed{\rho\Dt e
+ =\ten\sigma:\nabla\vct u-\nabla\cdot\vct q+\rho r.} \label{eq:internal-energy-general}
+\end{equation}
+代入 $\ten\sigma=-p\ten I+\ten\tau$：
+\begin{equation}
+ \boxed{\rho\Dt e
+ =-p\nabla\cdot\vct u+\ten\tau:\nabla\vct u
+ -\nabla\cdot\vct q+\rho r.} \label{eq:internal-energy}
+\end{equation}
+其中 $-p\nabla\cdot\vct u$ 是压缩功，$\ten\tau:\nabla\vct u$ 是黏性耗散产生的内能。
+
+\section{热力学关系与熵方程}
+
+\subsection{Gibbs 关系}
+
+对简单可压缩物质，单位质量的 Gibbs 关系为
+\begin{equation}
+ \boxed{T\dd s=\dd e+p\dd\left(\frac1\rho\right).} \label{eq:gibbs}
+\end{equation}
+沿粒子轨迹求导：
+\begin{equation}
+ T\Dt s=\Dt e+p\Dt\left(\frac1\rho\right).
+\end{equation}
+由质量方程
+\begin{equation}
+ \Dt\left(\frac1\rho\right)
+ =-\frac1{\rho^2}\Dt\rho
+ =\frac1\rho\nabla\cdot\vct u.
+\end{equation}
+因此
+\begin{equation}
+ \rho T\Dt s=\rho\Dt e+p\nabla\cdot\vct u.
+\end{equation}
+与内能方程 \eqref{eq:internal-energy} 比较，压强功正好消去：
+\begin{equation}
+ \boxed{\rho T\Dt s
+ =\ten\tau:\nabla\vct u-\nabla\cdot\vct q+\rho r.} \label{eq:entropy-material-pre}
+\end{equation}
+
+\subsection{熵平衡与熵产生}
+
+将 \eqref{eq:entropy-material-pre} 除以 $T$，利用
+\begin{equation}
+ \nabla\cdot\left(\frac{\vct q}{T}\right)
+ =\frac{\nabla\cdot\vct q}{T}
+ -\frac{\vct q\cdot\nabla T}{T^2},
+\end{equation}
+得到熵平衡
+\begin{equation}
+ \boxed{
+ \partial_t(\rho s)+\nabla\cdot\left(\rho s\vct u+\frac{\vct q}{T}\right)
+ =\frac{\rho r}{T}+\Sigma,
+ } \label{eq:entropy-balance}
+\end{equation}
+其中内部熵产生率为
+\begin{equation}
+ \boxed{\Sigma=
+ \frac{\ten\tau:\nabla\vct u}{T}
+ -\frac{\vct q\cdot\nabla T}{T^2}\ge 0.} \label{eq:entropy-production}
+\end{equation}
+不等式是热力学第二定律的局部表达。熵通量不是简单的 $\rho s\vct u$，还包含导热熵通量 $\vct q/T$。
+
+\begin{warningbox}
+一般情况下不能说“熵守恒”。黏性和热传导都会产生熵。只有对光滑、无黏、绝热、无外部供热的流动，才有 $\Dt s=0$；跨越激波时，物理熵还必须增加。
+\end{warningbox}
+
+\subsection{Newton--Fourier 本构为何符合第二定律}
+
+记对称应变率
+\begin{equation}
+ \ten D=\frac12\left(\nabla\vct u+(\nabla\vct u)^{\mathsf T}\right),
+ \qquad
+ \ten D_0=\ten D-\frac1d(\nabla\cdot\vct u)\ten I.
+\end{equation}
+各向同性 Newton 流体可写为
+\begin{equation}
+ \boxed{\ten\tau=2\mu\ten D_0+\zeta(\nabla\cdot\vct u)\ten I,}
+ \qquad \mu\ge0,\quad\zeta\ge0.
+\end{equation}
+由于反对称部分不与对称应力做功，
+\begin{equation}
+ \ten\tau:\nabla\vct u
+ =2\mu|\ten D_0|^2+\zeta(\nabla\cdot\vct u)^2\ge0.
+\end{equation}
+再取 Fourier 定律
+\begin{equation}
+ \vct q=-k\nabla T,\qquad k\ge0,
+\end{equation}
+则
+\begin{equation}
+ -\frac{\vct q\cdot\nabla T}{T^2}
+ =\frac{k|\nabla T|^2}{T^2}\ge0.
+\end{equation}
+所以
+\begin{equation}
+ \boxed{\Sigma=
+ \frac{2\mu|\ten D_0|^2+\zeta(\nabla\cdot\vct u)^2}{T}
+ +\frac{k|\nabla T|^2}{T^2}\ge0.}
+\end{equation}
+这说明黏性与热传导都是不可逆过程。
+
+另一种常见写法是
+\begin{equation}
+ \ten\tau=2\mu\ten D+\lambda(\nabla\cdot\vct u)\ten I,
+\end{equation}
+此时 $\zeta=\lambda+2\mu/d$，非负耗散条件为
+\begin{equation}
+ \mu\ge0,\qquad \lambda+\frac{2\mu}{d}\ge0.
+\end{equation}
+
+\input{sections/euler-three-views}
+
+\input{sections/ns-three-views}
+
+\input{sections/mass-coordinate-entropy}
+
+\input{sections/full-characteristics}
+
+\section{不可压缩 Navier--Stokes 方程}\label{sec:incompressible-details}
+
+\subsection{不可压缩与常密度}
+
+不可压缩运动的运动学条件是
+\begin{equation}
+ \boxed{\nabla\cdot\vct u=0.}
+\end{equation}
+质量方程随之变成 $\Dt\rho=0$：密度沿粒子轨迹不变。若初始密度处处为常数 $\rho_0$，此后仍为常数。
+
+它可在拉格朗日描述中写为 $J=1$（初始 $J=1$）、$\rho^{\mathrm L}=\rho_0$。如果初始密度并不均匀，则仍需保留密度输运式；不能单凭无散约束删除所有密度变化。
+
+对常黏度 $\mu$，因为 $\nabla\cdot\vct u=0$，
+\begin{equation}
+ \nabla\cdot\ten\tau=\mu\Delta\vct u.
+\end{equation}
+因此常密度不可压缩 Navier--Stokes 方程为
+\begin{align}
+ \partial_tu_1+\sum_{j=1}^3u_j\partial_{x_j}u_1
+ &=-\partial_{x_1}p/\rho_0+\nu\Delta u_1+f_1,\\
+ \partial_tu_2+\sum_{j=1}^3u_j\partial_{x_j}u_2
+ &=-\partial_{x_2}p/\rho_0+\nu\Delta u_2+f_2,\\
+ \partial_tu_3+\sum_{j=1}^3u_j\partial_{x_j}u_3
+ &=-\partial_{x_3}p/\rho_0+\nu\Delta u_3+f_3,\\
+ \partial_{x_1}u_1+\partial_{x_2}u_2+\partial_{x_3}u_3&=0.
+\end{align}
+前三条是三个方向的动量演化，最后一条是速度约束。汇总后才写成
+\begin{equation}
+ \boxed{
+ \begin{aligned}
+  &\partial_t\vct u+(\vct u\cdot\nabla)\vct u
+  =-\frac1{\rho_0}\nabla p+\nu\Delta\vct u+\vct f,\\
+  &\nabla\cdot\vct u=0,
+ \end{aligned}} \label{eq:ins}
+\end{equation}
+其中 $\nu=\mu/\rho_0$ 是运动黏度。
+
+\begin{keypoint}
+在不可压缩方程中，$p$ 通常不再由状态方程直接给出，而是作为保证 $\nabla\cdot\vct u=0$ 的 Lagrange 乘子。第~\ref{subsec:stokes-pressure}~节将从约束变分推导这一结论。对动量方程取散度可形式上得到压力 Poisson 方程。
+\end{keypoint}
+
+\subsection{压力约束：逐步得到 Poisson 方程}
+
+对常密度动量方程取散度。利用 $\nabla\cdot u=0$，时间项与常系数黏性项的散度均为零，而
+\begin{equation}
+ \partial_{x_i}(u_j\partial_{x_j}u_i)
+ =(\partial_{x_i}u_j)(\partial_{x_j}u_i)
+ +u_j\partial_{x_j}(\partial_{x_i}u_i)
+ =(\partial_{x_i}u_j)(\partial_{x_j}u_i).
+\end{equation}
+因此
+\begin{equation}
+ -\Delta p=\rho_0(\partial_{x_i}u_j)(\partial_{x_j}u_i)
+ -\rho_0\nabla\cdot f.
+\end{equation}
+这只给出内部方程，压力边界数据还须与速度或牵引条件相容。例如对光滑给定速度边界，将动量方程沿法向投影可写成
+\begin{equation}
+ \partial_n p=\rho_0\vct n\cdot
+ [\vct f-\partial_t\vct u-(\vct u\cdot\nabla)\vct u+\nu\Delta\vct u].
+\end{equation}
+它包含解的边界导数，不能随意独立指定。与可压缩系统相比，压力不再有自己的状态演化方程，而是通过约束在整个区域耦合速度。
+
+\subsection{动能估计：黏性为何耗散}
+
+在周期边界，或无滑移边界 $\vct u=0$ 下，令外力为零。将 \eqref{eq:ins} 与 $\vct u$ 做内积并积分：
+\begin{equation}
+ \frac{\dd}{\dd t}\int_\Omega\frac{\rho_0}{2}|\vct u|^2\,\dd V
+ +\mu\int_\Omega|\nabla\vct u|^2\,\dd V=0.
+\end{equation}
+对流项和压力项在不可压缩条件及相应边界条件下不给出净贡献；黏性项严格耗散动能。注意总能量并未凭空消失：若同时求解温度方程，这部分机械能转化为内能。
+
+\subsection{非等温情况与熵：力学系统之外还需热方程}
+
+若采用常密度、$e=cT$ 的简单不可压缩热模型，且忽略热膨胀耦合，内能式在 $\theta=0$ 下成为
+\begin{equation}
+ \rho_0c\Dt T=2\mu|D|^2+\nabla\cdot(k\nabla T)+\rho_0r.
+\end{equation}
+对应熵关系为 $\dd s=c\dd T/T$，所以
+\begin{equation}
+ \partial_t(\rho_0s)+\nabla\cdot(\rho_0s\vct u+q/T)
+ =\rho_0r/T+2\mu|D|^2/T+k|\nabla T|^2/T^2.
+\end{equation}
+这不是把理想气体 $p=\rho RT$ 与约束压力同时强行套用，而是另行选择的不可压缩热力学模型。等温力学计算若省略热方程，应理解为温度被外部控制或热过程不在该模型求解范围内。
+
+不可压缩系统没有完整可压缩 Euler 中独立的声学波族。对其线性化，先由无散投影消去压力，得到速度的扩散/输运结构；不能直接把 $u-c,u,u+c$ 当作不可压缩 N--S 的三个特征值。低 Mach 数极限是带尺度与约束的奇异极限，不能通过在理想气体状态方程里简单把密度写成常数完成。
+
+\input{sections/variational-fluids}
+
+\section{偏微分方程的分类与流体方程的类型}
+
+\subsection{二阶标量方程的椭圆、抛物、双曲分类}
+
+先考虑二维二阶线性方程的主部
+\begin{equation}
+ a(x,y)u_{xx}+2b(x,y)u_{xy}+c(x,y)u_{yy}
+ +\text{低阶项}=f.
+\end{equation}
+主部可用对称矩阵
+\begin{equation}
+ \ten A=
+ \begin{pmatrix}a&b\\b&c\end{pmatrix}
+\end{equation}
+表示。坐标变换可以把这个二次型化为标准形，分类由判别式
+\begin{equation}
+ \mathcal D=b^2-ac
+\end{equation}
+决定：
+\begin{equation}
+ \boxed{
+ \begin{array}{ccl}
+ \mathcal D<0&:&\text{椭圆型},\\
+ \mathcal D=0&:&\text{抛物型},\\
+ \mathcal D>0&:&\text{双曲型}.
+ \end{array}}
+\end{equation}
+三类典型模型为
+\begin{align}
+ \Delta u&=f &&\text{Laplace/Poisson 方程，椭圆型},\\
+ u_t-\nu\Delta u&=f &&\text{热方程，抛物型},\\
+ u_{tt}-c^2\Delta u&=f &&\text{波动方程，双曲型}.
+\end{align}
+
+这三种类型不仅是代数标签，还对应不同的信息传播方式：
+\begin{itemize}
+ \item \textbf{椭圆型：}一个点的解通常受整个区域及全部边界影响，描述空间平衡，没有独立的时间传播方向；
+ \item \textbf{抛物型：}初值向未来演化，高频迅速衰减，具有平滑和耗散效应；经典热方程在数学上具有无限传播速度；
+ \item \textbf{双曲型：}信息沿特征线或特征锥以有限速度传播，允许波、接触间断和激波。
+\end{itemize}
+
+\begin{warningbox}
+椭圆、抛物、双曲的严格定义取决于方程是标量还是系统、线性还是非线性。对非线性方程，通常在某个状态附近考察线性化后的主部，因此类型可能随状态变化。
+\end{warningbox}
+
+\subsection{一阶系统的双曲性}
+
+守恒律通常是一阶系统
+\begin{equation}
+ \partial_t\vct U+\sum_{j=1}^d\partial_{x_j}\vct F_j(\vct U)=0.
+\end{equation}
+对光滑解展开为拟线性形式
+\begin{equation}
+ \partial_t\vct U+\sum_{j=1}^d\ten A_j(\vct U)\partial_{x_j}\vct U=0,
+ \qquad
+ \ten A_j=\frac{\partial\vct F_j}{\partial\vct U}.
+\end{equation}
+给定单位方向 $\vct n$，定义方向通量 Jacobian
+\begin{equation}
+ \ten A(\vct n)=\sum_{j=1}^dn_j\ten A_j.
+\end{equation}
+若对每个 $\vct n$，$\ten A(\vct n)$ 都有实特征值并可对角化，则系统称为双曲型；若特征值互异，则称严格双曲。特征值是各特征波在 $\vct n$ 方向的传播速度。
+
+\subsection{为什么可压缩 Euler 方程是双曲型}
+
+详细的逐式推导、通量 Jacobian、特征多项式和特征向量已在第~\ref{sec:full-characteristics}~节给出；这里仅将结果放回 PDE 分类框架。特别地，一维完整 Euler 的三个根互异，三维方向矩阵却有中间三重根，后者双曲但不严格双曲。
+
+一维理想气体 Euler 方程写为
+\begin{equation}
+ \partial_t\vct U+\partial_x\vct F(\vct U)=0,
+ \quad
+ \vct U=
+ \begin{pmatrix}\rho\\ \rho u\\ \rho E\end{pmatrix},
+ \quad
+ \vct F=
+ \begin{pmatrix}
+ \rho u\\
+ \rho u^2+p\\
+ (\rho E+p)u
+ \end{pmatrix}.
+\end{equation}
+对通量 Jacobian $\partial\vct F/\partial\vct U$ 求特征值，可得
+\begin{equation}
+ \boxed{\lambda_1=u-c,\qquad \lambda_2=u,\qquad \lambda_3=u+c,}
+\end{equation}
+其中绝热声速满足
+\begin{equation}
+ \boxed{c^2=\left(\frac{\partial p}{\partial\rho}\right)_s.}
+\end{equation}
+理想气体中 $c^2=\gamma p/\rho>0$。三个特征速度分别对应向左声波、接触波和向右声波。因此在物理状态 $\rho>0,p>0$ 下，一维 Euler 系统是双曲型。
+
+双曲性意味着扰动不是瞬时影响整个空间，而是主要沿特征传播。它也意味着不同位置的特征可能相交，从而使光滑解形成间断。
+
+\subsection{从 Burgers 方程看梯度爆破与激波形成}
+
+无黏 Burgers 方程
+\begin{equation}
+ u_t+uu_x=0,
+ \qquad u(x,0)=u_0(x) \label{eq:burgers}
+\end{equation}
+是理解非线性双曲方程最简单的模型。沿曲线 $x=x(t)$，
+\begin{equation}
+ \frac{\dd}{\dd t}u(x(t),t)=u_t+x'(t)u_x.
+\end{equation}
+选择特征速度 $x'(t)=u$，由 \eqref{eq:burgers} 得
+\begin{equation}
+ \frac{\dd u}{\dd t}=0.
+\end{equation}
+所以从初始点 $\xi$ 出发的特征满足
+\begin{equation}
+ u(x(t),t)=u_0(\xi),
+ \qquad x(t)=\xi+t u_0(\xi).
+\end{equation}
+对 $x$ 关于 $\xi$ 求导：
+\begin{equation}
+ \frac{\partial x}{\partial\xi}=1+t u_0'(\xi).
+\end{equation}
+因此隐式解的空间梯度为
+\begin{equation}
+ \boxed{u_x(x,t)=\frac{u_0'(\xi)}{1+t u_0'(\xi)}.} \label{eq:burgers-gradient}
+\end{equation}
+若某处 $u_0'(\xi)<0$，后方较快的特征会追上前方较慢的特征。最早的梯度爆破时间是
+\begin{equation}
+ \boxed{T_*=\frac{-1}{\min_\xi u_0'(\xi)}}
+ \qquad\text{（若 $\min u_0'<0$）}.
+\end{equation}
+当 $t\uparrow T_*$ 时，$u$ 本身仍有界，但 $u_x$ 趋于无穷，经典解失效；之后必须使用带激波的弱解，并用熵条件选择物理解。
+
+可压缩 Euler 的压缩波也有类似机制：局部波速依赖于状态，特征线会聚并形成激波。因此“Euler 容易爆破”更准确地说是：即使初值光滑，非线性双曲系统也可能在有限时间发生\textbf{梯度爆破}并形成间断。某些情形下也可能出现密度、温度或速度的真正无界，但不能把二者混为一谈。
+
+\subsection{可压缩 Navier--Stokes 的双曲--抛物耦合}
+
+第~\ref{sec:full-characteristics}~节已分别计算无黏主部的传播速度与含黏性、导热项的 Fourier 时间谱。下面的分类保留这一区别：通量 Jacobian 的实特征值不能替代完整黏性符号的复时间特征根。
+
+给 Euler 方程加入 Newton 黏性和 Fourier 热传导后，动量方程出现 $\Delta\vct u$ 等二阶项，温度方程出现 $\Delta T$。在线性化的示意形式中，
+\begin{align}
+ &\partial_t\rho'+\rho_0\nabla\cdot\vct u'=0,\\
+ &\rho_0\partial_t\vct u'+\nabla p'
+ =\mu\Delta\vct u'+(\mu+\lambda)\nabla\nabla\cdot\vct u',\\
+ &\rho_0c_v\partial_tT'+p_0\nabla\cdot\vct u'=k\Delta T'.
+\end{align}
+质量方程本身没有密度扩散项，压力耦合仍携带声波这一双曲机制；速度和温度则受到黏性、导热的抛物型平滑。因此完整系统是\textbf{双曲--抛物耦合系统}，而不是纯抛物方程。
+
+黏性通常阻止 Burgers 型特征交叉形成真正跳跃。例如黏性 Burgers 方程
+\begin{equation}
+ u_t+uu_x=\nu u_{xx},\qquad \nu>0
+\end{equation}
+会把无黏激波替换成很薄但光滑的过渡层。不过这不等于所有 Navier--Stokes 解都已被完全理解：三维不可压缩 Navier--Stokes 对一般光滑大初值是否始终保持光滑仍是公开问题；可压缩系统还会遇到真空、温度控制及密度集中等困难。
+
+\subsection{不可压缩 Navier--Stokes 的抛物--椭圆结构}
+
+不可压缩系统
+\begin{equation}
+ \partial_t\vct u+(\vct u\cdot\nabla)\vct u
+ -\nu\Delta\vct u+\frac1\rho\nabla p=\vct f,
+ \qquad \nabla\cdot\vct u=0
+\end{equation}
+中，$-\nu\Delta\vct u$ 给速度带来抛物型扩散；压力没有自己的时间演化方程，而是由不可压缩约束决定。对动量方程取散度，形式上得到
+\begin{equation}
+ -\Delta p
+ =\rho\,\nabla\cdot[(\vct u\cdot\nabla)\vct u-\vct f],
+\end{equation}
+这是椭圆型 Poisson 方程。因此不可压缩 Navier--Stokes 常被理解为“非线性输运--扩散方程加椭圆压力约束”。
+
+\section{为什么波动方程会产生波}
+
+\subsection{一维波动方程的因式分解}
+
+考虑
+\begin{equation}
+ u_{tt}-c^2u_{xx}=0,
+ \qquad c>0. \label{eq:wave-1d}
+\end{equation}
+微分算子可以形式分解为
+\begin{equation}
+ \partial_t^2-c^2\partial_x^2
+ =(\partial_t-c\partial_x)(\partial_t+c\partial_x).
+\end{equation}
+也可引入特征坐标
+\begin{equation}
+ \xi=x-ct,
+ \qquad \eta=x+ct.
+\end{equation}
+链式法则给出
+\begin{equation}
+ u_{tt}-c^2u_{xx}=-4c^2u_{\xi\eta}.
+\end{equation}
+因此方程等价于 $u_{\xi\eta}=0$。先对 $\xi$ 积分，再对 $\eta$ 积分，得到 d'Alembert 一般解
+\begin{equation}
+ \boxed{u(x,t)=F(x-ct)+G(x+ct).} \label{eq:dalembert-general}
+\end{equation}
+$F$ 的图形以速度 $c$ 向右移动，$G$ 的图形以速度 $c$ 向左移动，而形状不变。这正是“波动”的数学含义。
+
+若初值为
+\begin{equation}
+ u(x,0)=u_0(x),
+ \qquad u_t(x,0)=v_0(x),
+\end{equation}
+解为
+\begin{equation}
+ \boxed{u(x,t)=\frac12[u_0(x-ct)+u_0(x+ct)]
+ +\frac1{2c}\int_{x-ct}^{x+ct}v_0(y)\,\dd y.} \label{eq:dalembert}
+\end{equation}
+点 $(x,t)$ 只依赖于初始区间 $[x-ct,x+ct]$，这体现了有限传播速度和特征锥。
+
+\subsection{什么是行波解}
+
+行波假设是
+\begin{equation}
+ u(x,t)=\Phi(z),
+ \qquad z=x-st,
+\end{equation}
+其中 $s$ 是波速，$\Phi$ 是波形。代入波动方程：
+\begin{equation}
+ (s^2-c^2)\Phi''(z)=0.
+\end{equation}
+当 $s=\pm c$ 时，任意足够光滑的 $\Phi$ 都可保持形状传播；这正是 \eqref{eq:dalembert-general} 的两个分量。
+
+对非线性方程，行波代换通常把 PDE 化为 ODE。例如黏性 Burgers 方程取 $u(x,t)=\Phi(x-st)$：
+\begin{equation}
+ -s\Phi'+\Phi\Phi'=\nu\Phi'',
+\end{equation}
+其连接两个常状态的解描述以速度 $s$ 移动的黏性激波层。孤立波、反应扩散前沿和燃烧波也常用行波方法研究。
+
+\subsection{Fourier 波形、色散关系与波包}
+
+另一类基本波形是复指数平面波
+\begin{equation}
+ u(x,t)=A e^{\mathrm i(kx-\omega t)}.
+\end{equation}
+代入 \eqref{eq:wave-1d} 得到色散关系
+\begin{equation}
+ \boxed{\omega^2=c^2k^2.}
+\end{equation}
+相速度与群速度分别为
+\begin{equation}
+ v_{\mathrm p}=\frac\omega k,
+ \qquad v_{\mathrm g}=\frac{\dd\omega}{\dd k}.
+\end{equation}
+对经典波动方程，$\omega=\pm ck$，所以相速度和群速度大小均为 $c$，不同波数以同样速度传播，不发生色散。许多具有不同波数的 Fourier 模式叠加形成局域的\textbf{波包}；若 $\omega(k)$ 非线性，群速度依赖波数，波包会逐渐展宽，这称为色散。
+
+\subsection{波动方程的能量守恒与时间可逆性}
+
+将 \eqref{eq:wave-1d} 乘以 $u_t$ 并在区域内积分：
+\begin{align}
+ 0&=\int(u_{tt}u_t-c^2u_{xx}u_t)\,\dd x\\
+ &=\frac{\dd}{\dd t}\int\frac12u_t^2\,\dd x
+ +c^2\int u_xu_{xt}\,\dd x
+ -c^2[u_xu_t]_{\partial\Omega}.
+\end{align}
+在周期边界或使边界功为零的条件下，
+\begin{equation}
+ \boxed{\frac{\dd}{\dd t}
+ \int_\Omega\frac12(u_t^2+c^2u_x^2)\,\dd x=0.}
+\end{equation}
+波动方程不抹去高频信息，只在动能与弹性势能之间交换能量。若把 $t$ 换成 $-t$，方程不变，因此理想波动方程是时间可逆的。
+
+\section{偏微分方程求解与分析方法地图}
+
+不存在对所有 PDE 都有效的单一方法。“求解”也可能指得到显式公式、证明解存在唯一、估计解的性质，或数值近似。下面给出学习中最主要的方法体系，而不是声称穷尽所有现代 PDE 技术。
+
+\subsection{特征线法}
+
+适用于一阶输运方程和双曲守恒律。对
+\begin{equation}
+ u_t+a(x,t,u)u_x=b(x,t,u),
+\end{equation}
+选择曲线
+\begin{equation}
+ \frac{\dd x}{\dd t}=a(x,t,u),
+ \qquad \frac{\dd u}{\dd t}=b(x,t,u),
+\end{equation}
+便把 PDE 化为沿特征线的 ODE。线性输运、Burgers 方程和 Euler 的 Riemann 问题都以此为基础。特征相交时经典解通常失效。
+
+\subsection{变量分离法与特征函数展开}
+
+对规则区域上的线性齐次方程，设
+\begin{equation}
+ u(x,t)=X(x)T(t).
+\end{equation}
+例如热方程 $u_t=\nu u_{xx}$ 给出
+\begin{equation}
+ \frac{T'}{\nu T}=\frac{X''}{X}=-\lambda,
+\end{equation}
+从而得到两个 ODE：
+\begin{equation}
+ X''+\lambda X=0,
+ \qquad T'+\nu\lambda T=0.
+\end{equation}
+边界条件把 $\lambda$ 限制为离散特征值，最后将各分离解叠加：
+\begin{equation}
+ u(x,t)=\sum_na_ne^{-\nu\lambda_nt}X_n(x).
+\end{equation}
+该方法适合矩形、圆、球等可分离几何；复杂区域通常转向谱方法或数值方法。
+
+\subsection{Fourier 变换与 Fourier 级数}
+
+在全空间对热方程作空间 Fourier 变换：
+\begin{equation}
+ \partial_t\widehat u(\vct k,t)
+ =-\nu|\vct k|^2\widehat u(\vct k,t).
+\end{equation}
+每个波数都满足一个 ODE，因此
+\begin{equation}
+ \boxed{\widehat u(\vct k,t)
+ =e^{-\nu|\vct k|^2t}\widehat u_0(\vct k).} \label{eq:heat-fourier}
+\end{equation}
+逆变换给出热核卷积解。Fourier 方法特别适合常系数线性 PDE、周期区域、色散关系与频率能量估计；边界复杂或系数变化时不再直接对角化算子。
+
+\subsection{Laplace 变换}
+
+对时间作 Laplace 变换可把 $t$ 导数变成代数因子，例如
+\begin{equation}
+ \mathcal L[u_t](s)=s\widetilde u(s)-u(0).
+\end{equation}
+这样初值问题可化为关于空间变量的椭圆边值问题。它常用于线性系统、半无限区域、瞬态响应和控制理论。
+
+\subsection{Green 函数与基本解方法}
+
+对线性算子 $L$，Green 函数满足
+\begin{equation}
+ L_xG(x,y)=\delta(x-y)
+\end{equation}
+以及指定边界条件。若 $Lu=f$，形式上可写成
+\begin{equation}
+ u(x)=\int_\Omega G(x,y)f(y)\,\dd y
+ +\text{边界贡献}.
+\end{equation}
+Green 函数表示单位点源在 $x$ 处产生的响应；线性叠加所有点源便得到一般解。Poisson 核、热核和波动方程的基本解都属于这一框架。它依赖线性叠加，对强非线性方程通常只能用于线性化或积分方程表示。
+
+\subsection{行波、自相似解与相似约化}
+
+行波 $u(x,t)=\Phi(x-st)$ 把平移不变 PDE 化为 ODE。自相似解则利用尺度不变性，例如
+\begin{equation}
+ u(x,t)=t^{-\alpha}F\left(\frac{x}{t^\beta}\right).
+\end{equation}
+热核取 $\beta=1/2$，许多爆破、扩散、激波和边界层的主导形态可由相似解描述。此类解揭示结构，但通常只覆盖特殊初值或渐近状态。
+
+\subsection{能量法}
+
+能量法不一定给出显式解，而是把 PDE 乘以适当测试函数并积分，利用分部积分得到先验估计。例如齐次边界下热方程满足
+\begin{equation}
+ \frac12\frac{\dd}{\dd t}\|u(t)\|_{L^2}^2
+ +\nu\|\nabla u(t)\|_{L^2}^2=0.
+\end{equation}
+它立即给出 $L^2$ 能量不增、梯度耗散和唯一性。波动方程得到能量守恒；Navier--Stokes 得到动能不等式。能量法是现代 PDE 存在性、唯一性、稳定性和误差分析的核心工具。
+
+\subsection{最大值原理与比较原理}
+
+椭圆和抛物方程常满足最大值原理：在无正源项时，内部不能凭空产生超过初边值的严格最大值。若 $u$ 是下解、$v$ 是上解，可通过比较原理推出 $u\le v$。该方法适合证明唯一性、正性、上下界和长期行为。
+
+\subsection{弱解、变分法与泛函分析}
+
+当经典导数不存在时，可以把方程乘以光滑测试函数并分部积分，定义弱解。第~\ref{sec:variation-foundations}、\ref{sec:variation-weak}~节已详细介绍第一变分、Euler--Lagrange 方程、自然边界条件及 Ritz 近似；第~\ref{sec:variation-stokes}、\ref{sec:variation-action}~节将它们用于流体。对称强制型椭圆问题可由能量极小化求解；一般弱形式则不必来自可极小化的泛函。Lax--Milgram 定理、Galerkin 逼近、紧性方法用于证明存在性，有限元法离散相应弱形式。
+
+对演化方程，还常使用：
+\begin{itemize}
+ \item 半群理论：把线性演化写成 $u(t)=e^{tL}u_0$；
+ \item Duhamel 原理：把非齐次或非线性项作为时间积分；
+ \item 不动点方法：Picard 迭代、Banach 或 Schauder 不动点；
+ \item 紧性方法：从近似解的统一估计提取收敛子列；
+ \item 熵方法：选择守恒律物理解并控制非线性耗散；
+ \item 调和分析：Littlewood--Paley 分解、奇异积分及频率局部化；
+ \item 微局部分析：研究奇性沿特征集的传播。
+\end{itemize}
+
+\subsection{渐近与近似方法}
+
+当存在小参数时，可使用正则/奇异摄动、多尺度法、WKB、匹配渐近展开和边界层理论。流体力学中的低 Mach 数极限、薄边界层、长波近似、弱非线性声学都属于这一类。
+
+\subsection{主要数值方法}
+
+复杂几何和非线性问题通常必须计算：
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.18\linewidth}
+                >{\raggedright\arraybackslash}p{0.34\linewidth}
+                >{\raggedright\arraybackslash}p{0.36\linewidth}}
+\toprule
+方法 & 基本思想 & 典型适用场景与注意点 \\
+\midrule
+有限差分 & 用网格差商近似导数 & 规则网格；需分析一致性、稳定性和收敛性 \\
+有限体积 & 对每个单元直接离散积分守恒律 & Euler/可压缩 NS；天然守恒，需 Riemann 通量与激波限制器 \\
+有限元 & 离散弱形式和函数空间 & 复杂几何、椭圆问题、黏性流；便于自适应网格 \\
+谱方法 & 用全局正交基展开 & 光滑解时高精度；间断附近有 Gibbs 现象 \\
+间断 Galerkin & 单元内高阶多项式并允许界面跳跃 & 兼顾局部守恒、高阶精度和复杂网格 \\
+粒子方法 & 用随流粒子表示介质 & 自由表面、大变形；核近似与邻域搜索是关键 \\
+算子分裂 & 分别推进输运、扩散、反应等子问题 & 多物理耦合；存在分裂误差 \\
+\bottomrule
+\end{tabular}
+\end{center}
+时间离散还包括显式/隐式 Euler、Runge--Kutta、Crank--Nicolson、IMEX 和指数积分等。双曲问题需要 CFL 条件和守恒通量；抛物问题的显式格式通常受到更严格的 $\Delta t\lesssim C\Delta x^2$ 限制。
+
+\subsection{如何按方程结构选择方法}
+
+\begin{itemize}
+ \item 一阶输运或双曲守恒律：特征线、Riemann 问题、熵方法、有限体积；
+ \item 线性常系数全空间问题：Fourier/Laplace 变换、基本解；
+ \item 规则有界区域线性问题：变量分离、特征函数展开；
+ \item 椭圆边值问题：Green 函数、变分法、最大值原理、有限元；
+ \item 抛物初边值问题：半群、热核、能量法、最大值原理；
+ \item 非线性演化方程：能量估计、不动点、紧性、熵解和数值计算；
+ \item 寻找特殊结构：行波、自相似解、摄动和渐近方法。
+\end{itemize}
+
+\section{“覆水难收”：不可逆性、后向方程与扩散模型}
+
+\subsection{热方程为什么容易向前、困难向后}
+
+由热方程 Fourier 解 \eqref{eq:heat-fourier}，每个空间频率满足
+\begin{equation}
+ \widehat u(\vct k,T)
+ =e^{-\nu|\vct k|^2T}\widehat u_0(\vct k).
+\end{equation}
+向前演化时，高频因子 $e^{-\nu|\vct k|^2T}$ 极小，细节、尖锐边界和微小尺度迅速被抹平。若试图由终态反推初态，形式上必须计算
+\begin{equation}
+ \boxed{\widehat u_0(\vct k)
+ =e^{\nu|\vct k|^2T}\widehat u(\vct k,T).} \label{eq:backward-heat}
+\end{equation}
+任何测量噪声 $\delta_{\vct k}$ 都会被放大为
+\begin{equation}
+ e^{\nu|\vct k|^2T}\delta_{\vct k},
+\end{equation}
+且放大率随 $|\vct k|$ 指数增长。终态看起来几乎相同的两个温度场，可能来自差异巨大的初态。因此后向热方程不是普通意义下稳定的初值问题，而是 Hadamard 不适定问题。
+
+黏性流体的线性扩散部分也含有 $e^{-\nu|\vct k|^2t}$。把 Navier--Stokes 倒放，相当于出现“负黏性”：原先被耗散的任意微小高频误差都会指数爆炸。数学上可以对极端精确、特殊的终态形式反演一小段时间，但这种反演对误差不连续，物理上无法稳健实现。
+
+\subsection{从熵产生解释宏观不可逆性}
+
+Navier--Stokes--Fourier 的熵产生为
+\begin{equation}
+ \Sigma=\frac{2\mu|\ten D_0|^2+\zeta(\nabla\cdot\vct u)^2}{T}
+ +\frac{k|\nabla T|^2}{T^2}\ge0.
+\end{equation}
+黏性把有组织的宏观动能转化为分子无规则运动，热传导把温度差抹平。水泼到地上时还伴随自由表面破碎、湍流级联、空气卷吸、润湿、毛细作用、摩擦、蒸发和热交换。宏观上少量可观察变量无法记录这些能量转移到的全部微观自由度。
+
+在理想的微观力学模型中，若能无限精确地知道并反转所有分子位置和速度，基本定律近似时间可逆；但误差、混沌和自由度数量使这种操作不可实现。连续介质模型则已经把微观信息平均掉，并通过 $\mu>0$、$k>0$ 和熵条件直接编码宏观不可逆性。这就是“覆水难收”的 PDE 版本：
+\begin{equation}
+ \boxed{\text{正向耗散会丢失可观测细节；反向恢复会无限放大误差。}}
+\end{equation}
+
+\subsection{Euler、波动方程和 Navier--Stokes 的时间反演差别}
+
+\begin{itemize}
+ \item 理想波动方程能量守恒，改变速度初值的符号即可倒放，数学上是稳定的时间可逆系统；
+ \item 光滑、无激波的 Euler 流在适当变换下也是可逆的；一旦选取满足熵条件的激波弱解，熵增加便选择了时间箭头，倒放的“膨胀激波”不满足物理熵条件；
+ \item Navier--Stokes--Fourier 即使解很光滑，也因黏性和热传导持续产生熵。其反向问题具有后向扩散的不稳定性。
+\end{itemize}
+
+\subsection{扩散生成模型的正向加噪}
+
+扩散生成模型人为定义一个概率过程，把数据样本逐渐加噪。例如离散模型常可写成
+\begin{equation}
+ \boxed{\vct x_t=\sqrt{\bar\alpha_t}\,\vct x_0
+ +\sqrt{1-\bar\alpha_t}\,\vct\varepsilon,}
+ \qquad \vct\varepsilon\sim\mathcal N(0,\ten I).
+\end{equation}
+当 $t$ 足够大时，$\vct x_t$ 接近已知的高斯分布。训练时，神经网络学习预测噪声，或等价地学习时刻 $t$ 的分布得分
+\begin{equation}
+ \vct s_\theta(\vct x,t)
+ \approx\nabla_{\vct x}\log p_t(\vct x).
+\end{equation}
+在连续时间表述中，正向随机微分方程可写成
+\begin{equation}
+ \dd\vct x=\vct f(\vct x,t)\dd t+g(t)\dd\vct W_t.
+\end{equation}
+逆时间 SDE 的漂移中出现得分项 $-g(t)^2\nabla\log p_t$。生成时从高斯噪声采样，再利用学习到的得分场逐步把样本推向训练数据的高概率区域。
+
+\subsection{它为什么不是把真实未来精确推回过去}
+
+后向热方程试图从一个给定终态恢复唯一的真实初态，缺少的高频信息只能通过指数放大终态中的微小误差来寻找。扩散模型的目标不同：
+\begin{enumerate}
+ \item 它学习的是整个数据分布在不同噪声尺度下的统计结构，而不是只观察一张终态图像；
+ \item 反向过程使用训练数据提供的先验，猜测“哪些干净图像更可能产生当前噪声状态”；
+ \item 生成通常是随机的，同一个噪声层状态可能产生不同合理图像；
+ \item 它追求从目标分布采样，不保证恢复某一张曾经存在的原图；
+ \item 训练和采样需要计算与能量消耗，并没有让真实物理系统的总熵自行下降。
+\end{enumerate}
+
+因此二者的相似之处是都从“模糊/噪声较多的状态”走向“结构较清晰的状态”；根本差别是
+\begin{equation}
+ \boxed{
+ \begin{aligned}
+ \text{后向耗散 PDE：}&\quad\text{试图精确反演，通常不适定；}\\
+ \text{扩散生成模型：}&\quad\text{利用学习到的先验进行概率采样。}
+ \end{aligned}}
+\end{equation}
+扩散模型不是从一杯已经泼出的水中找回其全部真实微观历史；它更像看过大量“水原来可能是什么样”的例子后，在统计意义上生成一个合理的过去。若要求逐分子、逐像素恢复唯一真实来源，信息丢失和不适定性仍然存在。
+
+\begin{keypoint}
+“能生成一个看起来合理的过去”与“能恢复唯一真实的过去”是两个完全不同的问题。扩散模型通过数据先验把不适定逆问题正则化了，但没有消除信息论和热力学意义上的不可逆性。
+\end{keypoint}
+
+\section{统一推导链条}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.18\linewidth}
+                >{\raggedright\arraybackslash}p{0.34\linewidth}
+                >{\raggedright\arraybackslash}p{0.36\linewidth}}
+\toprule
+层次 & 核心关系 & 得到的结论 \\
+\midrule
+运动学 & $\vct x=\vct\chi(\vct X,t)$，$\Dt=\partial_t+\vct u\cdot\nabla$ & 拉格朗日与欧拉描述互换 \\
+几何 & $\dot J=J\nabla\cdot\vct u$ & 体积变化与速度散度相连 \\
+质量守恒 & $\frac{\dd}{\dd t}\int_{\Omega(t)}\rho=0$ & 连续性方程 \\
+动量守恒 & Newton 第二定律，$\vct t=\ten\sigma\vct n$ & Cauchy 动量方程 \\
+总能量守恒 & 第一热力学定律 & 总能量与内能方程 \\
+第二定律 & Gibbs 关系与 $\Sigma\ge0$ & 熵平衡、限制本构关系 \\
+无黏绝热本构 & $\ten\tau=0,\ \vct q=0$ & Euler 方程；光滑解 $\Dt s=0$ \\
+Newton--Fourier 本构 & $\ten\tau=2\mu\ten D+\lambda(\nabla\cdot\vct u)\ten I$，$\vct q=-k\nabla T$ & 可压缩 NS--Fourier 方程 \\
+不可压缩极限 & $\rho=\rho_0$，$\nabla\cdot\vct u=0$ & 不可压缩 NS 方程 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{常见混淆与自检}
+
+\begin{enumerate}
+ \item \textbf{“欧拉描述”与“Euler 方程”不是同一概念。}
+ 欧拉描述是在固定空间位置观察；Euler 方程是无黏流体的动力学模型。Navier--Stokes 方程也通常用欧拉描述。
+
+ \item \textbf{守恒形式与物质导数形式各有用途。}
+ 光滑解下二者借助质量方程等价；出现激波后必须优先使用守恒形式定义弱解。
+
+ \item \textbf{能量方程不能随意丢掉。}
+ 可压缩非等温流中，$p$ 和 $T$ 的演化需要能量方程和状态方程闭合。只有在等熵、等温或其他特殊建模假设下才能约化。
+
+ \item \textbf{熵不是通常意义下永远守恒的量。}
+ 光滑无黏绝热流有 $\Dt s=0$；黏性、热传导和激波导致熵产生。
+
+ \item \textbf{不可压缩不自动等于密度空间常数。}
+ $\nabla\cdot\vct u=0$ 给出 $\Dt\rho=0$。只有初始密度本来就是统一常数时，才得到常密度模型。
+
+ \item \textbf{应力符号约定必须从头到尾一致。}
+ 本文采用 $\ten\sigma=-p\ten I+\ten\tau$。若教材采用压应力为正的不同约定，部分符号会改变。
+
+ \item \textbf{驻点、极小点与弱形式不能混为一谈。}
+ Euler--Lagrange 方程首先是驻点条件；极小性需要第二变分或凸性等额外论证。压力混合形式是鞍点问题，完整黏性动力学也不能直接由稳态耗散极小化代替。
+\end{enumerate}
+
+\clearpage
+\section{建议的学习顺序与练习}
+
+\subsection*{建议顺序}
+\begin{enumerate}
+ \item 先掌握张量变换律、并积与缩并，再重推四阶各向同性表示及 Newton 本构；
+ \item 用 Green 公式推导第一变分、内部方程与自然边界条件，完成一个约束变分和一个 Ritz 例题；
+ \item 熟练掌握物质导数、Jacobian 演化和 Reynolds 输运定理；
+ \item 不看答案，独立从三个积分守恒律推导局部形式；
+ \item 用动量方程从总能量方程中扣除动能，重推内能方程；
+ \item 用 Gibbs 关系重推熵平衡，逐项核对符号和量纲；
+ \item 分别代入无黏本构与 Newton--Fourier 本构；
+ \item 按质量、三个方向动量、总能量逐式核对 Euler/NSF，再由质量与内能推出熵；比较参考构形与一维质量坐标；
+ \item 最后计算原始变量和守恒变量的矩阵、特征值和特征向量，区分空间波速、质量坐标波速与黏性时间谱；
+ \item 重推 Stokes 的压力乘子形式与 Poiseuille 流，再理解 Euler 的受约束路径变分；
+ \item 最后学习 Euler 激波、熵解，以及 Navier--Stokes 的能量估计。
+\end{enumerate}
+
+\subsection*{练习}
+\begin{enumerate}
+ \item 用正交性证明 $(\ten A\ten B)'=Q(\ten A\ten B)Q^{\mathsf T}$，以及 $\ten A':\ten B'=\ten A:\ten B$。
+ \item 不预先假设指标对称性，重推 \eqref{eq:isotropic-four}；再说明小对称性为何使 $\beta=\gamma$，而大对称性为何不产生这一条件。
+ \item 设 $C_{ijkl}=2\delta_{ij}\delta_{kl}+3\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk}$，分别计算它对单位张量、对称无迹张量、反对称张量的作用，并用三个完全缩并值恢复系数。
+ \item 对简单剪切 $\vct u=(\dot\gamma x_2,0,0)^{\mathsf T}$ 计算 $\ten D$、$\ten W$、$\ten\tau$ 和黏性耗散，解释各向同性材料为何仍会出现剪应力。
+ \item 从 $\partial_t\rho+\nabla\cdot(\rho\vct u)=0$ 推导
+ $\partial_t(\rho\phi)+\nabla\cdot(\rho\phi\vct u)=\rho\Dt\phi$。
+ \item 在一维中把 Euler 方程写成 $\partial_t\vct U+\partial_x\vct F(\vct U)=0$，其中
+ $\vct U=(\rho,\rho u,\rho E)^{\mathsf T}$，并写出通量 $\vct F$。
+ \item 对理想气体利用 $e=c_vT$、$p=\rho RT$ 和 Gibbs 关系，推导
+ $s=c_v\ln(p/\rho^\gamma)+s_0$。
+ \item 从不可压缩 NS 方程取散度，推导压力的 Poisson 方程，并说明需要何种边界条件。
+ \item 对可压缩 NS--Fourier 系统，在绝热固壁 $\vct q\cdot\vct n=0$、无滑移边界下积分熵平衡，证明总熵非减。
+\end{enumerate}
+
+\clearpage
+\section{一页公式总览}
+
+\begin{align*}
+ &\text{物质导数:} &&\Dt=\partial_t+\vct u\cdot\nabla,\\
+ &\text{质量:} &&\partial_t\rho+\nabla\cdot(\rho\vct u)=0,\\
+ &\text{动量:} &&\rho\Dt\vct u=\nabla\cdot\ten\sigma+\rho\vct f,\\
+ &\text{应力分解:} &&\ten\sigma=-p\ten I+\ten\tau,\\
+ &\text{内能:} &&\rho\Dt e=-p\nabla\cdot\vct u
+ +\ten\tau:\nabla\vct u-\nabla\cdot\vct q+\rho r,\\
+ &\text{Gibbs 关系:} &&T\dd s=\dd e+p\dd(1/\rho),\\
+ &\text{熵平衡:} &&\partial_t(\rho s)+\nabla\cdot(\rho s\vct u+\vct q/T)
+ =\rho r/T+\Sigma,\\
+ &\text{熵产生:} &&\Sigma=\frac{\ten\tau:\nabla\vct u}{T}
+ -\frac{\vct q\cdot\nabla T}{T^2}\ge0,\\
+ &\text{Newton 流体:} &&\ten\tau=2\mu\ten D+\lambda(\nabla\cdot\vct u)\ten I,\\
+ &\text{Fourier 导热:} &&\vct q=-k\nabla T.
+\end{align*}
+
+\bigskip
+\begin{center}
+\fbox{\parbox{0.88\linewidth}{
+\centering
+守恒律决定方程的骨架；本构关系决定具体模型；\\
+热力学第二定律筛选物理上可接受的本构与弱解。
+}}
+\end{center}
+
+\end{document}
