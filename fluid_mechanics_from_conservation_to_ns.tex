@@ -3,6 +3,7 @@
 
 \usepackage{amssymb,mathtools,bm}
 \usepackage{longtable,array,float}
+\usepackage{needspace}
 \setCJKfamilyfont{notekai}[AutoFakeBold=2]{KaiTi}
 \renewcommand{\kaishu}{\CJKfamily{notekai}}
 
@@ -44,7 +45,7 @@
 \title{从守恒律到 Euler 与 Navier--Stokes 方程}
 \author{流体力学偏微分方程学习笔记}
 \institute{连续介质力学与偏微分方程}
-\version{1.5}
+\version{1.7}
 \date{\zhdate{2026/11/09}}
 
 \begin{document}
@@ -300,6 +301,8 @@ Green 第二公式常用于证明 Laplace 算子的对称性、解的唯一性�
  =\oint_{\partial S}\vct u\cdot\dd\vct l.} \label{eq:stokes}
 \end{equation}
 它说明穿过曲面的总涡量通量等于边界上的速度环流。把曲面划分为许多小曲面后，各内部边界被相反方向走过而相互抵消，只留下外边界，这与 Gauss 定理中内部面通量抵消的思想完全平行。
+
+\input{sections/lp-sobolev}
 
 \input{sections/variational-foundations}
 
@@ -1447,6 +1450,7 @@ Newton--Fourier 本构 & $\ten\tau=2\mu\ten D+\lambda(\nabla\cdot\vct u)\ten I$�
 \subsection*{建议顺序}
 \begin{enumerate}
  \item 先掌握张量变换律、并积与缩并，再重推四阶各向同性表示及 Newton 本构；
+ \item 按 Young、H\"older、Minkowski 的顺序证明 $L^p$ 范数与完备性，再学习弱导数、Sobolev 完备性、嵌入及流体能量空间；
  \item 用 Green 公式推导第一变分、内部方程与自然边界条件，完成一个约束变分和一个 Ritz 例题；
  \item 熟练掌握物质导数、Jacobian 演化和 Reynolds 输运定理；
  \item 不看答案，独立从三个积分守恒律推导局部形式；

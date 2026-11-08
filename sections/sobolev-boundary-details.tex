@@ -1,0 +1,132 @@
+% 接在弱导数理论之后；边界构造的证明限定在有界 C^1 区域。
+\subsection{为什么需要延拓：先在平边界上亲手构造}
+
+对 $\R^d_+=\{x_d>0\}$，定义偶反射
+\[
+ Eu(x',x_d)=u(x',|x_d|).
+\]
+若 $u\in W^{1,p}(\R^d_+)$、$1\le p<\infty$，由切片刻画，一维法向切片在有限区间上有绝对连续代表元，偶反射后仍绝对连续。切向切片只是在另一侧复制。因此反射函数的弱导数为
+\begin{equation}
+ D_jEu(x',x_d)=
+ \begin{cases}(D_ju)(x',|x_d|),&j<d,\\
+ \operatorname{sgn}(x_d)(D_du)(x',|x_d|),&j=d.
+ \end{cases}
+ \label{eq:weak-reflection}
+\end{equation}
+切片上的导数与弱导数等价，故这不是仅对光滑函数的形式计算。上下半空间作变量替换得到
+\[
+ \|Eu\|_p^p=2\|u\|_p^p,\qquad
+ \|D_jEu\|_p^p=2\|D_ju\|_p^p.
+\]
+因此反射是有界线性延拓。注意这里不能使用零延拓代替：若上侧边界值非零，零延拓产生界面跳跃与 Dirac 曲面项。
+
+\subsection{有界 \texorpdfstring{$C^1$}{C1} 区域的延拓：坐标拉平与单位分解}\label{subsec:weak-extension}
+
+\begin{theorem}[一阶有界延拓]\label{thm:weak-extension}
+若 $\Omega\subset\R^d$ 为有界 $C^1$ 区域，$1\le p<\infty$，存在有界线性映射
+\[
+ E:W^{1,p}(\Omega)\longrightarrow W^{1,p}(\R^d),\qquad
+ Eu=u\text{ a.e. 于 }\Omega,
+\]
+且可使所有 $Eu$ 的支撑包含于同一个有界集内。
+\end{theorem}
+\begin{proof}
+\textbf{第一步：写出坐标变换。}边界紧，可用有限个坐标邻域覆盖。经刚体变换，在每个邻域内
+$\Omega=\{(x',x_d):x_d>\gamma(x')\}$，$\gamma\in C^1$。定义
+\[
+ \Phi(y',s)=(y',s+\gamma(y')),\qquad
+ \Phi^{-1}(x',x_d)=(x',x_d-\gamma(x')).
+\]
+两者在选定的小邻域内导数有界，Jacobian 行列式为 1。令 $v=u\circ\Phi$，链式变换为
+\[
+ \partial_s v=(D_du)\circ\Phi,\qquad
+ \partial_{y_j}v=(D_ju)\circ\Phi+
+                 (\partial_j\gamma)(D_du)\circ\Phi\quad(j<d).
+\]
+这些公式对弱导数也成立：在任何紧含于上半邻域的集合中先光滑逼近 $u$，对光滑函数计算，再用变量替换和有界 Jacobian 将函数及一阶导数的 $L^p$ 收敛传递过去，最后在测试函数恒等式中取极限。穷竭紧子集便覆盖上半邻域。故坐标拉平及拉回均有 $W^{1,p}$ 有界估计。
+
+\textbf{第二步：对局部块反射。}取一组光滑单位分解 $\chi_0,\ldots,\chi_N$，在 $\overline\Omega$ 的邻域内和为 1；$\chi_0$ 支撑远离边界，其余各项支撑在上述坐标邻域内。有限光滑单位分解是这里使用的标准几何工具。对 $\chi_j u$ 拉平，在平边界上偶反射，再拉回；选择邻域与截断使该局部块在坐标邻域外缘附近为零，然后可以向外零延拓。利用上一小节反射估计、坐标变换和光滑截断乘积公式，得到
+\[
+ \|E_j(\chi_j u)\|_{W^{1,p}(\R^d)}
+ \le C_j\|u\|_{W^{1,p}(\Omega\cap U_j)}.
+\]
+$\chi_0u$ 直接零延拓即可，因为支撑远离边界，不会有界面项。
+
+\textbf{第三步：求和。}将这些有限个线性局部延拓相加，便得 $Eu$。在 $\Omega$ 内和为 $u\sum_j\chi_j=u$，且总范数由有限个常数之和控制。所有截断、坐标邻域预先固定且有界，所以延拓的支撑也统一有界。
+\end{proof}
+
+这也证明了 $C^\infty(\overline\Omega)$ 在 $W^{1,p}(\Omega)$ 中稠密：将 $Eu$ 在全空间卷积，再限制回 $\Omega$，即可在函数和全部一阶导数的 $L^p$ 范数下收敛。这里 $C^\infty(\overline\Omega)$ 指在闭包邻域内光滑的函数的限制，允许边界值非零。
+
+延拓结论也适用于 Lipschitz 区域，但图函数只有 a.e. 导数时，须补上 Lipschitz 变换的弱链式法则。为保持本节每一步可验证，上面的完整构造限定为 $C^1$ 边界；本专题后续需要延拓的完整证明均采用该假设。
+
+\subsection{迹不等式与迹算子：先证明平边界估计}
+
+取柱体 $Q=Q'\times(0,L)$，先设 $u$ 在闭柱体附近光滑。对 $p>1$，沿竖直线由基本定理得
+\[
+ |u(x',0)|^p
+ \le |u(x',t)|^p+
+ p\int_0^L|u(x',s)|^{p-1}|\partial_du(x',s)|\dd s.
+\]
+对 $t$ 在 $(0,L)$ 上取平均，再对 $x'$ 积分，H\"older 给出
+\begin{align*}
+ \|u(\cdot,0)\|_{L^p(Q')}^p
+ &\le L^{-1}\|u\|_{L^p(Q)}^p
+    +p\|u\|_{L^p(Q)}^{p-1}\|\partial_du\|_{L^p(Q)}\\
+ &\le C_{p,L}\big(\|u\|_{L^p(Q)}^p+\|\partial_du\|_{L^p(Q)}^p\big).
+\end{align*}
+最后一步是 Young。当 $p=1$，直接使用
+$|u(x',0)|\le|u(x',t)|+\int_0^L|\partial_du|$，得到同样的范数控制。拉平边界后，曲面测度为 $\sqrt{1+|\nabla\gamma|^2}\dd x'$，因子有界，结合有限单位分解得到一般边界估计。
+
+\begin{theorem}[迹算子的构造]\label{thm:weak-trace}
+若 $\Omega$ 有界 $C^1$，$1\le p<\infty$，存在唯一有界线性算子
+\begin{equation}
+ \operatorname{Tr}:W^{1,p}(\Omega)\to L^p(\partial\Omega),\qquad
+ \|\operatorname{Tr}u\|_{L^p(\partial\Omega)}\le C\|u\|_{W^{1,p}},
+ \label{eq:weak-trace-estimate}
+\end{equation}
+它对光滑函数等于通常边界限制。
+\end{theorem}
+\begin{proof}
+取光滑逼近 $u_n\to u$ 于 $W^{1,p}$。刚才的估计用于差值，说明 $u_n|_{\partial\Omega}$ 在 $L^p(\partial\Omega)$ 中 Cauchy。用 $L^p$ 完备性定义其极限为 $\operatorname{Tr}u$。若换一组逼近，同一估计用于两组之差，说明极限无关。线性与估计取极限保留，光滑稠密性保证这样的连续延伸唯一。
+
+还可确认这个迹等于 a.e. 法向绝对连续切片的端点值：在平柱体上，选取误差的 $W^{1,p}$ 范数的 $p$ 次幂可求和的光滑子列。Fubini 说明对 a.e. $x'$，其切片在一维 $W^{1,p}(0,L)$ 中收敛；一维端点估计又保证端点值收敛到该绝对连续切片的端点值。这与已经定义的 $L^p$ 边界极限相同。
+\end{proof}
+边界在体积测度下是零测集，所以迹不能通过“挑一个代表元直接在边界取值”定义。对于 $p=2$，更精确的边界目标空间是 $H^{1/2}(\partial\Omega)$；这一分数阶迹定理此处仅作延伸方向，不作证明，也不宣称任意 $L^2$ 边界数据都有 $H^1$ 延拓。
+
+\subsection{零边界空间为什么恰好是零迹空间}
+
+定义
+\begin{equation}
+ W^{1,p}_0(\Omega)=\overline{C_c^\infty(\Omega)}^{W^{1,p}},
+ \qquad H^1_0=W^{1,2}_0.
+ \label{eq:sobolev-zero}
+\end{equation}
+它作为完备空间的闭子空间也完备。对有界 $C^1$ 区域和 $p<\infty$，有
+\begin{equation}
+ \boxed{W^{1,p}_0(\Omega)=\ker\operatorname{Tr}.}
+ \label{eq:weak-trace-kernel}
+\end{equation}
+
+\begin{proof}
+\textbf{正向包含。}紧支撑光滑函数的迹为零，由迹算子连续性，其 Sobolev 闭包的迹也为零。
+
+\textbf{反向包含先看平边界。}若上半柱体的 $u$ 迹为零，且已作截断使其在侧面和顶面附近为零，那么几乎每条法向绝对连续切片的下端值为零。将切片向下零延拓，仍是绝对连续函数，导数是原导数的零延拓；切向导数由分部积分/Fubini 保留。因此全空间零延拓 $Zu$ 属于 $W^{1,p}(\R^d)$，没有边界测度项。
+
+令 $w_h(y',s)=Zu(y',s-h)$，$h>0$，即把支撑向域内移动 $h$。全空间平移连续性对函数及导数同时成立，故 $w_h\to Zu$ 于 $W^{1,p}$。再以半径小于 $h/2$ 的核卷积，得到支撑距平边界为正的光滑逼近。
+
+\textbf{再处理曲边界。}对零迹 $u$ 作前述有限单位分解并拉平边界。每个边界块按上述方法零延拓并内移，再拉回，得到支撑紧含于原区域的 $W^{1,p}$ 逼近。$C^1$ 坐标拉回不一定保持无穷光滑，但支撑已远离边界，此时再在原坐标内卷积即可得到真正的 $C_c^\infty(\Omega)$ 逼近。内域块直接卷积。有限求和并逐项控制误差得 $u\in W^{1,p}_0$。
+\end{proof}
+
+这个论证还说明：$u\in W^{1,p}_0$ 的零延拓属于全空间 $W^{1,p}$，并且 $D_iZu=Z(D_i u)$。对任意开集，这个结论也可直接用 $C_c^\infty$ 逼近的定义证明。无滑移边界取 $\vct u\in H^1_0(\Omega)^d$，正是同时要求有限能量和零迹。
+
+\subsection{弱紧性、下半连续性及本节的依赖边界}
+
+$W^{k,p}$ 通过 $u\mapsto(D^\alpha u)_{|\alpha|\le k}$ 等距嵌入有限个 $L^p$ 的乘积，像由完备性证明可知是闭的。因此 $p<\infty$ 时可分，$1<p<\infty$ 时自反；这里使用了 $L^p$ 的相应结构定理。故有界 Sobolev 序列在 $1<p<\infty$ 时可抽出弱收敛子列。
+
+若 $u_n\rightharpoonup u$ 于赋范空间，利用 Hahn--Banach 给出的对偶范数表示，可选 $\ell$ 满足 $\|\ell\|=1$、$\ell(u)=\|u\|$，于是
+\[
+ \|u\|=\lim_n\ell(u_n)\le\liminf_n\|u_n\|.
+\]
+这就是范数的弱下半连续性，能量泛函由此在弱极限下得到下界。
+
+本节完整展开了一阶弱导数、卷积、切片、运算、差商及 $C^1$ 边界上的一阶延拓与迹构造。作为预备引用的工具包括 Lebesgue 积分与微分基础、测度正则性、光滑单位分解、$L^p$ 对偶/自反性和 Hahn--Banach；没有把这些基础定理也当作已经在本节重新证明。

@@ -1,0 +1,146 @@
+% 延续嵌入章节：空间紧性、零均值 Poincare 和高阶补充。
+\subsection{Rellich 的第一步：一致平移估计与一致光滑逼近}
+
+对 $f\in W^{1,p}(\R^d)$，$1\le p<\infty$，沿向量 $h$ 的线段积分并用 Jensen，得到
+\begin{equation}
+ \|f(\cdot-h)-f\|_p\le |h|\|\nabla f\|_p.
+ \label{eq:sobolev-translation-uniform}
+\end{equation}
+光滑时逐点有 $f(x-h)-f(x)=-\int_0^1\nabla f(x-th)\cdot h\dd t$，积分即可；一般情况用光滑稠密性推广。将此式用于卷积平均，得到定量估计
+\begin{equation}
+ \|f*\rho_\varepsilon-f\|_p
+ \le C_\rho\varepsilon\|\nabla f\|_p.
+ \label{eq:sobolev-uniform-mollify}
+\end{equation}
+与普通近似恒等不同，这个误差对\textbf{整个梯度范数有界的函数族一致趋零}，它是紧性证明的核心。
+
+设 $u_n$ 在有界 $C^1$ 区域的 $W^{1,p}$ 中一致有界，用固定的有界支撑延拓得到 $f_n=Eu_n$，则 $\|f_n\|_{W^{1,p}}\le M$，所有支撑都在一个固定紧集内。令 $f_{n,\varepsilon}=\rho_\varepsilon*f_n$。对固定 $\varepsilon>0$，由 H\"older，
+\[
+ \|f_{n,\varepsilon}\|_\infty\le\|\rho_\varepsilon\|_{p'}M,
+ \quad
+ \|\nabla f_{n,\varepsilon}\|_\infty\le\|\nabla\rho_\varepsilon\|_{p'}M.
+\]
+这些函数支撑统一有界，且一致有界、一致 Lipschitz，因此在一致范数下可抽出收敛子列。
+
+为看清最后一步，可用有限网格证明：给定误差 $\eta$，用有限个半径足够小的球覆盖固定支撑集，Lipschitz 界保证每个球内振荡小于 $\eta$；中心点上的函数值位于固定有界区间，将这些值以步长 $\eta$ 量化，只有有限种组合。每种组合给出一个一致范数的有限精度近似。因此该函数族完全有界，再用连续函数空间完备性即可抽取一致收敛子列。这就是此处所需的 Arzel\`a--Ascoli 论证。
+
+\Needspace{11\baselineskip}
+\subsection{Rellich 的第二步：对角子列与原序列的强收敛}
+
+\begin{theorem}[Rellich--Kondrachov 紧嵌入]\label{thm:sobolev-rellich}
+设 $\Omega$ 有界 $C^1$，$1\le p<\infty$。则
+\begin{enumerate}
+ \item $W^{1,p}(\Omega)\Subset L^p(\Omega)$；
+ \item 若 $p<d$，则 $W^{1,p}(\Omega)\Subset L^q(\Omega)$ 对每个 $1\le q<p^*$ 成立；
+ \item 若 $p=d\ge2$，则对每个有限 $q$ 紧嵌入 $L^q$；
+ \item 若 $p>d$，则紧嵌入 $C^{0,\beta}(\overline\Omega)$，$0<\beta<1-d/p$。
+\end{enumerate}
+\end{theorem}
+\begin{proof}
+\textbf{先证明 $L^p$ 紧性。}取 $\varepsilon_j\downarrow0$。对 $j=1$ 抽出使 $f_{n,\varepsilon_1}$ 一致收敛的子列；再在其中抽出使 $f_{n,\varepsilon_2}$ 一致收敛的子列，依次进行。取对角子列后，对每个固定 $j$，相应光滑函数都一致收敛，从而也在固定有界支撑集上 $L^p$ 收敛。
+
+对角子列仍记 $f_n$。给定 $\eta>0$，先选 $j$ 使 $2C_\rho M\varepsilon_j<\eta/2$，再令 $m,n$ 足够大，使光滑项的 $L^p$ 距离小于 $\eta/2$。于是
+\begin{align*}
+ \|f_n-f_m\|_p
+ &\le\|f_n-f_{n,\varepsilon_j}\|_p
+     +\|f_{n,\varepsilon_j}-f_{m,\varepsilon_j}\|_p
+     +\|f_{m,\varepsilon_j}-f_m\|_p\\
+ &<\eta.
+\end{align*}
+故原函数子列在 $L^p$ 中 Cauchy，由完备性强收敛；限制回 $\Omega$ 得第一项。
+
+\textbf{用插值提高到次临界 $q$。}若 $p<q<p^*$，已证连续嵌入保证子列在 $L^{p^*}$ 中一致有界；选 $0<\theta<1$ 使 $1/q=\theta/p+(1-\theta)/p^*$。对差值插值，
+\[
+ \|u_n-u_m\|_q\le\|u_n-u_m\|_p^\theta
+                    \|u_n-u_m\|_{p^*}^{1-\theta}\to0.
+\]
+若 $q<p$，直接用有限测度包含即可。临界 $p=d$ 时，对任意指定 $q>d$ 先选一个有限 $s>q$，用已证 $W^{1,d}\hookrightarrow L^s$，再在 $L^d$ 和 $L^s$ 间插值。
+
+\textbf{超临界 H\"older 紧性。}Morrey 给出一致的 $C^{0,\alpha}$ 界，$\alpha=1-d/p$。在紧集 $\overline\Omega$ 上，用同样的有限网格方法得到一致收敛子列。对任意函数差 $w$，有
+\[
+ [w]_{C^{0,\beta}}
+ \le C_{\alpha,\beta}\|w\|_\infty^{1-\beta/\alpha}
+                           [w]_{C^{0,\alpha}}^{\beta/\alpha}.
+\]
+证明只需把 $|w(x)-w(y)|$ 同时控制为 $2\|w\|_\infty$ 与 $[w]_\alpha|x-y|^\alpha$，在两界相等的距离处分段。由于一致收敛而 $\alpha$ 半范数有界，便得 $C^{0,\beta}$ 强收敛。
+\end{proof}
+
+对任意有界开集的 $W^{1,p}_0$，同样的紧性结论可用零延拓证明，而不需要一般边界延拓。无界区域会因平移丧失紧性：取 $\phi(x-ne_1)$ 即可。临界指数处则有前面的集中反例。因此紧性需要同时防止向远处逃逸和向小尺度集中。
+
+\subsection{零均值 Poincar\'e：用刚刚证明的紧性完成反证}
+
+\begin{theorem}[零均值 Poincar\'e]\label{thm:sobolev-mean-poincare}
+若 $\Omega$ 有界、连通且 $C^1$，$1\le p<\infty$，令 $u_\Omega=|\Omega|^{-1}\int_\Omega u$，则
+\[
+ \|u-u_\Omega\|_p\le C\|\nabla u\|_p.
+\]
+\end{theorem}
+\begin{proof}
+若不存在统一 $C$，则可取零均值 $v_n$，使 $\|v_n\|_p=1$、$\|\nabla v_n\|_p\to0$，方法是将反例减均值后按 $L^p$ 范数归一化。它们在 $W^{1,p}$ 中有界，由 Rellich 有子列在 $L^p$ 中强收敛于 $v$，故 $\|v\|_p=1$。另一方面测试函数恒等式取极限说明 $D_i v=0$，连通性与零梯度判据给出 $v$ 为常数。有限测度下 $L^p$ 强收敛推出积分收敛，所以 $\int v=0$，该常数只能为零，与范数为 1 矛盾。
+\end{proof}
+此证明明确按“零边界 Poincar\'e、独立证明 Rellich、再证明零均值 Poincar\'e”的顺序进行，没有循环依赖。
+
+\subsection{高阶嵌入与乘积估计：以三维 \texorpdfstring{$H^2$}{H2} 为例}
+
+高阶空间可通过逐次对导数应用一阶嵌入来理解。为避免额外引用高阶边界延拓，这里先在全空间 $\R^3$ 证明。若 $u\in H^2(\R^3)$，则 $u$ 和每个 $D_i u$ 均属于 $H^1$，因此次临界估计给出
+\[
+ \|u\|_6+\sum_i\|D_i u\|_6\le C\|u\|_{H^2}.
+\]
+于是 $u\in W^{1,6}$，再由 Morrey（$1-3/6=1/2$）得到
+\begin{equation}
+ H^2(\R^3)\hookrightarrow C^{0,1/2}(\R^3)\cap L^\infty(\R^3),
+ \qquad\|u\|_\infty\le C\|u\|_{H^2}.
+ \label{eq:sobolev-h2-embedding}
+\end{equation}
+同时 $\nabla u\in L^2\cap L^6$，插值得 $\|\nabla u\|_4\le C\|u\|_{H^2}$。对光滑 $u,v$，二阶乘积公式包含
+\[
+ D_{ij}(uv)=uD_{ij}v+vD_{ij}u+(D_i u)(D_j v)+(D_j u)(D_i v).
+\]
+前两项用 $L^\infty\cdot L^2$，后两项用 $L^4\cdot L^4$，连同零阶和一阶项得到
+\begin{equation}
+ \|uv\|_{H^2(\R^3)}\le C\|u\|_{H^2}\|v\|_{H^2}.
+ \label{eq:sobolev-h2-algebra}
+\end{equation}
+通过全空间光滑逼近及该双线性估计可推广到一般 $H^2$ 函数。全空间的 $H^2$ 稠密性由前述截断与卷积对二阶导数重复即可证明。故三维 $H^2$ 是乘法代数，这对非线性强解估计很有用。
+
+相比之下，三维 $H^1$ 一般不是乘法代数：取 $u=\chi(x)|x|^{-a}$，$1/4\le a<1/2$，$\chi$ 在原点附近为 1。前面的径向计算说明 $u\in H^1$，但 $u^2$ 的导数平方积分含 $\int_0^\delta r^{-4a}\dd r$，故 $u^2\notin H^1$。这明确说明何时不能直接把非线性乘积留在同一个空间。
+
+\subsection{分数阶空间：与整数阶弱导数的关系}
+
+对 $0<s<1$、$1\le p<\infty$，一种自然的分数阶定义是
+\[
+ [u]_{W^{s,p}(\Omega)}^p
+ =\iint_{\Omega\times\Omega}\frac{|u(x)-u(y)|^p}{|x-y|^{d+sp}}\dd x\dd y,
+ \quad\|u\|_{W^{s,p}}^p=\|u\|_p^p+[u]_{W^{s,p}}^p.
+\]
+它把差商在所有尺度上的平均大小作为“分数阶导数”，并非先要求经典非整数次求导。这里只给出定义和下面可直接验证的 Fourier 对应。
+
+在 $\R^d$ 上采用酉归一化 Fourier 变换。对光滑快速衰减 $u$，令 $h=y-x$，由 Tonelli 与 Plancherel，
+\begin{align*}
+ [u]_{W^{s,2}(\R^d)}^2
+ &=\int\frac{\|u(\cdot+h)-u\|_2^2}{|h|^{d+2s}}\dd h\\
+ &=\int|\widehat u(\xi)|^2
+       \left(\int\frac{|e^{i\xi\cdot h}-1|^2}{|h|^{d+2s}}\dd h\right)\dd\xi\\
+ &=c_{d,s}\int|\xi|^{2s}|\widehat u(\xi)|^2\dd\xi.
+\end{align*}
+最后一步用旋转和缩放 $h\mapsto h/|\xi|$；常数有限，因为近原点分子为 $O(|h|^2)$，远处有界，径向积分分别是 $\int_0^1r^{1-2s}\dd r$ 和 $\int_1^\infty r^{-1-2s}\dd r$，恰好要求 $0<s<1$。
+
+更一般定义 $H^s(\R^d)$ 的 Fourier 范数为 $\int(1+|\xi|^2)^s|\widehat u|^2$。在非负整数阶，它与弱导数的 $H^k$ 范数等价，因为 $\widehat{D^\alpha u}=(i\xi)^\alpha\widehat u$。这里使用 Fourier--Plancherel 理论作为另一路基础工具。分数阶空间解释了为何边界迹自然出现半阶正则性；一般区域上的分数阶迹和延拓不在这里证明。
+
+\subsection{嵌入结论总表与时间紧性的边界}
+
+\begin{center}\small
+\begin{tabular}{p{0.18\linewidth}p{0.34\linewidth}p{0.35\linewidth}}
+\toprule
+条件 & 连续控制 & 紧性结论\\
+\midrule
+$1\le p<d$ & $W^{1,p}\hookrightarrow L^{p^*}$ & $L^q$ 紧，$1\le q<p^*$\\
+$p=d\ge2$ & 每个有限 $L^q$ & 每个有限 $L^q$ 紧\\
+$d<p<\infty$ & $C^{0,\alpha}$，$\alpha=1-d/p$ & $C^{0,\beta}$ 紧，$0<\beta<\alpha$\\
+$d=1,p=1$ & 绝对连续且连续 & $L^q$ 紧，任意有限 $q$\\
+\bottomrule
+\end{tabular}
+\end{center}
+一般边界版本在本节均假设有界 $C^1$；零边界版本可采用零延拓。一维 $p=1$ 的有限 $L^q$ 紧性来自 $L^1$ 紧性、由绝对连续公式得到的统一 $L^\infty$ 界，以及插值；不宣称在 $C^0$ 中紧，因为跳变层可收缩。
+
+空间紧性本身不能排除时间振荡，例如 $u_n(t,x)=\sin(nt)\phi(x)$。Aubin--Lions 型结论要求 $X_0\Subset X\hookrightarrow X_1$，$u_n$ 在 $L^a_tX_0$ 有界，且 $\partial_tu_n$ 在 $L^b_tX_1$ 有界（这里取 $1<a,b<\infty$），才得到 $L^a_tX$ 强收敛子列。该一般时间紧性定理在此明确作为外部定理引用；下一节会另证一个适用于常见三维 Galerkin 序列的 Hilbert 空间版本。

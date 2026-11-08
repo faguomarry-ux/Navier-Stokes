@@ -1,0 +1,354 @@
+% 由 lp-sobolev.tex 载入；先修为 Lebesgue 积分的基础定理。
+\clearpage
+\section{弱导数与 Sobolev 空间：从分部积分逐步建立理论}\label{sec:sobolev-definition}
+
+本节不预先把“弱导数”当作会计算的符号，而是依次回答：为什么这样定义，能否唯一确定，何时存在，如何用光滑函数逼近，以及边界条件如何进入空间。凡出现 $D_i u$，都应能还原为一个对所有测试函数成立的积分恒等式。“弱导数”描述求导的意义；“弱收敛”描述序列的收敛方式，是两个不同概念。
+
+\subsection{从经典分部积分推出弱导数的定义}
+
+先设 $u\in C^1(\Omega)$，$\varphi\in C_c^\infty(\Omega)$。由于 $\varphi$ 支撑远离边界，$u\varphi$ 也紧支撑，故
+\[
+ 0=\int_\Omega\partial_i(u\varphi)\dd x
+  =\int_\Omega(\partial_i u)\varphi\dd x
+   +\int_\Omega u\partial_i\varphi\dd x.
+\]
+移项得 $\int u\partial_i\varphi=-\int(\partial_i u)\varphi$。右式中导数已从未知函数移到已知的光滑测试函数，因此即使 $u$ 不经典可微，左侧仍然有定义。
+
+\begin{definition}[测试函数、局部可积与弱导数]\label{def:weak-derivative}
+$u\in L^1_{\mathrm{loc}}(\Omega)$ 意味着在每个紧子集上可积。若存在 $g_i\in L^1_{\mathrm{loc}}(\Omega)$，使
+\begin{equation}
+ \boxed{\int_\Omega u\partial_i\varphi\dd x
+       =-\int_\Omega g_i\varphi\dd x,
+       \quad\forall\varphi\in C_c^\infty(\Omega),}
+ \label{eq:weak-derivative-definition}
+\end{equation}
+则称 $g_i$ 为 $u$ 的第 $i$ 个弱偏导数，记为 $D_i u$。
+\end{definition}
+
+局部可积性保证所有积分有限：$\varphi$ 及其导数有界且支撑在同一个紧集内。定义中的“任意 $\varphi$”至关重要；只验证一两个测试函数远远不够。测试函数紧支撑消除了边界项，\textbf{并未要求 $u$ 的边界值为零}。
+
+对多重指标 $\alpha=(\alpha_1,\ldots,\alpha_d)$，记 $|\alpha|=\sum_i\alpha_i$，定义
+\begin{equation}
+ \int_\Omega uD^\alpha\varphi\dd x
+ =(-1)^{|\alpha|}\int_\Omega D^\alpha u\,\varphi\dd x.
+ \label{eq:weak-higher-derivative}
+\end{equation}
+每移走一个导数就引入一个负号。重复求导与直接用此式定义一致；混合分布导数交换，因为测试函数的混合经典导数交换。
+
+\subsection{先证明光滑核逼近：后续唯一性与运算法则的基础}
+
+取非负光滑函数
+\[
+ \rho(x)=c\begin{cases}\exp\big(-1/(1-|x|^2)\big),&|x|<1,\\0,&|x|\ge1,\end{cases}
+ \qquad\int_{\R^d}\rho=1,
+\]
+并令 $\rho_\varepsilon(x)=\varepsilon^{-d}\rho(x/\varepsilon)$。这是把一个总质量为 1 的光滑核压缩进半径 $\varepsilon$ 的球。
+
+\begin{lemma}[平移连续与近似恒等]\label{lem:weak-approx-identity}
+若 $f\in L^p(\R^d)$，$1\le p<\infty$，则
+\[
+ \|f(\cdot-h)-f\|_p\to0\quad(h\to0),\qquad
+ \|\rho_\varepsilon*f-f\|_p\to0\quad(\varepsilon\to0).
+\]
+若 $f\in L^1_{\mathrm{loc}}(\Omega)$，第二结论在每个 $K\Subset\Omega$ 上以 $L^1(K)$ 成立。
+\end{lemma}
+\begin{proof}
+\textbf{先证明平移。}给定 $\eta>0$，利用 $C_c(\R^d)$ 在 $L^p$ 中的稠密性，选 $g$ 使 $\|f-g\|_p<\eta$。这一基础稠密性可由简单函数逼近、Lebesgue 测度的内外正则性和连续截断证明，此处作为测度论预备使用。平移不改变 $L^p$ 范数，所以
+\[
+ \|f(\cdot-h)-f\|_p\le2\eta+\|g(\cdot-h)-g\|_p.
+\]
+$g$ 一致连续，小平移下两函数的支撑落在固定有限测度集内，故最后一项趋零。令 $\eta\downarrow0$ 得结论。
+
+\textbf{再证明卷积。}由 Jensen 不等式和 Tonelli，
+\begin{align*}
+ \|\rho_\varepsilon*f-f\|_p^p
+ &\le\int\rho_\varepsilon(h)
+             \|f(\cdot-h)-f\|_p^p\dd h\\
+ &\le\sup_{|h|\le\varepsilon}\|f(\cdot-h)-f\|_p^p\longrightarrow0.
+\end{align*}
+此处 Jensen 只是对凸函数 $t\mapsto|t|^p$ 和概率权重 $\rho_\varepsilon$ 使用凸性。局部情形取 $\chi\in C_c^\infty(\Omega)$，使它在 $K$ 的一个邻域上为 1，将 $\chi f$ 零延拓到全空间。充分小的 $\varepsilon$ 下，它与 $f$ 的卷积在 $K$ 上相同。
+\end{proof}
+
+对局部可积 $f$，$f_\varepsilon=\rho_\varepsilon*f$ 在内缩区域上光滑；对核逐次求导即可得到
+\[
+ D^\alpha f_\varepsilon(x)=\int f(y)D_x^\alpha\rho_\varepsilon(x-y)\dd y.
+\]
+在固定紧集上，核及其导数有共同紧支撑并有界，故可由控制收敛交换求导和积分。
+
+\subsection{基本引理、弱导数唯一性和零梯度判据}
+
+\begin{lemma}[局部可积函数的基本引理]\label{lem:weak-fundamental}
+若 $h\in L^1_{\mathrm{loc}}(\Omega)$，且 $\int h\varphi=0$ 对所有 $\varphi\in C_c^\infty(\Omega)$ 成立，则 $h=0$ a.e.。
+\end{lemma}
+\begin{proof}
+固定 $K\Subset\Omega$，并取 $\varepsilon<\operatorname{dist}(K,\partial\Omega)$。对每个 $x\in K$，函数 $y\mapsto\rho_\varepsilon(x-y)$ 是允许的测试函数，故 $(h*\rho_\varepsilon)(x)=0$。由引理~\ref{lem:weak-approx-identity}，它在 $L^1(K)$ 中趋于 $h$，所以 $\int_K|h|=0$。用可数个这样的紧集穷竭 $\Omega$，便得全区域 a.e. 为零。
+\end{proof}
+
+若 $g_i,\widetilde g_i$ 都满足弱导数定义，作差得 $\int(g_i-\widetilde g_i)\varphi=0$，基本引理立即给出 $g_i=\widetilde g_i$ a.e.。因此弱导数唯一到零测集；修改 $u$ 的零测集取值也不会改变它。
+
+\begin{proposition}[连通区域上零弱梯度意味着常数]\label{prop:weak-zero-gradient}
+若 $\Omega$ 开且连通，$u\in L^1_{\mathrm{loc}}(\Omega)$、$D_i u=0$ 对所有 $i$ 成立，则 $u$ a.e. 等于一个常数。
+\end{proposition}
+\begin{proof}
+在球 $B\Subset\Omega$ 内作局部卷积。由定义，$\partial_i u_\varepsilon=0$，故在略小的同心球上 $u_\varepsilon=c_\varepsilon$。固定一个更小球 $B'$，局部 $L^1$ 收敛说明这些常数在 $L^1(B')$ 中 Cauchy，即
+$|B'||c_\varepsilon-c_\delta|\to0$。所以 $c_\varepsilon\to c$，$u=c$ a.e. 于 $B'$。重叠球上的常数必须相同；开连通集内任意两点可由有限条相交小球连接，故整个区域的常数一致。
+\end{proof}
+若区域不连通，不同连通分支可以有不同常数。这正是零均值 Poincar\'e 不等式需要连通性的原因。
+
+\subsection{分布导数总存在，函数型弱导数却未必存在}
+
+分布是测试函数上的连续线性泛函。这里的连续性意为：若 $\varphi_n$ 支撑在同一个紧集内，且任意阶导数都一致趋零，则 $T(\varphi_n)\to0$。每个 $u\in L^1_{\mathrm{loc}}$ 产生分布 $T_u(\varphi)=\int u\varphi$，因为在固定紧集 $K$ 上
+\[
+ |T_u(\varphi)|\le\|u\|_{L^1(K)}\|\varphi\|_\infty.
+\]
+定义 $D_iT$ 的作用为 $\langle D_iT,\varphi\rangle=-\langle T,\partial_i\varphi\rangle$；连续性和线性仍然成立，所以\textbf{每个分布都可以任意次求分布导数}。但只有当 $D_iT_u=T_g$、$g\in L^1_{\mathrm{loc}}$ 时，才得到本专题的函数型弱导数。
+
+例如 Dirac 分布 $\delta_{x_0}(\varphi)=\varphi(x_0)$ 是连续线性泛函，却不能由体积局部可积函数表示。弱导数的存在问题，实质上是检查分布导数是否具有所需可积性的函数表示。基本引理说明这种表示若存在则 a.e. 唯一。
+
+\subsection{折角、跳跃、奇性与界面：逐项计算弱导数}
+
+\begin{example}[折角：$u(x)=|x|$]
+在 $(-1,1)$ 上，测试函数在端点附近为零。逐段积分得到
+\begin{align*}
+ \int_{-1}^1|x|\varphi'\dd x
+ &=\int_{-1}^0(-x)\varphi'\dd x+\int_0^1x\varphi'\dd x\\
+ &=[-x\varphi]_{-1}^0+\int_{-1}^0\varphi
+   +[x\varphi]_0^1-\int_0^1\varphi\\
+ &=-\int_{-1}^1\operatorname{sgn}(x)\varphi(x)\dd x.
+\end{align*}
+因此 $D|x|=\operatorname{sgn}x$ a.e.。再求一次分布导数：
+$\langle D^2|x|,\varphi\rangle=-\int\operatorname{sgn}x\,\varphi'=2\varphi(0)$，所以 $D^2|x|=2\delta_0$。结论是 $|x|\in W^{1,\infty}$，但 $|x|\notin W^{2,1}$。
+\end{example}
+
+\begin{example}[跳跃：阶跃函数]
+令 $H=\mathbf1_{(0,1)}$，定义域为 $(-1,1)$。由于 $\int H\varphi'=\int_0^1\varphi'=-\varphi(0)$，其分布导数为 $DH=\delta_0$。假设存在局部可积 $g$ 表示它；取 $0\le\varphi_\varepsilon\le1$、$\varphi_\varepsilon(0)=1$，支撑缩进 $(-\varepsilon,\varepsilon)$，则
+\[
+ 1=\int g\varphi_\varepsilon
+ \le\left|\int g\varphi_\varepsilon\right|
+ \le\int_{-\varepsilon}^{\varepsilon}|g|\longrightarrow0,
+\]
+矛盾。最后一步来自可积函数积分的绝对连续性。因此 $H$ 不属于任何 $W^{1,p}(-1,1)$，即使它在原点以外的经典导数都为零。
+\end{example}
+
+\begin{example}[可积奇性：径向幂函数]
+在 $B_1\subset\R^d$、$d\ge2$ 中取 $u(x)=|x|^{-a}$，$a>0$。极坐标计算给出
+\[
+ \int_{B_1}|u|^p=|\mathbb S^{d-1}|\int_0^1r^{d-1-ap}\dd r,
+ \quad |\nabla u|=a r^{-a-1}.
+\]
+因此候选弱导数可积到 $p$ 次幂的条件是 $(a+1)p<d$。还须检查原点没有额外 Dirac 项：在 $B_1\setminus\overline B_\varepsilon$ 分部积分，内球边界项绝对值不超过 $C\varepsilon^{d-1-a}$，在上述条件下趋零。令 $\varepsilon\downarrow0$ 得到真正的弱导数 $D_i u=-a x_i|x|^{-a-2}$。反过来，若属于 $W^{1,p}$，在去掉原点的区域弱导数必须等于经典导数，故同一积分条件必要。于是
+\[
+ |x|^{-a}\in W^{1,p}(B_1)\iff (a+1)p<d\quad(a>0).
+\]
+三维中 $0<a<1/2$ 给出无界的 $H^1$ 函数；能量有限不意味着速度有界。
+\end{example}
+
+\begin{proposition}[分片光滑函数的界面项]\label{prop:weak-interface}
+设光滑界面 $\Sigma$ 将区域分成 $\Omega_-,\Omega_+$，法向 $n$ 从负侧指向正侧，$u=u_\pm$ 分片光滑，跳跃 $[u]=u_+-u_-$。其分布导数为
+\begin{equation}
+ D_i u=(\partial_i u)_{\mathrm{piecewise}}+[u]n_i\,\delta_\Sigma,
+ \label{eq:weak-interface}
+\end{equation}
+这里 $\langle\delta_\Sigma,\varphi\rangle=\int_\Sigma\varphi\dd A$。
+\end{proposition}
+\begin{proof}
+在两侧分别分部积分。负侧界面外法向为 $n$，正侧为 $-n$，故
+\[
+ -\int u\partial_i\varphi
+ =\sum_{\pm}\int_{\Omega_\pm}\partial_i u_\pm\varphi
+   +\int_\Sigma(u_+-u_-)n_i\varphi\dd A.
+\]
+这就是分布作用式。若 $[u]=0$，界面项消失；若有非零跳跃，通常留下无法由体积 $L^p$ 函数表示的曲面测度。
+\end{proof}
+这解释了连续分片线性有限元为何可属于 $H^1$：函数连续，分片梯度虽有跳跃，但一阶导数没有曲面 Dirac 项。它一般不在 $H^2$，因为梯度的界面跳跃会进入二阶分布导数。
+
+\subsection{一维刻画：弱导数等价于绝对连续代表元}\label{subsec:weak-ac}
+
+\begin{theorem}[一维 Sobolev 微积分基本定理]\label{thm:weak-ac}
+在有限区间 $(a,b)$ 上，$u\in W^{1,p}(a,b)$、$1\le p\le\infty$，当且仅当存在代表元 $\widetilde u$ 绝对连续且其 a.e. 经典导数在 $L^p$。此时 $\widetilde u'=Du$ a.e.，并有
+\begin{equation}
+ \widetilde u(y)-\widetilde u(x)=\int_x^yDu(s)\dd s,
+ \qquad x,y\in[a,b].
+ \label{eq:weak-ac-ftc}
+\end{equation}
+\end{theorem}
+\begin{proof}
+\textbf{从弱导数构造代表元。}令 $g=Du\in L^p\subset L^1$，定义 $v(x)=\int_a^xg(s)\dd s$。Lebesgue 积分的微积分基本定理说明 $v$ 绝对连续，$v'=g$ a.e.。对测试函数用 Fubini：
+\[
+ \int_a^bv(x)\varphi'(x)\dd x
+ =\int_a^bg(s)\left(\int_s^b\varphi'(x)\dd x\right)\dd s
+ =-\int_a^bg(s)\varphi(s)\dd s.
+\]
+所以 $D(u-v)=0$。由命题~\ref{prop:weak-zero-gradient}，$u-v=c$ a.e.，取 $\widetilde u=v+c$ 即得代表元及公式。
+
+\textbf{从绝对连续推出弱导数。}若有绝对连续 $\widetilde u$，则 $\widetilde u\varphi$ 绝对连续，a.e. 导数为 $\widetilde u'\varphi+\widetilde u\varphi'$。积分这个导数，端点项因 $\varphi$ 消失，得到弱导数恒等式。有限区间上的绝对连续函数有界，故本身属于 $L^p$，结论成立。
+\end{proof}
+
+当 $p>1$，公式与 H\"older 给出
+\[
+ |\widetilde u(y)-\widetilde u(x)|
+ \le|y-x|^{1-1/p}\|Du\|_p.
+\]
+$p=1$ 时仍有绝对连续性，但不能从这个估计获得一个正的统一 H\"older 指数。Cantor 函数连续、经典导数 a.e. 为零，却不是绝对连续；由本定理可知它不在 $W^{1,1}(0,1)$。所以“a.e. 存在经典导数且导数可积”仍不足以替代弱导数条件。
+
+在 $(0,1)$ 上 $u=x^\alpha$、$\alpha>0$ 时，直接计算 $u'=\alpha x^{\alpha-1}$，得到 $u\in W^{1,p}\iff\alpha>1-1/p$（$p<\infty$）。等号时出现 $\int_0^1x^{-1}\dd x$。常数 $\alpha=0$ 必须单独处理。
+
+\subsection{沿坐标直线的绝对连续性：高维弱导数的几何含义}
+
+\begin{proposition}[长方体上的切片刻画]\label{prop:weak-acl}
+设 $Q=Q'\times(a,b)$，$u,g\in L^p(Q)$，$1\le p<\infty$。则 $D_d u=g$ 当且仅当对几乎所有 $x'\in Q'$，切片 $t\mapsto u(x',t)$ 有绝对连续代表元，导数为 $g(x',t)$ a.e.。
+\end{proposition}
+\begin{proof}
+若 $D_du=g$，用乘积测试函数 $\varphi(x',t)=\eta(x')\psi(t)$，得
+\[
+ \int_{Q'}\eta(x')\left[\int_a^b
+       \big(u(x',t)\psi'(t)+g(x',t)\psi(t)\big)\dd t\right]\dd x'=0.
+\]
+Fubini 和基本引理说明方括号对 a.e. $x'$ 为零。但这个零测集一开始可能依赖 $\psi$。为统一它，先在每个固定紧支撑区间内取测试函数关于 $C^1$ 范数的可数稠密子集，再对一列穷竭区间取并，去掉对应的可数零测集。其余 $x'$ 上 $u(x',\cdot),g(x',\cdot)\in L^1$，所以该恒等式关于 $\psi$ 的 $C^1$ 范数连续，得以推广到所有测试函数。由一维定理得到绝对连续代表元。
+
+反过来，若 a.e. 切片绝对连续，对任意 $\varphi\in C_c^\infty(Q)$ 先沿 $t$ 做一维分部积分，再用 Fubini 对 $x'$ 积分，便得 $D_du=g$。
+\end{proof}
+对每个坐标方向重复此论证，得到通常所说的 ACL：沿几乎每条平行坐标轴的线局部绝对连续。这里不要求每条线都成立，也不能据此推出高维函数处处连续。
+
+\subsection{Sobolev 定义、范数与完备性的逐项证明}
+
+\begin{definition}[整数阶 Sobolev 空间]\label{def:sobolev}
+对整数 $k\ge0$、$1\le p\le\infty$，定义
+\begin{equation}
+ W^{k,p}(\Omega)=\{u\in L^p:D^\alpha u\in L^p,\ |\alpha|\le k\},
+ \label{eq:sobolev-definition}
+\end{equation}
+取范数
+\begin{equation}
+ \|u\|_{W^{k,p}}=
+ \begin{cases}(\sum_{|\alpha|\le k}\|D^\alpha u\|_p^p)^{1/p},&p<\infty,\\
+ \max_{|\alpha|\le k}\|D^\alpha u\|_\infty,&p=\infty.
+ \end{cases}
+ \label{eq:sobolev-norm}
+\end{equation}
+\end{definition}
+弱导数的线性直接由定义得到，所以集合对线性运算封闭。各项非负，零阶项保证正定性；齐次性来自积分；三角不等式先对每个导数用 $L^p$ 的 Minkowski，再对有限项向量用 $\ell^p$ 的 Minkowski。只有梯度的表达式通常是半范数，因为它不能识别常数。
+
+记 $H^k=W^{k,2}$，内积为
+\begin{equation}
+ (u,v)_{H^k}=\sum_{|\alpha|\le k}\int D^\alpha uD^\alpha v\dd x.
+ \label{eq:sobolev-inner-product}
+\end{equation}
+对一般 $p$，采用各梯度分量的 $p$ 次幂之和与采用 $|\nabla u|$ 欧氏长度给出等价范数，常数中可吸收相应维数因子。
+
+\begin{theorem}[Sobolev 完备性]\label{thm:sobolev-complete}
+$W^{k,p}(\Omega)$ 是 Banach 空间，$H^k(\Omega)$ 是 Hilbert 空间。
+\end{theorem}
+\begin{proof}
+设 $u_n$ 为 Sobolev Cauchy 序列。对每个 $|\alpha|\le k$，$D^\alpha u_n$ 是 $L^p$ Cauchy，故有极限 $g_\alpha\in L^p$。令 $u=g_0$。关键是确认这些极限之间仍有导数关系。
+
+固定 $\varphi\in C_c^\infty$，由 H\"older，
+\[
+ \left|\int(u_n-u)D^\alpha\varphi\right|
+ \le\|u_n-u\|_p\|D^\alpha\varphi\|_{p'}\to0,
+\]
+且 $|\int(D^\alpha u_n-g_\alpha)\varphi|\to0$。测试函数紧支撑保证 $p=1$ 所需的 $L^\infty$ 范数、$p=\infty$ 所需的 $L^1$ 范数均有限。在原恒等式中取极限得
+\[
+ \int uD^\alpha\varphi=(-1)^{|\alpha|}\int g_\alpha\varphi.
+\]
+所以 $D^\alpha u=g_\alpha$，从而 $u\in W^{k,p}$，有限项收敛又给出 $\|u_n-u\|_{W^{k,p}}\to0$。$p=2$ 时此范数由上述内积诱导，故为 Hilbert 空间。
+\end{proof}
+
+同一论证有一个常用的弱极限版本：若 $u_n\to u$ 于分布意义，$D_iu_n\rightharpoonup g_i$ 于 $L^p$（$1<p<\infty$），则 $D_iu=g_i$。测试函数配对即可取极限；不需要导数强收敛。这是 PDE 先验界构造弱解的基本机制。
+
+\subsection{导数与卷积交换：把负号和变量写清楚}
+
+若 $D_i u=g_i$，在 $\operatorname{dist}(x,\partial\Omega)>\varepsilon$ 处，
+\begin{align*}
+ \partial_i(u*\rho_\varepsilon)(x)
+ &=\int u(y)\partial_{x_i}\rho_\varepsilon(x-y)\dd y\\
+ &=-\int u(y)\partial_{y_i}\rho_\varepsilon(x-y)\dd y\\
+ &=\int g_i(y)\rho_\varepsilon(x-y)\dd y.
+\end{align*}
+第二行来自核依赖差变量，第三行来自弱导数定义，因此
+\begin{equation}
+ D_i u_\varepsilon=\rho_\varepsilon*D_i u.
+ \label{eq:sobolev-mollifier}
+\end{equation}
+对 $p<\infty$，近似恒等引理对 $u$ 和每个 $D_i u$ 分别应用，得到 $u_\varepsilon\to u$ 于局部 $W^{1,p}$。
+
+在全空间还可以得到\textbf{紧支撑光滑逼近}：先令 $\chi_R(x)=\chi(x/R)$，$\chi=1$ 于 $B_1$、支撑在 $B_2$，则 $\chi_Ru\to u$ 于 $W^{1,p}(\R^d)$，因为尾部积分趋零，且
+\[
+ D_i(\chi_Ru)=\chi_RD_iu+(D_i\chi_R)u,
+ \quad\|(D_i\chi_R)u\|_p\le C R^{-1}\|u\|_p\to0.
+\]
+此乘积公式可直接将 $\chi_R\varphi$ 代入定义证明，并不依赖待证的一般乘积定理。再对紧支撑函数卷积，便得 $C_c^\infty(\R^d)$ 在 $W^{1,p}(\R^d)$ 中稠密。
+
+一般开集的内部光滑逼近也可构造：取局部有限光滑单位分解 $\sum_j\psi_j=1$，每个 $\psi_j$ 紧支撑于 $\Omega$。给定 $\eta>0$，逐项将 $\psi_ju$ 卷积，使第 $j$ 项的 $W^{1,p}$ 误差小于 $\eta2^{-j}$，并选择核半径使卷积后的支撑仍局部有限且留在 $\Omega$ 内。局部有限和是光滑函数，总误差不超过 $\eta$。因此 $C^\infty(\Omega)\cap W^{1,p}(\Omega)$ 稠密；通常不能把它改成 $C_c^\infty(\Omega)$。
+
+\begin{warningbox}
+上述范数逼近要求 $p<\infty$。$p=\infty$ 时局部卷积仍可用来验证分布恒等式，但不保证 $W^{1,\infty}$ 范数收敛；$|x|$ 的导数跳跃就是反例。
+\end{warningbox}
+
+\subsection{乘积法则、链式法则与截断：证明而非形式套用}
+
+\begin{proposition}[有界 Sobolev 函数的乘积]\label{prop:weak-product}
+若 $u,v\in W^{1,p}(\Omega)\cap L^\infty(\Omega)$，$1\le p<\infty$，则 $uv\in W^{1,p}$，且 $D_i(uv)=uD_iv+vD_iu$。
+\end{proposition}
+\begin{proof}
+在紧子集内卷积，非负核保证 $|u_\varepsilon|\le\|u\|_\infty$、$|v_\varepsilon|\le\|v\|_\infty$。取一个子列使函数 a.e. 收敛。光滑函数满足通常乘积公式；例如
+\[
+ u_\varepsilon D_iv_\varepsilon-uD_iv
+ =u_\varepsilon(D_iv_\varepsilon-D_iv)
+   +(u_\varepsilon-u)D_iv.
+\]
+第一项以一致上界乘导数的 $L^p$ 收敛趋零；第二项由 a.e. 收敛、上界 $2\|u\|_\infty|D_iv|$ 和控制收敛在 $L^p$ 中趋零。另一项同理。对测试函数取极限，得到弱乘积公式；右侧全局属于 $L^p$，而 $uv\in L^p$，故是全局结论。
+\end{proof}
+
+\begin{proposition}[有界导数的链式法则]\label{prop:weak-chain}
+若 $F\in C^1(\R)$、$\|F'\|_\infty<\infty$，$u\in W^{1,p}(\Omega)$、$p<\infty$，则局部有 $D_iF(u)=F'(u)D_i u$。若 $F(0)=0$ 或 $|\Omega|<\infty$，则 $F(u)\in W^{1,p}(\Omega)$。
+\end{proposition}
+\begin{proof}
+局部光滑逼近后，$F(u_\varepsilon)\to F(u)$ 于 $L^p$，因为 $F$ 是 Lipschitz。对导数作分解
+\[
+ F'(u_\varepsilon)D_i u_\varepsilon-F'(u)D_i u
+ =F'(u_\varepsilon)(D_i u_\varepsilon-D_i u)
+  +(F'(u_\varepsilon)-F'(u))D_i u.
+\]
+第一项强收敛，第二项取 a.e. 收敛子列后由 $F'$ 连续及控制收敛得到 $L^p$ 收敛。因此积分恒等式可取极限。最后 $|F(u)|\le|F(0)|+\|F'\|_\infty|u|$，给出全局可积性条件。
+\end{proof}
+
+\textbf{绝对值与正部。}先取 $F_\varepsilon(s)=\sqrt{s^2+\varepsilon^2}-\varepsilon$。其导数有界于 1，$F_\varepsilon(u)\to|u|$ 于 $L^p$，且 $F_\varepsilon'(u)D_i u\to\operatorname{sgn}(u)D_i u$ 于 $L^p$，其中 $\operatorname{sgn}(0)=0$。所以 $D_i|u|=\operatorname{sgn}(u)D_i u$。
+
+还需要说明 $D_i u=0$ a.e. 于 $\{u=0\}$。由切片刻画，将问题归为一维绝对连续函数：在零点集的几乎每个点，该点既是零点集的密度点，又是可微点；取零点序列趋向它，差商为零，所以导数为零。Lebesgue 密度定理和 Fubini 给出结论。于是
+\[
+ D_i u^+=\mathbf1_{\{u>0\}}D_i u,\qquad
+ D_iT_M(u)=\mathbf1_{\{|u|<M\}}D_i u,
+\]
+其中 $u^+=\max(u,0)$、$T_M(s)=\max(-M,\min(s,M))$。截断公式也可由绝对连续切片直接验证。它们用于最大值原理、非负性保持与弱解测试。
+
+\subsection{差商判据：不用先知道导数也能检测 Sobolev 正则性}
+
+令 $\delta_h^iu(x)=[u(x+he_i)-u(x)]/h$。若线段落在定义域内，光滑函数的基本定理给出
+\[
+ \delta_h^iu(x)=\int_0^1D_i u(x+the_i)\dd t.
+\]
+由 Jensen 积分并作变量替换，在全空间有
+\begin{equation}
+ \|\delta_h^iu\|_p\le\|D_i u\|_p,
+ \qquad u\in W^{1,p}(\R^d),\quad1\le p<\infty.
+ \label{eq:weak-difference-bound}
+\end{equation}
+对一般 Sobolev 函数由光滑稠密性推广。局部版本用包含所有平移线段的较大紧子域控制。
+
+\begin{theorem}[局部差商的反向判据]\label{thm:weak-difference}
+设 $1<p<\infty$，$u\in L^p_{\mathrm{loc}}(\Omega)$。若对每个 $U\Subset\Omega$、每个方向 $i$，存在 $C_U$，使所有充分小 $h$ 满足 $\|\delta_h^iu\|_{L^p(U)}\le C_U$，则 $u\in W^{1,p}_{\mathrm{loc}}(\Omega)$。
+\end{theorem}
+\begin{proof}
+固定 $U$，由 $L^p$ 自反性，任取 $h_n\to0$ 可抽取子列，使 $\delta_{h_n}^iu\rightharpoonup g_i$ 于 $L^p(U)$。对 $\varphi\in C_c^\infty(U)$，变量替换得到
+\[
+ \int\delta_h^iu\,\varphi
+ =-\int u\,\delta_{-h}^i\varphi
+ \longrightarrow-\int u\partial_i\varphi.
+\]
+左侧同时趋于 $\int g_i\varphi$，故 $g_i=D_i u$。在穷竭子域上逐一构造，唯一性使这些局部导数相容。弱下半连续还给出 $\|D_i u\|_{L^p(U)}\le C_U$。
+\end{proof}
+
+$p=1$ 的反向判据不能直接成立：阶跃函数的差商 $L^1$ 范数一致有界，却没有 $L^1$ 弱导数；它对应 BV（有界变差）空间中的测度导数。差商方法也会用于椭圆方程的二阶弱正则性估计。
+
+\input{sections/sobolev-boundary-details}

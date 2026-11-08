@@ -1,0 +1,289 @@
+% 从一阶基础不等式到临界、Morrey 和 Rellich；保留旧交叉引用。
+\Needspace{12\baselineskip}
+\section{Sobolev 嵌入：次临界、临界、连续性与紧性的详细证明}\label{sec:sobolev-embedding}
+
+\subsection{先区分包含、连续嵌入与紧嵌入}
+
+$X\subset Y$ 只说明每个 $X$ 元素也属于 $Y$。$X\hookrightarrow Y$ 还要求恒等映射连续，即存在与 $u$ 无关的 $C$，使 $\|u\|_Y\le C\|u\|_X$。这保证 $X$ 中强收敛传递到 $Y$。$X\Subset Y$ 表示紧嵌入：$X$ 中每个有界序列都有 $Y$ 中的强收敛子列。
+
+接下来的证明按四条路线展开：$p<d$ 得更高可积性，$p=d$ 得任意有限次幂可积性，$p>d$ 得 H\"older 连续代表元，最后以平移估计证明紧性。需要一般边界延拓时，完整证明统一采用上一节已经构造过的有界 $C^1$ 区域。
+
+\begin{theorem}[次临界一阶 Sobolev 嵌入]\label{thm:sobolev-main}
+设整数 $d\ge2$，$1\le p<d$，$p^*=dp/(d-p)$。对任意开集 $\Omega\subset\R^d$，
+\begin{equation}
+ \boxed{\|u\|_{p^*}\le C_{d,p}\|\nabla u\|_p,
+       \qquad u\in W^{1,p}_0(\Omega).}
+ \label{eq:sobolev-main}
+\end{equation}
+在全空间 $W^{1,p}(\R^d)$ 上也有同一估计。若 $\Omega$ 有界且为 $C^1$，一般非零边界函数满足
+\begin{equation}
+ \|u\|_{p^*}\le C_{\Omega,p}\big(\|u\|_p+\|\nabla u\|_p\big),
+ \qquad u\in W^{1,p}(\Omega).
+ \label{eq:sobolev-nonzero}
+\end{equation}
+\end{theorem}
+
+\subsection{基础积分引理：将不同坐标缺失的函数乘起来}
+
+\begin{lemma}[坐标乘积积分估计]\label{lem:sobolev-coordinate}
+对每个 $i=1,\ldots,d$，设非负可积函数 $A_i(\widehat x_i)$ 只依赖除 $x_i$ 以外的 $d-1$ 个变量，则
+\begin{equation}
+ \int_{\R^d}\prod_{i=1}^d A_i(\widehat x_i)^{1/(d-1)}\dd x
+ \le\prod_{i=1}^d
+       \left(\int_{\R^{d-1}}A_i\dd\widehat x_i\right)^{1/(d-1)}.
+ \label{eq:sobolev-coordinate}
+\end{equation}
+\end{lemma}
+\begin{proof}
+对维数归纳。$d=2$ 时是 $\iint A_1(x_2)A_2(x_1)=\int A_1\int A_2$。
+
+设 $d\ge3$，并假设 $d-1$ 维成立。先沿 $x_d$ 积分，$A_d$ 与它无关。对其余 $d-1$ 个因子用指数全为 $d-1$ 的 H\"older，令
+\[
+ G_i(\widehat x_i')=\int_\R A_i(\widehat x_i)\dd x_d
+ \quad(1\le i<d),\qquad x'=(x_1,\ldots,x_{d-1}).
+\]
+则原积分不超过
+\[
+ \int_{\R^{d-1}} A_d(x')^{1/(d-1)}
+                \prod_{i<d}G_i(\widehat x_i')^{1/(d-1)}\dd x'.
+\]
+设 $H(x')=\prod_{i<d}G_i^{1/(d-2)}$，上式的后半乘积为 $H^{(d-2)/(d-1)}$。再用共轭指数 $d-1$、$(d-1)/(d-2)$ 的 H\"older，上式不超过
+\[
+ \left(\int A_d\right)^{1/(d-1)}
+ \left(\int H\right)^{(d-2)/(d-1)}.
+\]
+对 $H$ 使用 $d-1$ 维归纳假设，即 $\int H\le\prod_{i<d}(\int G_i)^{1/(d-2)}$。而 Tonelli 给出 $\int G_i=\int A_i$。代入即可得到所需的全部 $d$ 个因子。
+\end{proof}
+
+\subsection{第一步：从微积分基本定理证明 \texorpdfstring{$W^{1,1}$}{W11} 估计}
+
+设 $v\in C_c^1(\R^d)$。固定除 $x_i$ 以外的变量，从负无穷积分，因紧支撑有
+\[
+ |v(x)|=\left|\int_{-\infty}^{x_i}\partial_i v(x_1,\ldots,s,\ldots,x_d)\dd s\right|
+ \le A_i(\widehat x_i):=\int_\R|\partial_i v|\dd x_i.
+\]
+将 $d$ 个不等式相乘并取 $1/(d-1)$ 次幂，得
+\[
+ |v(x)|^{d/(d-1)}\le\prod_{i=1}^d A_i(\widehat x_i)^{1/(d-1)}.
+\]
+积分并用刚证明的引理，再取 $(d-1)/d$ 次幂：
+\begin{align*}
+ \|v\|_{d/(d-1)}
+ &\le\prod_{i=1}^d\|\partial_i v\|_1^{1/d}\\
+ &\le\frac1d\sum_{i=1}^d\|\partial_i v\|_1
+ \le C_d\|\nabla v\|_1.
+\end{align*}
+于是
+\begin{equation}
+ \boxed{\|v\|_{d/(d-1)}\le C_d\|\nabla v\|_1.}
+ \label{eq:sobolev-w11}
+\end{equation}
+这是整个次临界嵌入证明的起点，且已经覆盖 $p=1$。
+
+\textbf{二维单独核对。}此时 $|v(x,y)|$ 同时不超过 $A(y)$ 与 $B(x)$，所以
+\[
+ |v|^2\le A(y)B(x),\qquad
+ \|v\|_2^2\le\|\partial_1v\|_1\|\partial_2v\|_1.
+\]
+
+\textbf{三维单独核对。}令 $A(y,z)=\int|\partial_1v|\dd x$、$B(x,z)=\int|\partial_2v|\dd y$、$C(x,y)=\int|\partial_3v|\dd z$。则
+\[
+ \iiint|v|^{3/2}\le\iiint(ABC)^{1/2}
+ \le(\|\partial_1v\|_1\|\partial_2v\|_1\|\partial_3v\|_1)^{1/2}.
+\]
+最后一个估计就是引理在 $d=3$ 时的三次 Cauchy--Schwarz。取 $2/3$ 次幂得到 $\|v\|_{3/2}\le C\|\nabla v\|_1$。
+
+\subsection{第二步：为什么必须选这个幂指数}
+
+设 $1<p<d$，先取 $u\in C_c^\infty(\R^d)$。希望把基础估计应用于 $v=|u|^\gamma$。左边会出现 $\|u\|_{\gamma d/(d-1)}^\gamma$；右边的导数乘积在 H\"older 后会出现 $\|u\|_{(\gamma-1)p'}^{\gamma-1}$。为了两侧使用同一个函数范数，要求
+\[
+ \frac{\gamma d}{d-1}=(\gamma-1)p'.
+\]
+这不是猜测，而是解一个代数方程。代入 $p'=p/(p-1)$，交叉相乘得
+\[
+ \gamma d(p-1)=p(d-1)(\gamma-1),\qquad
+ \gamma(d-p)=p(d-1).
+\]
+所以
+\begin{equation}
+ \gamma=\frac{p(d-1)}{d-p}>1,\qquad
+ \frac{\gamma d}{d-1}=(\gamma-1)p'=p^*=\frac{dp}{d-p}.
+ \label{eq:sobolev-power-choice}
+\end{equation}
+因为 $\gamma>1$，$|s|^\gamma$ 在零点也 $C^1$，故 $v\in C_c^1$；不需要宣称它无穷可微。逐项计算得
+\begin{align*}
+ \|u\|_{p^*}^{\gamma}
+ &\le C_d\|\nabla(|u|^\gamma)\|_1\\
+ &=C_d\gamma\int|u|^{\gamma-1}|\nabla u|\dd x\\
+ &\le C_d\gamma\|\nabla u\|_p
+      \left(\int|u|^{(\gamma-1)p'}\dd x\right)^{1/p'}\\
+ &=C_d\gamma\|\nabla u\|_p\|u\|_{p^*}^{\gamma-1}.
+\end{align*}
+若 $u$ 非零可除去 $\|u\|_{p^*}^{\gamma-1}$；若为零结论直接成立。这就证明了光滑函数版本。三维 $p=2$ 对应 $\gamma=4$：
+\[
+ \|u\|_6^4\le C\int|u|^3|\nabla u|
+ \le C\|u\|_6^3\|\nabla u\|_2.
+\]
+
+\subsection{第三步：光滑函数的估计怎样推广到 Sobolev 函数}
+
+\textbf{零边界情形。}若 $u\in W^{1,p}_0(\Omega)$，按定义取 $u_n\in C_c^\infty(\Omega)$，使其在 $W^{1,p}$ 范数中趋于 $u$。将各 $u_n$ 零延拓，已证估计用于差值：
+\[
+ \|u_n-u_m\|_{p^*}\le C\|\nabla u_n-\nabla u_m\|_p\to0.
+\]
+由 $L^{p^*}$ 完备性得到某个 $w\in L^{p^*}$。还须确认 $w=u$：对任意有限测度 $K\Subset\Omega$，
+\[
+ \|u-w\|_{L^1(K)}
+ \le |K|^{1-1/p}\|u-u_n\|_{L^p(K)}
+     +|K|^{1-1/p^*}\|u_n-w\|_{L^{p^*}(K)}\to0.
+\]
+故 $u=w$ a.e.，用可数穷竭覆盖区域即可。最后范数收敛允许在不等式两侧取极限，证明~\eqref{eq:sobolev-main}。
+
+\textbf{全空间情形。}上一节已经构造了 $C_c^\infty(\R^d)$ 的 $W^{1,p}$ 逼近，因此逐字重复上面的 Cauchy 与极限识别论证即可。
+
+\textbf{一般边界情形。}对有界 $C^1$ 区域，使用定理~\ref{thm:weak-extension} 的延拓 $Eu$，则
+\[
+ \|u\|_{L^{p^*}(\Omega)}
+ \le\|Eu\|_{L^{p^*}(\R^d)}
+ \le C\|\nabla Eu\|_{L^p(\R^d)}
+ \le C_\Omega\|u\|_{W^{1,p}(\Omega)}.
+\]
+延拓中的截断产生零阶项，所以不能删掉 $\|u\|_p$。非零常数也是立即可见的反例。至此定理~\ref{thm:sobolev-main} 的三个版本全部证明。
+
+\subsection{缩放推导临界指数，并构造不能改进的反例}
+
+令 $u_\lambda(x)=u(\lambda x)$，变量替换给出
+\[
+ \|u_\lambda\|_q=\lambda^{-d/q}\|u\|_q,\qquad
+ \|\nabla u_\lambda\|_p=\lambda^{1-d/p}\|\nabla u\|_p.
+\]
+若全空间的纯梯度估计 $\|u\|_q\le C\|\nabla u\|_p$ 对所有尺度成立且 $C$ 不变，则必须 $-d/q=1-d/p$，即 $q=p^*$。
+
+在有界区域内部一点 $x_0$ 附近，取非零 $\phi\in C_c^\infty(B_1)$，定义
+\[
+ u_n(x)=n^{d/p-1}\phi(n(x-x_0)),
+\]
+对充分大的 $n$ 支撑落在区域内。计算
+\begin{equation}
+ \|\nabla u_n\|_p=\|\nabla\phi\|_p,\quad
+ \|u_n\|_p=n^{-1}\|\phi\|_p,\quad
+ \|u_n\|_q=n^{d/p-1-d/q}\|\phi\|_q.
+ \label{eq:sobolev-concentration}
+\end{equation}
+若 $q>p^*$，最后指数为正，$L^q$ 范数发散，所以这种更高指数的连续嵌入一般不成立。若 $q=p^*$，范数恒为正，而 $u_n\to0$ a.e.，故不可能有 $L^{p^*}$ 强收敛子列。这同时解释端点连续但一般不紧。
+
+\subsection{临界情况 \texorpdfstring{$p=d$}{p=d}：有限次幂可以，端点无穷不可以}
+
+\begin{theorem}[临界有限指数嵌入]\label{thm:sobolev-critical}
+若 $d\ge2$，$\Omega$ 有界 $C^1$，则对每个 $1\le q<\infty$，
+\[
+ \|u\|_q\le C_{\Omega,q}\|u\|_{W^{1,d}},
+ \qquad u\in W^{1,d}(\Omega).
+\]
+\end{theorem}
+\begin{proof}
+$q\le d$ 时由有限测度上的 $L^d\hookrightarrow L^q$ 直接成立。若 $q>d$，选
+\[
+ r=\frac{dq}{d+q},\qquad1<r<d,\qquad\frac{dr}{d-r}=q.
+\]
+有限测度上的 H\"older 给出 $W^{1,d}\hookrightarrow W^{1,r}$。对 $r$ 使用已证的次临界一般边界嵌入：
+\[
+ \|u\|_q\le C_{\Omega,r}\|u\|_{W^{1,r}}
+ \le C_{\Omega,q}\|u\|_{W^{1,d}}.
+\]
+这说明每个有限 $q$ 都可以，但常数依赖 $q$，没有推出 $q=\infty$ 的估计。
+\end{proof}
+
+\begin{example}[临界无界函数的完整检查]\label{ex:sobolev-loglog}
+在 $d\ge2$、原点附近取 $u(x)=\log\log(e/|x|)$，再乘支撑于 $B_1$、原点附近为 1 的光滑截断。令 $r=|x|$，有
+\[
+ |u'(r)|=\frac1{r\log(e/r)},\qquad
+ \int_0^\delta|u'(r)|^dr^{d-1}\dd r
+ =\int_0^\delta\frac{\dd r}{r\log^d(e/r)}<\infty.
+\]
+最后的积分以 $s=\log(e/r)$ 化为 $\int^\infty s^{-d}\dd s$，因 $d>1$ 收敛。函数本身的 $d$ 次幂积分也收敛：同一换元后被指数衰减 $e^{-ds}$ 控制。去掉 $B_\varepsilon$ 分部积分时，内边界项不超过 $C\varepsilon^{d-1}\log\log(e/\varepsilon)\to0$，所以候选导数确实是弱导数，无额外原点质量。因此 $u\in W^{1,d}_0(B_1)$，但 $u$ 本质无界。特别二维 $H^1$ 不嵌入 $L^\infty$。
+\end{example}
+
+\subsection{Morrey 证明的核心：从线段平均得到奇核估计}
+
+设 $u\in C_c^\infty(\R^d)$，$B_r(x)$ 为球，记 $u_B=|B|^{-1}\int_Bu$。从沿线段的基本定理出发，
+\[
+ |u(x)-u(x+s\omega)|\le\int_0^s|\nabla u(x+t\omega)|\dd t.
+\]
+在球上取平均，极坐标和 Tonelli 给出
+\begin{align*}
+ |u(x)-u_{B_r(x)}|
+ &\le\frac1{|B_r|}\int_{\mathbb S^{d-1}}\int_0^r
+       \int_0^s|\nabla u(x+t\omega)|\dd t\,s^{d-1}\dd s\dd\omega\\
+ &\le C_d\int_{\mathbb S^{d-1}}\int_0^r
+                   |\nabla u(x+t\omega)|\dd t\dd\omega\\
+ &=C_d\int_{B_r(x)}\frac{|\nabla u(z)|}{|x-z|^{d-1}}\dd z.
+\end{align*}
+第二行使用 $|B_r|^{-1}\int_t^rs^{d-1}\dd s\le C_d$。这个核的分母次数来自极坐标体积元 $t^{d-1}$，不能凭空省略。
+
+若 $p>d$，则 $p'=p/(p-1)$ 满足 $(d-1)p'<d$。H\"older 的核积分为
+\begin{align*}
+ \left(\int_{B_r(x)}|x-z|^{-(d-1)p'}\dd z\right)^{1/p'}
+ &=\left(|\mathbb S^{d-1}|\int_0^r
+                 t^{d-1-(d-1)p'}\dd t\right)^{1/p'}\\
+ &=C_{d,p}r^{1-d/p}.
+\end{align*}
+因此
+\begin{equation}
+ |u(x)-u_{B_r(x)}|\le C_{d,p}r^{1-d/p}\|\nabla u\|_{L^p(B_r(x))}.
+ \label{eq:sobolev-morrey-average}
+\end{equation}
+这里恰好需要 $p>d$；当 $p=d$ 核积分临界发散，这说明证明在哪里失效。
+
+\subsection{Morrey 连续嵌入：两点估计、上界与代表元}
+
+\begin{theorem}[Morrey 不等式]\label{thm:sobolev-morrey}
+若 $d<p<\infty$，$\alpha=1-d/p$，则 $W^{1,p}(\R^d)$ 的每个 a.e. 等价类有唯一连续代表元，满足
+\begin{equation}
+ [u]_{C^{0,\alpha}}:=\sup_{x\ne y}\frac{|u(x)-u(y)|}{|x-y|^\alpha}
+ \le C\|\nabla u\|_p,\qquad
+ \|u\|_\infty\le C(\|u\|_p+\|\nabla u\|_p).
+ \label{eq:sobolev-morrey}
+\end{equation}
+有界 $C^1$ 区域上有 $W^{1,p}(\Omega)\hookrightarrow C^{0,\alpha}(\overline\Omega)$，估计由完整 Sobolev 范数控制。
+\end{theorem}
+\begin{proof}
+\textbf{两点之差。}先设 $u$ 光滑。取 $x\ne y$、$r=2|x-y|$，令 $E=B_r(x)\cap B_r(y)$。交集包含半径 $3r/4$、中心为 $(x+y)/2$ 的球，因此 $|E|\ge c_dr^d$。对 $z\in E$ 写
+\[
+ |u(x)-u(y)|\le |u(x)-u(z)|+|u(y)-u(z)|,
+\]
+在 $E$ 上平均。第一项不超过 $C_dr^{-d}\int_{B_r(x)}|u(x)-u(z)|\dd z$，第二项类似。沿上一小节的线段平均计算再用 H\"older，即得
+$|u(x)-u(y)|\le C r^\alpha\|\nabla u\|_p=C'|x-y|^\alpha\|\nabla u\|_p$。
+
+\textbf{本身的上界。}取半径 1 的球，利用~\eqref{eq:sobolev-morrey-average} 及 $|u_{B_1(x)}|\le |B_1|^{-1/p}\|u\|_p$，得到一致的 $\|u\|_\infty$ 估计。
+
+\textbf{推广与代表元。}取 $u_n\in C_c^\infty$ 使其在 $W^{1,p}$ 中趋于 $u$。上述两个估计用于 $u_n-u_m$，说明它们在完整 $C^{0,\alpha}$ 范数下 Cauchy，特别一致收敛到某个连续函数 $\widetilde u$。它在局部 $L^p$ 的极限与 $u$ 一致，所以是代表元；不等式取极限保留。两个连续代表元若 a.e. 相同，差若某点非零则在一个球内非零，与 a.e. 相同矛盾，故代表元唯一。一般边界情形先延拓到全空间，再限制至闭包即可。
+\end{proof}
+
+当 $p=\infty$，全空间 $W^{1,\infty}$ 具有 Lipschitz 代表元。可在光滑卷积上用线段基本定理得到 $|u_\varepsilon(x)-u_\varepsilon(y)|\le\|\nabla u\|_\infty|x-y|$，再用局部一致紧性与局部 $L^1$ 收敛识别代表元；这里无需 $W^{1,\infty}$ 范数的光滑稠密性。凸区域内也能直接沿线段估计；一般区域应考虑延拓或域的几何性质。
+
+\subsection{Poincar\'e：零边界版本的独立证明}
+
+\begin{theorem}[零边界 Poincar\'e]\label{thm:sobolev-poincare}
+若 $\Omega$ 有界，$1\le p<\infty$，则
+\begin{equation}
+ \|u\|_p\le C_\Omega\|\nabla u\|_p,
+ \qquad u\in W^{1,p}_0(\Omega).
+ \label{eq:sobolev-poincare}
+\end{equation}
+\end{theorem}
+\begin{proof}
+将区域平移后放进边长 $L$ 的立方体 $Q=(0,L)^d$。对 $u\in C_c^\infty(\Omega)$ 零延拓，有
+\[
+ u(x_1,x')=\int_0^{x_1}\partial_1u(s,x')\dd s.
+\]
+H\"older（$p=1$ 直接积分）给出
+\[
+ |u(x_1,x')|^p\le L^{p-1}\int_0^L|\partial_1u(s,x')|^p\dd s.
+\]
+再积分 $x_1,x'$ 得 $\|u\|_p^p\le L^p\|\partial_1u\|_p^p$。按 $W^{1,p}_0$ 定义逼近并取极限即可。这个证明不需要边界光滑，也不依赖后面的紧性定理。
+\end{proof}
+
+因此 $\|\nabla u\|_p$ 在零边界空间上是等价范数；在一般 $W^{1,p}$ 上仍只是半范数。三维的 Sobolev 嵌入再结合有限测度的 $L^6\hookrightarrow L^2$ 也能推出 $p=2$ 的零边界 Poincar\'e，但沿线积分证明适用范围更直接。
+
+\input{sections/sobolev-compactness-details}

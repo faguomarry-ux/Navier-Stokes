@@ -1,0 +1,141 @@
+% 接在流体唯一性估计之后，补充可直接使用的 PDE 工具及证明。
+\subsection{截断测试的应用：Poisson 方程的非负性}
+
+本小节取有界 $C^1$ 区域。设 $u\in H^1_0(\Omega)$ 满足 $\int\nabla u\cdot\nabla v=\int fv$，其中 $f\in L^2$、$f\ge0$。由弱链式法则及零迹性质，$u^-=\max(-u,0)\in H^1_0$，可合法作为测试函数；并且 $\nabla u^-=-\mathbf1_{\{u<0\}}\nabla u$。因此
+\[
+ -\|\nabla u^-\|_2^2=\int_\Omega fu^-\dd x\ge0.
+\]
+左侧非正，右侧非负，故 $\nabla u^-=0$，由 Poincar\'e 得 $u^-=0$，即 $u\ge0$ a.e.。这就是不依赖经典二阶可微性的弱最大值原理的一种基本形式。
+
+若担心“零迹经过非光滑截断仍保留”，可用前面零迹空间的证明：零延拓后负部仍在全空间 $H^1$，沿法向切片的边界值为零，故零迹刻画给出结论。更一般非齐次边界的比较原理需要相应的迹次序条件。
+
+\subsection{差商方法怎样产生二阶弱导数：Poisson 内部正则性}
+
+\begin{theorem}[内部 $H^2$ 正则性]\label{thm:sobolev-interior-h2}
+若 $u\in H^1(\Omega)$，$f\in L^2(\Omega)$，且 $-\Delta u=f$ 于分布意义，则 $u\in H^2_{\mathrm{loc}}(\Omega)$。对 $U\Subset\Omega$，有
+\[
+ \|D^2u\|_{L^2(U)}\le C_{U,\Omega'}
+       \big(\|f\|_{L^2(\Omega')}+\|u\|_{H^1(\Omega')}\big),
+\]
+其中可选固定中间子域 $U\Subset\Omega'\Subset\Omega$，常数依赖相互距离及截断。
+\end{theorem}
+\begin{proof}
+取 $0\le\eta\le1$，$\eta\in C_c^\infty(\Omega')$，$\eta=1$ 于 $U$ 邻域。固定方向 $i$，$h$ 足够小，使所有测试与平移支撑仍在 $\Omega'$ 内；记 $z=\delta_h^iu$。用
+\[
+ v=-\delta_{-h}^i(\eta^2z)
+\]
+测试弱方程。对固定 $h$，$z\in H^1$，因此 $v\in H^1_0$ 且紧支撑；可由内部光滑逼近将分布等式推广到这个测试函数，不要求 $u$ 预先具有二阶导数。
+
+离散分部积分 $\int a\delta_{-h}b=-\int(\delta_h a)b$ 由变量替换得到，且差商与已有的一阶弱导数交换，故
+\begin{align*}
+ \int\nabla u\cdot\nabla v
+ &=\int\delta_h^i\nabla u\cdot\nabla(\eta^2z)\\
+ &=\int\eta^2|\nabla z|^2+2\int\eta z\nabla z\cdot\nabla\eta.
+\end{align*}
+令 $A=\|\eta\nabla z\|_2$，$Z=\|z\|_{L^2(\operatorname{supp}\eta)}$。交叉项由 Young 控制为 $A^2/4+C_\eta Z^2$。
+
+右侧不对 $f$ 求导，而用差商的正向估计：
+\begin{align*}
+ \left|\int fv\right|
+ &\le\|f\|_{L^2(\Omega')}\|\delta_{-h}^i(\eta^2z)\|_2\\
+ &\le\|f\|_{L^2(\Omega')}\|\partial_i(\eta^2z)\|_2\\
+ &\le C_\eta\|f\|_{L^2(\Omega')}(A+Z)\\
+ &\le A^2/4+C_\eta\big(\|f\|_{L^2(\Omega')}^2+Z^2\big).
+\end{align*}
+合并并吸收后，$A^2\le C_\eta(\|f\|_2^2+Z^2)$。另一方面差商界给出 $Z\le C\|\nabla u\|_{L^2(\Omega')}$，因为 $z$ 的积分线段仍在固定子域内。因此对每个 $j$，$\delta_h^i(D_j u)$ 在 $L^2(U)$ 中一致有界。应用差商的反向判据，得到 $D_iD_j u\in L^2(U)$ 及所述估计。
+\end{proof}
+这里仅证明\textbf{内部}正则性。要得全局 $H^2(\Omega)$，还须处理边界形状、边界数据和方程系数；不能因 $f\in L^2$ 就在任意粗糙区域直接断言全局二阶正则。
+
+\subsection{无滑移边界下的 Korn 估计：对称梯度为何足够}
+
+流体应力依赖 $D\vct u=(\nabla\vct u+\nabla\vct u^{\mathsf T})/2$，而 Sobolev 范数依赖完整梯度。对 $\vct u\in C_c^\infty(\Omega)^d$，
+\[
+ 2\int|D\vct u|^2
+ =\int|\nabla\vct u|^2+
+   \sum_{i,j}\int(\partial_j u_i)(\partial_i u_j).
+\]
+交叉项两次分部积分给出
+\[
+ \sum_{i,j}\int(\partial_j u_i)(\partial_i u_j)
+ =-\sum_{i,j}\int u_i\partial_i\partial_j u_j
+ =\int(\nabla\cdot\vct u)^2.
+\]
+再由 $H^1_0$ 稠密性推广，得到恒等式
+\begin{equation}
+ \boxed{2\|D\vct u\|_2^2=\|\nabla\vct u\|_2^2
+                +\|\nabla\cdot\vct u\|_2^2,
+       \qquad\vct u\in H^1_0(\Omega)^d.}
+ \label{eq:sobolev-korn-zero}
+\end{equation}
+因此 $\|\nabla\vct u\|_2\le\sqrt2\|D\vct u\|_2$；再配合 Poincar\'e，黏性耗散控制完整的 $H^1_0$ 范数。若还无散，则 $2\|D\vct u\|_2^2=\|\nabla\vct u\|_2^2$，与不可压缩方程的两种黏性弱形式一致。
+
+没有零边界时，刚体转动 $\vct u(x)=Ax$、$A^{\mathsf T}=-A$ 满足 $D\vct u=0$ 而 $\nabla\vct u=A\ne0$，故不能直接使用这个估计。一般 Korn 定理须另加零阶项或去掉刚体运动；此处不证明该一般形式。
+
+\subsection{能量类还给出哪些时空可积性}
+
+三维中由空间插值
+$\|\vct u\|_{10/3}\le\|\vct u\|_2^{2/5}\|\vct u\|_6^{3/5}$，取 $10/3$ 次幂再积分时间，
+\begin{equation}
+ \int_0^T\|\vct u\|_{10/3}^{10/3}\dd t
+ \le C\left(\operatorname*{ess\,sup}_{0<t<T}\|\vct u(t)\|_2^{4/3}\right)
+       \int_0^T\|\nabla\vct u\|_2^2\dd t.
+ \label{eq:sobolev-spacetime-3d}
+\end{equation}
+所以三维能量类嵌入时空 $L^{10/3}((0,T)\times\Omega)$。二维则由 Ladyzhenskaya 得
+\[
+ \int_0^T\|\vct u\|_4^4\dd t
+ \le C\left(\operatorname*{ess\,sup}_{0<t<T}\|\vct u(t)\|_2^2\right)
+       \int_0^T\|\nabla\vct u\|_2^2\dd t,
+\]
+即二维能量类具有时空 $L^4$ 控制。这些指数由空间插值与时间积分共同决定，不能把每一时刻的 $L^6$ 控制误写成时间上的 $L^\infty_tL^6_x$ 控制。
+
+\subsection{一个可完整证明的时间紧性版本：有限模态与高频尾部}\label{subsec:sobolev-time-compact}
+
+下面给出前文 Aubin--Lions 用途的一个 Hilbert 空间证明。设 $V\Subset H$ 为稠密紧嵌入的 Hilbert 空间，选 $H$ 正交归一基 $e_j\in V$ 及 $\lambda_j\uparrow\infty$，使
+\[
+ \|v\|_H^2=\sum_j|(v,e_j)_H|^2,\qquad
+ \|v\|_V^2=\sum_j\lambda_j|(v,e_j)_H|^2.
+\]
+这种基可由紧自伴算子的谱定理构造：在 $V$ 的内积下解 $(Kf,v)_V=(f,v)_H$，再将 $K:H\to H$ 看作紧正自伴算子。谱定理在这里作为泛函分析基础引用。流体中对应 Stokes 特征模态。
+
+\begin{proposition}[能量界加时间导数界推出强紧性]\label{prop:sobolev-time-compact}
+若 $u_n$ 在 $L^\infty(0,T;H)\cap L^2(0,T;V)$ 中一致有界，$\partial_tu_n$ 在 $L^b(0,T;V^*)$ 中一致有界，某个 $b>1$，则有子列在 $L^2(0,T;H)$ 中强收敛。
+\end{proposition}
+\begin{proof}
+\textbf{低频模态紧。}对固定 $j$，$a_{n,j}(t)=(u_n(t),e_j)_H$ 的分布导数为 $\langle\partial_tu_n,e_j\rangle$，其 $L^b$ 范数不超过 $C\|e_j\|_V$。由一维弱导数定理，系数有绝对连续代表元，且
+\[
+ |a_{n,j}(t)-a_{n,j}(s)|\le C_j|t-s|^{1-1/b}.
+\]
+能量界还给出系数一致有界。因此对任意固定 $N$，有限个系数 $j\le N$ 可抽出一致收敛子列。沿 $N$ 取对角子列，所有有限模态同时紧。
+
+\textbf{高频尾部一致小。}令 $P_N$ 是前 $N$ 个模态的投影，则
+\[
+ \int_0^T\|(I-P_N)u_n\|_H^2\dd t
+ \le\lambda_{N+1}^{-1}\int_0^T\|u_n\|_V^2\dd t
+ \le C\lambda_{N+1}^{-1}\longrightarrow0.
+\]
+给定误差，先取 $N$ 使尾部足够小，再使子列指标足够大以控制前 $N$ 个模态，便得子列在 $L^2_tH$ 中 Cauchy。Bochner $L^2$ 完备性（可按标量 $L^p$ 完备性的求和子列法证明）给出强收敛极限。
+\end{proof}
+
+三维 Galerkin 序列的能量与非线性估计提供 $b=4/3$，因此这个命题已经足够支撑前文使用的时空 $L^2$ 强收敛。使用特征基投影时，$\|P_Nv\|_V\le\|v\|_V$，这也补足了近似方程中时间导数估计所需的投影稳定性。完整的 Navier--Stokes 弱解存在性仍需核对近似初值、极限测试、初值连续性及能量不等式，本专题只把关键函数空间步骤逐一证明。
+
+\subsection{新增练习：每题都检查一个证明环节}
+
+\begin{enumerate}
+ \item \textbf{基本引理。}为什么 $h*\rho_\varepsilon=0$ 本身还不能立刻推出 $h=0$？\\
+ \textit{解答：}必须用局部 $L^1$ 近似恒等性让 $\varepsilon\to0$，并在可数穷竭子集上识别极限。
+ \item \textbf{界面法向。}若把 $\Sigma$ 的法向反向，同时交换正负侧，式~\eqref{eq:weak-interface} 是否改变？\\
+ \textit{解答：}$[u]$ 与 $n_i$ 同时反号，乘积不变；这是检查符号的一种方法。
+ \item \textbf{差商端点。}在 $(-1,1)$ 上计算阶跃函数的 $\|\delta_hH\|_1$。\\
+ \textit{解答：}充分小 $h$ 时为 1。它的差商质量集中成 Dirac 质量，不能抽出 $L^1$ 弱收敛子列来完成反向判据。
+ \item \textbf{幂指数。}从 $\gamma d/(d-1)=(\gamma-1)p'$ 独立解出 $\gamma$ 和 $p^*$。\\
+ \textit{解答：}依次为 $p(d-1)/(d-p)$ 与 $dp/(d-p)$；检查 $d=3,p=2$ 得 $4,6$。
+ \item \textbf{Morrey 端点。}核 $|x-z|^{1-d}$ 在什么条件下属于局部 $L^{p'}$？\\
+ \textit{解答：}需 $(d-1)p'<d$，等价于 $p>d$。当 $p=d$ 时径向积分出现 $\int_0^r t^{-1}\dd t$。
+ \item \textbf{紧性顺序。}Rellich 证明中为何先选光滑尺度，再选序列指标？\\
+ \textit{解答：}先用一致光滑误差控制整个函数族，固定尺度后才有光滑序列的收敛；颠倒顺序不能给出统一的 Cauchy 估计。
+ \item \textbf{Korn。}对不可压缩无滑移场核对 $2\int|D\vct u|^2=\int|\nabla\vct u|^2$，并说明刚体转动为何不是反例。\\
+ \textit{解答：}恒等式含零边界假设，非零刚体转动一般不满足无滑移条件。
+ \item \textbf{时空指数。}求 $\theta$ 使 $3/10=\theta/2+(1-\theta)/6$，再核对式~\eqref{eq:sobolev-spacetime-3d}。\\
+ \textit{解答：}$\theta=2/5$，取 $10/3$ 次幂后两个指数为 $4/3$ 和 $2$，恰好能由动能上界及耗散积分控制。
+\end{enumerate}

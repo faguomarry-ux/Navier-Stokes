@@ -1,0 +1,367 @@
+% 先修：Lebesgue 积分、单调收敛、Fatou 引理、Tonelli/Fubini 定理。
+\section{从 Young 不等式到 \texorpdfstring{$L^p$}{Lp} 空间的完备性}\label{sec:lp-foundations}
+
+本专题服务于后面的流体弱解理论。学习主线是：先证明积分估计，再证明函数集合带范数，接着证明 Cauchy 序列在空间内有极限；最后把同样的方法用于函数及其弱导数。全文的 Sobolev 指索伯列夫空间，Young 指杨氏不等式，H\"older 指赫尔德不等式。
+
+\subsection{预备知识、几乎处处与学习路线}
+
+本专题使用 Lebesgue 积分。先承认以下测度积分定理：非负可测函数的单调收敛定理、Fatou 引理、Tonelli 定理及可积函数的 Fubini 定理。它们的测度论证明不在本专题内。记 $\Omega\subset\R^d$ 为非空开集，$|E|$ 为 Lebesgue 测度，$\|\cdot\|_p$ 默认在 $\Omega$ 上计算，$1\le p\le\infty$。
+
+“几乎处处”（a.e.）表示可以去掉一个零测集。例如仅在一点改变函数，不会改变任何 $L^p$ 积分。以下以实值标量函数为主；向量场按欧氏长度定义 $L^p$ 范数，各分量弱求导。复值情形将内积中的第二因子取共轭即可。
+
+\begin{keypoint}
+逻辑依赖是 Young $\Rightarrow$ H\"older $\Rightarrow$ Minkowski $\Rightarrow L^p$ 为赋范空间 $\Rightarrow L^p$ 完备 $\Rightarrow W^{k,p}$ 完备。嵌入定理再把“导数的可积性”转化为“函数更好的可积性或连续性”。
+\end{keypoint}
+
+\subsection{Young 不等式：先证明一个数的乘积估计}
+
+\begin{theorem}[Young 不等式]\label{thm:lp-young}
+设 $1<p<\infty$，共轭指数 $p'=p/(p-1)$，即 $1/p+1/p'=1$。对 $a,b\ge0$，
+\begin{equation}
+ ab\le\frac{a^p}{p}+\frac{b^{p'}}{p'},
+ \qquad\text{等号当且仅当 }a^p=b^{p'}.
+ \label{eq:lp-young}
+\end{equation}
+\end{theorem}
+\begin{proof}
+固定 $b$，考虑 $F(a)=a^p/p-ab+b^{p'}/p'$。其导数为 $F'(a)=a^{p-1}-b$，在 $a=b^{1/(p-1)}$ 处取得全局最小值。代入并用 $1/p+1/p'=1$ 得最小值为零；$b=0$ 的情形直接成立。这也给出等号条件。
+\end{proof}
+
+将 $a,b$ 换为 $\lambda a,b/\lambda$，可得常用于吸收项的版本：对任意 $\varepsilon>0$，
+\begin{equation}
+ ab\le\varepsilon a^p+C_{p,\varepsilon}b^{p'},\qquad
+ C_{p,\varepsilon}=\frac{(p\varepsilon)^{-p'/p}}{p'}.
+ \label{eq:lp-young-eps}
+\end{equation}
+尤其 $ab\le\varepsilon a^2+b^2/(4\varepsilon)$。能量估计中，选 $\varepsilon$ 足够小，就能把第一项并入左侧的黏性耗散。
+
+\subsection{定义 \texorpdfstring{$L^p$}{Lp}：为什么必须取等价类}
+
+先定义 $\mathcal L^p(\Omega)=\{f\text{ 可测}:\int_\Omega|f|^p\dd x<\infty\}$（$p<\infty$）。规定 $f\sim g$ 当且仅当 $f=g$ a.e.，取商空间
+\begin{equation}
+ L^p(\Omega)=\mathcal L^p(\Omega)/\!\sim,\qquad
+ \|f\|_p=\left(\int_\Omega|f|^p\dd x\right)^{1/p}.
+ \label{eq:lp-definition}
+\end{equation}
+定义时还不能直接宣称它是范数，三角不等式将在后面证明。若不取等价类，函数 $\mathbf1_{\{x_0\}}$ 逐点并非零函数，却有积分“长度”零，只能得到半范数。
+
+在 $p=\infty$ 时定义
+\begin{equation}
+ \|f\|_\infty=\operatorname*{ess\,sup}_{x\in\Omega}|f(x)|
+ =\inf\{M\ge0:|f|\le M\text{ a.e.}\},
+ \label{eq:lp-infinity}
+\end{equation}
+$L^\infty$ 是本质有界函数的 a.e. 等价类。例如 $f(1/n)=n$ 而其余点取零，普通上确界为无穷，本质上确界为零。$p=\infty$ 的符号不能解释成直接把无穷代入积分公式。
+
+\subsection{H\"older 不等式：从逐点估计到积分估计}
+
+\begin{theorem}[H\"older 不等式]\label{thm:lp-holder}
+若 $f\in L^p(\Omega)$、$g\in L^{p'}(\Omega)$，则 $fg\in L^1(\Omega)$ 且
+\begin{equation}
+ \boxed{\int_\Omega|fg|\dd x\le\|f\|_p\|g\|_{p'}.}
+ \label{eq:lp-holder}
+\end{equation}
+这里允许端点 $(p,p')=(1,\infty)$ 或 $(\infty,1)$。
+\end{theorem}
+\begin{proof}
+先设 $1<p<\infty$。任一范数为零时结论直接成立；否则令 $F=|f|/\|f\|_p$、$G=|g|/\|g\|_{p'}$。逐点应用 Young，再积分：
+\[
+ \int_\Omega FG\dd x
+ \le\frac1p\int_\Omega F^p\dd x+
+ \frac1{p'}\int_\Omega G^{p'}\dd x=1.
+\]
+乘回两个范数即得结论。在端点处用 $|fg|\le|f|\|g\|_\infty$ a.e. 后积分。
+\end{proof}
+
+非零函数且 $1<p<\infty$ 时，等号条件是 $|f|^p/\|f\|_p^p=|g|^{p'}/\|g\|_{p'}^{p'}$ a.e.。特别 $p=2$ 给出 Cauchy--Schwarz 不等式。
+
+反复使用 H\"older 可得多因子版本：若 $\sum_j1/p_j=1$，则 $\int\prod_j|f_j|\le\prod_j\|f_j\|_{p_j}$；若 $1/r=1/p+1/q$ 且 $r\ge1$，则
+\begin{equation}
+ \|fg\|_r\le\|f\|_p\|g\|_q.
+ \label{eq:lp-product}
+\end{equation}
+证明后式时，对 $|f|^r|g|^r$ 用指数 $p/r,q/r$ 的 H\"older，再取 $r$ 次根。后面三维对流项使用的指数是 $6,2,3$，因为 $1/6+1/2+1/3=1$。
+
+\subsection{Minkowski 不等式与范数三公理}
+
+\begin{theorem}[Minkowski 不等式]\label{thm:lp-minkowski}
+对 $f,g\in L^p(\Omega)$，有 $f+g\in L^p(\Omega)$，并且
+\begin{equation}
+ \boxed{\|f+g\|_p\le\|f\|_p+\|g\|_p.}
+ \label{eq:lp-minkowski}
+\end{equation}
+\end{theorem}
+\begin{proof}
+当 $1<p<\infty$，先由数函数 $s\mapsto s^p$ 的凸性得到
+$|f+g|^p\le2^{p-1}(|f|^p+|g|^p)$，所以 $f+g$ 已确定属于 $L^p$，避免后面除以一个未经证明有限的量。由 H\"older，
+\begin{align*}
+ \|f+g\|_p^p
+ &\le\int_\Omega (|f|+|g|)|f+g|^{p-1}\dd x\\
+ &\le(\|f\|_p+\|g\|_p)
+ \big\||f+g|^{p-1}\big\|_{p'}\\
+ &=(\|f\|_p+\|g\|_p)\|f+g\|_p^{p-1}.
+\end{align*}
+若 $\|f+g\|_p=0$ 则已成立，否则相除。$p=1$ 直接积分逐点三角不等式；$p=\infty$ 对 a.e. 不等式取本质上确界。
+\end{proof}
+
+现在逐条核对：
+\begin{enumerate}
+ \item 非负及正定性：$\|f\|_p\ge0$，且 $\|f\|_p=0\iff f=0$ a.e.，即商空间中的零元素；
+ \item 绝对齐次性：$\|cf\|_p=|c|\|f\|_p$；
+ \item 三角不等式：正是 Minkowski。
+\end{enumerate}
+加法、数乘对 a.e. 等价类良定义，由上面的可积性和齐次性封闭。因此 $L^p(\Omega)$ 是赋范线性空间。
+
+\begin{example}[为什么通常限制 $p\ge1$]
+在 $(0,2)$ 取 $f=\mathbf1_{(0,1)}$、$g=\mathbf1_{(1,2)}$。当 $0<p<1$，$\|f+g\|_p=2^{1/p}>2=\|f\|_p+\|g\|_p$，三角不等式失效。此时仍可研究 $L^p$，但这里的表达式不是范数。
+\end{example}
+
+\subsection{完备性：每个 Cauchy 序列都在空间内收敛}
+
+\begin{definition}[Cauchy、完备与 Banach 空间]
+若任意 $\varepsilon>0$ 都存在 $N$，使 $m,n\ge N$ 时 $\|f_n-f_m\|_p<\varepsilon$，称序列为 Cauchy。若每个这样的序列都有 $f\in L^p$ 满足 $\|f_n-f\|_p\to0$，空间称为完备；完备赋范空间称为 Banach 空间。
+\end{definition}
+
+\begin{theorem}[$L^p$ 完备性]\label{thm:lp-complete}
+对任意 $1\le p\le\infty$，$L^p(\Omega)$ 为 Banach 空间。$p=2$ 时还是内积 $\langle f,g\rangle=\int fg$ 诱导的 Hilbert 空间。
+\end{theorem}
+\begin{proof}
+先设 $p<\infty$，令 $(f_n)$ 为 Cauchy 序列。
+
+\textbf{第一步：抽取相邻差可求和的子列。}选递增的 $n_k$，使
+\[
+ \|f_{n_{k+1}}-f_{n_k}\|_p\le2^{-k}.
+\]
+令 $h_k=|f_{n_{k+1}}-f_{n_k}|$，$S_m=\sum_{k=1}^mh_k$。有限次 Minkowski 给出 $\|S_m\|_p\le\sum_{k=1}^m2^{-k}\le1$。
+
+\textbf{第二步：构造逐点极限，并证明它可积。}由于 $S_m\uparrow S=\sum_{k=1}^\infty h_k$，单调收敛定理给出 $\int S^p\le1$。所以 $S<\infty$ a.e.，且 $S\in L^p$。在这个满测集上，数列的差绝对可求和，故可定义
+\[
+ f=f_{n_1}+\sum_{k=1}^\infty(f_{n_{k+1}}-f_{n_k}).
+\]
+在例外零测集上任取零。$f$ 可测，且 $|f|\le|f_{n_1}|+S$，因此 $f\in L^p$。
+
+\textbf{第三步：从逐点收敛加强为范数收敛。}对 $T_k=\sum_{j=k}^\infty h_j$，再次用有限和的 Minkowski 与单调收敛，
+\[
+ \|f-f_{n_k}\|_p\le\|T_k\|_p
+ \le\sum_{j=k}^\infty2^{-j}=2^{1-k}\longrightarrow0.
+\]
+
+\textbf{第四步：恢复整个序列。}给定 $\varepsilon>0$，先令 Cauchy 尾部距离小于 $\varepsilon/2$，再取尾部子列元素使 $\|f_{n_k}-f\|_p<\varepsilon/2$。三角不等式给出 $\|f_n-f\|_p<\varepsilon$。
+
+最后处理 $p=\infty$。可取同样的子列。对每个 $k$，相邻差的逐点界 $|f_{n_{k+1}}-f_{n_k}|\le2^{-k}$ 在某个满测集上成立；再纳入 $f_{n_1}$ 的本质有界例外集。去掉这些\textbf{可数个}零测集的并后，级数在剩余集合上一致收敛，得到本质有界 $f$，且 $\|f-f_{n_k}\|_\infty\le2^{1-k}$。同样恢复全序列。$p=2$ 的内积性质直接由积分与 Cauchy--Schwarz 得到，完备性已经证明。
+\end{proof}
+
+\begin{warningbox}
+Cauchy 并不表示逐点单调，也不能未经论证直接写出逐点极限。证明的关键是\textbf{先抽取差范数可求和的子列}。完备性也不是说所有有界序列都收敛。
+\end{warningbox}
+
+\subsection{包含关系、插值与收敛的区别}
+
+若 $|\Omega|<\infty$ 且 $1\le p<q\le\infty$，对 $|f|^p\cdot1$ 使用 H\"older 得
+\begin{equation}
+ \|f\|_p\le|\Omega|^{1/p-1/q}\|f\|_q,
+ \qquad L^q(\Omega)\hookrightarrow L^p(\Omega).
+ \label{eq:lp-finite-inclusion}
+\end{equation}
+在无限测度区域上不能照搬，例如 $1\notin L^p(\R^d)$（$p<\infty$），但 $1\in L^\infty$。$(0,1)$ 上 $x^{-\alpha}\in L^p$ 当且仅当 $\alpha p<1$，说明有限测度下的包含一般也不可反向。
+
+若 $1\le a<b\le\infty$，$0\le\theta\le1$ 且 $1/r=\theta/a+(1-\theta)/b$，则
+\begin{equation}
+ \|f\|_r\le\|f\|_a^\theta\|f\|_b^{1-\theta}.
+ \label{eq:lp-interpolation}
+\end{equation}
+当指数有限时，把 $|f|^r$ 分成 $|f|^{\theta r}|f|^{(1-\theta)r}$，使用 H\"older 的指数 $a/(\theta r)$、$b/((1-\theta)r)$；$b=\infty$ 时直接提出本质上界。这是后面估计 $L^3,L^4$ 范数的工具。
+
+对于 $p<\infty$，范数收敛 $f_n\to f$ 推出依测度收敛，因为
+\[
+ |\{|f_n-f|>\varepsilon\}|\le\varepsilon^{-p}\|f_n-f\|_p^p.
+\]
+也能抽出 a.e. 收敛子列；可选 $\|f_{n_k}-f\|_p^p\le2^{-k}$，利用 Tonelli 得 $\sum_k|f_{n_k}-f|^p<\infty$ a.e.。但全序列不必逐点收敛。反过来，$f_n=n^{1/p}\mathbf1_{(0,1/n)}$ a.e. 趋零而 $\|f_n\|_p=1$，说明逐点收敛本身不足以推出范数收敛。
+
+当 $1<p<\infty$ 时，弱收敛写为 $f_n\rightharpoonup f$，可用 $\int f_ng\to\int fg$ 对所有 $g\in L^{p'}$ 检验。$L^p$ 的对偶表示与自反性属于进一步的泛函分析定理，这里陈述使用而不证明。自反性保证有界序列存在弱收敛子列；强收敛子列还需要紧性。
+
+\input{sections/weak-derivatives-details}
+
+\input{sections/sobolev-embedding-details}
+
+\section{Sobolev 工具怎样进入流体方程}\label{sec:sobolev-fluids}
+
+\subsection{负阶空间与 Poisson 弱解：一个完整应用}
+
+取有界区域 $\Omega$，记 $H^{-1}(\Omega)=(H^1_0(\Omega))^*$，配对记为 $\langle F,v\rangle$，定义
+\[
+ \|F\|_{H^{-1}}=\sup_{v\ne0}\frac{|\langle F,v\rangle|}{\|\nabla v\|_2}.
+\]
+这里采用 Poincar\'e 等价范数。若 $f\in L^2$，则 $\langle f,v\rangle=\int fv$ 连续，因为 $|\int fv|\le C\|f\|_2\|\nabla v\|_2$。三维中更一般有 $L^{6/5}\hookrightarrow H^{-1}$，因为 $|\int fv|\le\|f\|_{6/5}\|v\|_6\le C\|f\|_{6/5}\|\nabla v\|_2$。
+
+考虑 $-\Delta u=F$，$u|_{\partial\Omega}=0$。对经典光滑解乘测试函数并分部积分，再推广测试空间，得到
+\begin{equation}
+ \int_\Omega\nabla u\cdot\nabla v\dd x=\langle F,v\rangle,
+ \quad\forall v\in H^1_0(\Omega).
+ \label{eq:sobolev-poisson}
+\end{equation}
+反过来，以此为弱解定义，不要求二阶导数在 $L^2$。
+
+\begin{theorem}[Poisson 弱解的存在唯一性]
+对每个 $F\in H^{-1}$，有唯一 $u\in H^1_0$ 满足~\eqref{eq:sobolev-poisson}，且
+\[
+ \|\nabla u\|_2\le\|F\|_{H^{-1}}.
+\]
+\end{theorem}
+\begin{proof}
+由 Sobolev 完备性、闭子空间性质与 Poincar\'e，$H^1_0$ 在内积 $(u,v)_V=\int\nabla u\cdot\nabla v$ 下为 Hilbert 空间。使用 Hilbert 空间的 Riesz 表示定理，连续线性泛函 $F$ 唯一表示为 $(u,\cdot)_V$，得到存在性；Riesz 定理在此作为泛函分析基础定理引用。取 $v=u$ 得 $\|\nabla u\|_2^2\le\|F\|_{H^{-1}}\|\nabla u\|_2$，即估计。两解之差取为测试函数，得到差的梯度为零，再由 Poincar\'e 得两解相同。
+\end{proof}
+
+还可以直接展开能量 $J(v)=\frac12\|\nabla v\|_2^2-\langle F,v\rangle$：弱解满足
+$J(u+w)-J(u)=\frac12\|\nabla w\|_2^2$，所以是唯一极小点。这把本专题与后面变分法连接起来。更一般的有界、强制双线性型由 Lax--Milgram 定理处理。
+
+\subsection{无散空间、压力与对流三线性型}
+
+以下设 $\Omega$ 是有界光滑区域，$d=2$ 或 $3$，采用不可压缩、定密度、无滑移模型。令
+\[
+ \mathcal D_\sigma=\{\vct\varphi\in C_c^\infty(\Omega)^d:
+                       \nabla\cdot\vct\varphi=0\},\qquad
+ H=\overline{\mathcal D_\sigma}^{L^2},\qquad
+ V=\overline{\mathcal D_\sigma}^{H^1_0}.
+\]
+这一定义自动给出光滑无散测试场的稠密性和 $V\Subset H\hookrightarrow V^*$。不必先借助更深的边界 Helmholtz 分解来定义这些空间。对 $\vct u,\vct v,\vct w\in V$，令
+\begin{equation}
+ b(\vct u,\vct v,\vct w)
+ =\sum_{i,j=1}^d\int_\Omega u_i(\partial_i v_j)w_j\dd x.
+ \label{eq:sobolev-trilinear}
+\end{equation}
+三维中用 H\"older 的 $6,2,3$ 指数及嵌入、Poincar\'e，
+\begin{equation}
+ |b(\vct u,\vct v,\vct w)|
+ \le\|\vct u\|_6\|\nabla\vct v\|_2\|\vct w\|_3
+ \le C\|\nabla\vct u\|_2\|\nabla\vct v\|_2\|\nabla\vct w\|_2.
+ \label{eq:sobolev-b-bound}
+\end{equation}
+二维则用 $4,2,4$，同样连续。因而这个原先为光滑函数写下的非线性表达式，在 $V$ 中也确实有意义。
+
+对光滑无散场，分部积分给出
+\begin{align*}
+ b(\vct u,\vct v,\vct w)+b(\vct u,\vct w,\vct v)
+ &=\int_\Omega\vct u\cdot\nabla(\vct v\cdot\vct w)\dd x=0,\\
+ b(\vct u,\vct v,\vct v)&=0.
+\end{align*}
+再由稠密性和上述连续估计推广到 $V$。这是对流项在动能估计中消失的严格空间依据。
+
+令 $\pi=p/\rho_0$ 为运动学压力，$\nu=\mu/\rho_0>0$，并沿用全文 $\vct f$ 为单位质量力。不可压缩方程为
+\[
+ \partial_t\vct u+(\vct u\cdot\nabla)\vct u
+ -\nu\Delta\vct u+\nabla\pi=\vct f,\qquad\nabla\cdot\vct u=0.
+\]
+对所有 $\vct v\in V$，其无散弱形式为
+\begin{equation}
+ \langle\partial_t\vct u,\vct v\rangle
+ +\nu\int\nabla\vct u:\nabla\vct v
+ +b(\vct u,\vct u,\vct v)=\langle\vct f,\vct v\rangle.
+ \label{eq:sobolev-ns-weak}
+\end{equation}
+压力项因 $\int\nabla\pi\cdot\vct v=-\int\pi\nabla\cdot\vct v=0$ 而消失。恢复压力及其正则性还需 de Rham/inf--sup 等理论；不能从“测试式中没有压力”推断物理压力为零。
+
+\subsection{能量估计：Young 如何回到流体方程}
+
+先对光滑解或有限维 Galerkin 近似取 $\vct v=\vct u$，利用反对称性，
+\[
+ \frac12\frac{\mathrm d}{\mathrm dt}\|\vct u\|_2^2
+ +\nu\|\nabla\vct u\|_2^2
+ =\langle\vct f,\vct u\rangle
+ \le\|\vct f\|_{V^*}\|\nabla\vct u\|_2.
+\]
+Young 取 $\varepsilon=\nu/2$ 得
+\begin{equation}
+ \frac12\frac{\mathrm d}{\mathrm dt}\|\vct u\|_2^2
+ +\frac\nu2\|\nabla\vct u\|_2^2
+ \le\frac1{2\nu}\|\vct f\|_{V^*}^2.
+ \label{eq:sobolev-ns-energy}
+\end{equation}
+因此若 $\vct u_0\in H$、$\vct f\in L^2(0,T;V^*)$，自然的速度控制为
+\begin{equation}
+ \vct u\in L^\infty(0,T;H)\cap L^2(0,T;V).
+ \label{eq:sobolev-energy-space}
+\end{equation}
+其中 $L^2(0,T;V)$ 表示强可测的 $V$ 值函数且 $\int_0^T\|\vct u(t)\|_V^2\dd t<\infty$；$L^\infty$ 表示时间上的本质有界。
+
+对粗糙三维弱解，直接用自身作测试和写时间导数链式法则需要额外论证。经典构造先在 Galerkin 层得到等式，再以弱下半连续性得到极限的\textbf{能量不等式}。这里的计算给出先验界和构造路线，并不替代完整弱解存在性证明。
+
+\subsection{三维的非线性项与紧性：为什么需要强收敛}
+
+对空间中的 $\vct u\in V$，将导数移到测试场，使用 $4,4,2$ 的 H\"older 和 $L^2$--$L^6$ 插值，
+\begin{align*}
+ \|B(\vct u,\vct u)\|_{V^*}
+ &\le C\|\vct u\|_4^2\\
+ &\le C\|\vct u\|_2^{1/2}\|\vct u\|_6^{3/2}
+ \le C\|\vct u\|_2^{1/2}\|\nabla\vct u\|_2^{3/2}.
+\end{align*}
+故三维能量界给出 $B(\vct u,\vct u)\in L^{4/3}(0,T;V^*)$；形式方程因而控制 $\partial_t\vct u$ 于同一时间空间（有限 $T$ 下 $L^2_t\subset L^{4/3}_t$）。
+
+Galerkin 近似的导数估计需结合投影稳定性，例如使用 Stokes 特征函数基时正交投影在 $V$ 上有统一界。取得这些一致估计后，Aubin--Lions 以 $V\Subset H\hookrightarrow V^*$ 给出 $L^2(0,T;H)$ 强收敛子列。若 $\vct u_n\to\vct u$ 于时空 $L^2$，则
+\[
+ \|\vct u_n\otimes\vct u_n-\vct u\otimes\vct u\|_{L^1_{t,x}}
+ \le(\|\vct u_n\|_{L^2_{t,x}}+\|\vct u\|_{L^2_{t,x}})
+       \|\vct u_n-\vct u\|_{L^2_{t,x}}\to0.
+\]
+这足以使对流项对光滑测试场取极限。仅有弱收敛时，乘积一般不收敛到极限的乘积；在 $(0,2\pi)$ 上，$\sin(nx)\rightharpoonup0$ 于 $L^2$，而 $\sin^2(nx)\rightharpoonup1/2$ 于 $L^2$，已说明问题。
+
+\subsection{二维 Ladyzhenskaya 不等式及唯一性估计}
+
+\begin{proposition}[二维四次方估计]\label{prop:sobolev-lady}
+对 $u\in H^1_0(\Omega)$、$\Omega\subset\R^2$，
+\begin{equation}
+ \|u\|_4^2\le C\|u\|_2\|\nabla u\|_2.
+ \label{eq:sobolev-lady}
+\end{equation}
+\end{proposition}
+\begin{proof}
+先对零延拓后的光滑函数使用二维基础估计~\eqref{eq:sobolev-w11} 于 $v=u^2$：
+\[
+ \|u\|_4^2=\|u^2\|_2
+ \le C\|\nabla(u^2)\|_1
+ \le2C\|u\|_2\|\nabla u\|_2.
+\]
+再由 $H^1_0$ 的稠密性，对逼近序列的差使用该不等式，得到 $L^4$ 收敛并取极限。向量场通过逐分量估计得到相应版本。
+\end{proof}
+
+若两组二维能量类解 $\vct u,\vct v$ 具有相同初值和外力，令 $\vct w=\vct u-\vct v$。相应差方程的能量计算中，唯一剩下的对流项可估为
+\begin{align*}
+ |b(\vct w,\vct u,\vct w)|
+ &\le\|\vct w\|_4^2\|\nabla\vct u\|_2\\
+ &\le C\|\vct w\|_2\|\nabla\vct w\|_2\|\nabla\vct u\|_2\\
+ &\le\frac\nu2\|\nabla\vct w\|_2^2
+       +\frac C\nu\|\nabla\vct u\|_2^2\|\vct w\|_2^2.
+\end{align*}
+系数 $\|\nabla\vct u\|_2^2$ 时间可积，Gronwall 引理推出 $\vct w=0$。在严格证明中，二维估计还给出时间导数的 $L^2_tV^*$ 控制，从而可用 Hilbert 三元组链式法则正当化差方程测试；该时间链式法则在此引用。这解释了二维唯一性估计为什么能够在能量层闭合。
+
+三维相应插值是 $\|\vct w\|_4^2\le C\|\vct w\|_2^{1/2}\|\nabla\vct w\|_2^{3/2}$。Young 后会出现 $C\nu^{-3}\|\nabla\vct u\|_2^4\|\vct w\|_2^2$；能量界只提供梯度范数平方的时间可积性，不能据此获得四次方可积性。因此这里的推导不能推出一般三维能量类弱解唯一性。
+
+\input{sections/sobolev-pde-details}
+
+\subsection{基础复习题与解答要点}
+
+\begin{enumerate}
+ \item \textbf{归一化。}不直接引用 H\"older，证明 $\int|fg|\le\|f\|_3\|g\|_{3/2}$。\\
+ \textit{解答：}除以两个非零范数，应用 Young 的 $3,3/2$ 指数并积分，右侧为 $1/3+2/3=1$；零范数情形单独处理。
+ \item \textbf{有限测度包含。}若 $|\Omega|=8$，$f\in L^6$，证明 $\|f\|_2\le2\|f\|_6$。\\
+ \textit{解答：}$8^{1/2-1/6}=8^{1/3}=2$。说明这一结论不能推广到整个 $\R^3$。
+ \item \textbf{完备性。}为何 $u_n\to u$、$Du_n\to g$ 于 $L^p$ 还必须检验一个积分恒等式？\\
+ \textit{解答：}只有验证 $\int u\varphi'=-\int g\varphi$，才能确认 $g=Du$，而不是一个无关的函数极限。
+ \item \textbf{折角和跳跃。}计算 $D^2|x|$ 于 $(-1,1)$，判断 $|x|$ 是否在 $H^2$ 中。\\
+ \textit{解答：}$D|x|=\operatorname{sgn}x$，$D^2|x|=2\delta_0$，所以不在 $H^2$，尽管属于 $W^{1,\infty}$。
+ \item \textbf{三维插值。}证明 $\|u\|_3\le\|u\|_2^{1/2}\|u\|_6^{1/2}$，并核对 $L^4$ 的指数。\\
+ \textit{解答：}$1/3=(1/2)/2+(1/2)/6$；$1/4=(1/4)/2+(3/4)/6$，故 $\|u\|_4\le\|u\|_2^{1/4}\|u\|_6^{3/4}$。
+ \item \textbf{边界条件。}为什么一般 $H^1$ 函数不满足 $\|u\|_2\le C\|\nabla u\|_2$？\\
+ \textit{解答：}非零常数反例；需零迹、零均值或其他消除常数的条件。无滑移速度采用 $H^1_0$。
+ \item \textbf{临界失紧。}三维中取 $u_n=n^{1/2}\phi(n(x-x_0))$，分别算其 $L^2,L^6$ 和梯度 $L^2$ 范数。\\
+ \textit{解答：}依次为 $n^{-1}\|\phi\|_2$、$\|\phi\|_6$、$\|\nabla\phi\|_2$；这是 $H^1_0\hookrightarrow L^6$ 不紧的例子。
+ \item \textbf{流体指数。}三维能量类为何控制 $\partial_t\vct u$ 于 $L^{4/3}_tV^*$ 而非自动于 $L^2_tV^*$？\\
+ \textit{解答：}非线性上界含 $\|\nabla\vct u\|_2^{3/2}$，其 $4/3$ 次方才只需要梯度平方的时间积分。
+\end{enumerate}
+
+\subsection{证明范围与延伸阅读}
+
+本专题在积分不等式与完备性之后，详细证明弱导数唯一性、一维绝对连续刻画、切片、光滑逼近、乘积与链式法则、差商判据、有界 $C^1$ 区域上的一阶延拓与迹、任意维数的次临界一阶 Sobolev 嵌入、临界有限指数嵌入、Morrey、Rellich、两种 Poincar\'e、内部 $H^2$ 正则性、零边界 Korn 及一个 Hilbert 空间时间紧性命题。Poisson 与流体估计给出相应应用。测度积分与微分基础、单位分解、Riesz/Hahn--Banach、$L^p$ 结构、紧自伴谱理论和 Fourier--Plancherel 等工具明确作为基础引用。一般 Lipschitz 边界的全部技术、分数阶迹、一般 Aubin--Lions、压力重建及完整 Navier--Stokes 弱解存在性未在这里全部证明。
+
+可对照 John K. Hunter 的大学课程讲义
+\href{https://www.math.ucdavis.edu/~hunter/pdes/pde_notes.pdf}{\textit{Notes on Partial Differential Equations}}：第 1 章复习积分空间，第 3 章系统学习弱导数、逼近、嵌入与紧性，第 4 章连接椭圆弱形式，第 6 章连接演化方程和流体模型。本文证明按上述依赖关系重新组织；课后可进一步学习 Korn 不等式、分数阶空间、Helmholtz 投影和 Stokes 算子。

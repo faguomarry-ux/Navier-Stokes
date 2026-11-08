@@ -8,9 +8,19 @@
 可直接阅读[完整讲义 PDF](output/pdf/fluid_mechanics_from_conservation_to_ns.pdf)，校验记录见 `VALIDATION.md`。
 Git 跟踪 `output/pdf/` 中这一份正式 PDF；主文件旁的同名编译副本、辅助文件、`tmp/` 预览和缓存由 `.gitignore` 忽略。
 
-2026-11-09 更新至 **v1.5**：重写 Euler 与 Navier--Stokes--Fourier 推导，先逐条展开质量、三个方向的动量、总能量、内能，再从拉格朗日、欧拉与熵的角度对照，最后引入矩阵和特征分析。
+2026-11-09 更新至 **v1.7**：大幅展开弱导数与各类 Sobolev 嵌入的推导，补入边界、紧性、高阶/分数阶和 PDE 应用的证明，接在 Gauss--Green 公式之后、变分法之前。
 
-当前 PDF 共 **78 页**，本次重点为第 **16–21 节（35–57 页）**；各节有独立目录链接。
+当前 PDF 共 **108 页**，函数空间专题为第 **7–10 节（21–50 页）**；由 `sections/lp-sobolev.tex` 统一组织，细节分为五个源文件：
+
+- 第 7 节：Young → Hölder → Minkowski；几乎处处等价类；范数三公理；有限 `p` 及 `p=∞` 的完备性证明；包含关系、插值、强弱收敛。
+- 第 8 节（25–35 页）：`weak-derivatives-details.tex` 与 `sobolev-boundary-details.tex`。从分部积分、近似恒等、基本引理证明弱导数唯一性；展开分布、折角/跳跃/径向奇性/界面例子、一维绝对连续与高维切片、完备性、乘积/链式/截断、差商、反射延拓、迹及零迹空间。
+- 第 9 节（35–43 页）：`sobolev-embedding-details.tex` 与 `sobolev-compactness-details.tex`。完整证明任意维数 `d≥2` 的次临界一阶嵌入、临界有限指数嵌入、Morrey、Rellich 和两种 Poincaré；给出集中反例、三维 H² 嵌入与乘法代数、分数阶定义及 Fourier 对应。
+- 第 10 节（43–50 页）：保留 Poisson 与流体弱形式，并由 `sobolev-pde-details.tex` 增加截断测试、Poisson 内部 H² 差商证明、零边界 Korn、二维/三维时空指数和 Hilbert 空间时间紧性证明。共附 16 道练习及解答要点。
+- 一般边界延拓、迹与紧性的完整构造采用有界 C¹ 区域；零边界次临界嵌入和零边界 Poincaré 另给更一般的区域范围。基础工具、谱/Fourier 理论及未完整证明的进一步结果均明确标注；本次为作者侧自检，未经过独立数学审阅。
+
+此前 **v1.6** 建立函数空间专题初版，共 93 页；v1.7 保留其 Lᵖ 主线并重写、扩充弱导数与嵌入部分。
+
+此前 **v1.5** 重写 Euler 与 Navier--Stokes--Fourier 推导，先逐条展开质量、三个方向的动量、总能量、内能，再从拉格朗日、欧拉与熵的角度对照，最后引入矩阵和特征分析。该历史版本为 78 页；其章节在 v1.6 中已自动后移。
 
 - `sections/euler-three-views.tex`：物质体与固定控制体、三条动量的分量推导、压力功、内能、参考构形完整系统、热力学闭合。
 - `sections/ns-three-views.tex`：六个应力分量、黏性动量、四类能量通量、黏性生热、温度/压力/熵方程，以及参考热流和参考应力的变换。
